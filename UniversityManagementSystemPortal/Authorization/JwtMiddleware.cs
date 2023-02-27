@@ -8,14 +8,13 @@
     public class JwtMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IUserRepository _userRepository;
-        public JwtMiddleware(RequestDelegate next, IUserRepository userRepository)
+        //private readonly IUserRepository _userRepository;
+        public JwtMiddleware(RequestDelegate next)
         {
             _next = next;
-            _userRepository = userRepository;
         }
 
-        public async Task InvokeAsync(HttpContext context, IJwtTokenService jwtTokenService, IUserRepository userRepository)
+        public async Task InvokeAsync(HttpContext context, IJwtTokenService jwtTokenService)
         {
             string? token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 

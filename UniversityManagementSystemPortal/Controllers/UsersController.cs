@@ -36,8 +36,7 @@ namespace UniversityManagementSystemPortal.Controllers
             }
             return await _context.Users.ToListAsync();
         }
-        [HttpGet("Login")]
-        [AllowAnonymous]
+        [HttpPost("Login")]
         public async Task<ActionResult<User>> Login(Login model)
         {
             var response = _userRepository.Authenticate(model);
