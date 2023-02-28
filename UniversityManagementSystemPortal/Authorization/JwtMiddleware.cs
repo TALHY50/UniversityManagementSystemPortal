@@ -1,38 +1,37 @@
 ﻿namespace UniversityManagementSystemPortal.Authorization
+{ 
+
+    public class JwtMiddleware : IMiddleware
 {
-    using System;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Http;
-    using UniversityManagementSystemPortal.Interfce;
+    private readonly IJwtTokenService _jwtAuth;
 
-    public class JwtMiddleware
+    public JwtMiddleware(IJwtTokenService jwtAuth)
     {
-        private readonly RequestDelegate _next;
-        //private readonly IUserRepository _userRepository;
-        public JwtMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public async Task InvokeAsync(HttpContext context, IJwtTokenService jwtTokenService)
-        {
-            string? token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
-            if (token != null && jwtTokenService.ValidateToken(token))
-            {
-                // User is authenticated
-                await _next(context);
-            }
-            else if (context.Request.Path.StartsWithSegments("/api/authenticate"))
-            {
-                // Allow anonymous access to the authentication endpoint
-                await _next(context);
-            }
-            else
-            {
-                context.Response.StatusCode = 401;
-            }
-        }
+        _jwtAuth = jwtAuth;
     }
+
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        // Check if the HTTP request has an Authorization header with a JWT token
+        if (context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+        {
+            // Extract the JWT token from the Authorization header
+            var token = authHeader.ToString().Split(" ").Last();
+
+            // Validate the JWT token
+            var userId = _jwtAuth.ValidateJwtToken(token);
+
+            if (userId != null)
+            {
+                // If the JWT token is valid, set the authenticated user ID in the HTTP context
+                context.Items["UserId"] = userId;
+            }
+        }
+
+        // Call the next middleware in the pipeline
+        await next(context);
+    }
+}
+
 
 }

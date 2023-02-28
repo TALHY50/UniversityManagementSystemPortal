@@ -40,10 +40,10 @@ namespace UniversityManagementSystemPortal.Authorization
             var token = authorizationHeader.Substring("Bearer ".Length).Trim();
 
             // Check if token is valid
-            var isTokenValid = context.HttpContext.RequestServices.GetService(typeof(IJwtTokenService)) is IJwtTokenService jwtTokenService &&
-                               jwtTokenService.ValidateToken(token);
+            var jwtTokenService = context.HttpContext.RequestServices.GetService<IJwtTokenService>();
+            var userId = jwtTokenService?.ValidateJwtToken(token) ?? -1;
 
-            if (!isTokenValid)
+            if (userId == -1)
             {
                 context.Result = new UnauthorizedResult();
                 return;

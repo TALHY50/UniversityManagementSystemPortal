@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto;
-using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -36,8 +31,9 @@ namespace UniversityManagementSystemPortal.Controllers
             }
             return await _context.Users.ToListAsync();
         }
+        [JwtAuthorize("SuperAdmin")]
         [HttpPost("Login")]
-        public async Task<ActionResult<User>> Login(Login model)
+        public async Task<ActionResult<LoginView>> Login(Login model)
         {
             var response = _userRepository.Authenticate(model);
             return Ok(response);
@@ -59,9 +55,6 @@ namespace UniversityManagementSystemPortal.Controllers
 
             return user;
         }
-
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(Guid id, User user)
         {
@@ -90,9 +83,6 @@ namespace UniversityManagementSystemPortal.Controllers
 
             return NoContent();
         }
-
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
@@ -119,8 +109,6 @@ namespace UniversityManagementSystemPortal.Controllers
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
-
-        // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {

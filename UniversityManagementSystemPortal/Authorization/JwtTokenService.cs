@@ -9,11 +9,11 @@ using UniversityManagementSystemPortal.ModelDto;
 
 namespace UniversityManagementSystemPortal.Authorization
 {
-    public interface IJwtTokenService
+
+  public interface IJwtTokenService
     {
-        string GenerateToken(User user);
-        bool ValidateToken(string token);
-        string RefreshToken(string token);
+        string GenerateJwtToken(User user);
+        int? ValidateJwtToken(string token);
     }
 
     public class JwtTokenService : IJwtTokenService
@@ -27,88 +27,65 @@ namespace UniversityManagementSystemPortal.Authorization
             _context = context;
         }
 
-        public string GenerateToken(User user)
+        public string GenerateJwtToken(User user)
         {
+            // Get the user's roles
+            var roles = _context.UserRoles
+        .Where(ur => ur.UserId == user.Id)
+        .Select(ur => ur.Role);
+
+            // generate token that is valid for 7 days
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var roles = user.UserRoles.Select(ur => ur.Role.Name).ToArray();
-
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                new Claim("id", user.Id.ToString()),
-                new Claim("username", user.Username),
-                new Claim(ClaimTypes.Role, string.Join(",", roles))
-            }),
-                Expires = DateTime.UtcNow.AddMinutes(_appSettings.TokenExpirationMinutes),
+                Subject = new ClaimsIdentity(new[] {
+            new Claim("id", user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            // Add the user's roles to the claims
+            new Claim(ClaimTypes.Role, string.Join(",", roles.Select(r => r.Name)))
+        }),
+                Expires = DateTime.UtcNow.AddDays(7),
                 Issuer = "https://localhost:7003",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-
-        public bool ValidateToken(string token)
+        public int? ValidateJwtToken(string token)
         {
             if (token == null)
-                return false;
+                return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-
             try
             {
+
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     RequireExpirationTime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
+                    ValidIssuer = "https://localhost:7003",
                     ValidateAudience = false,
+                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
-                return validatedToken is JwtSecurityToken;
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+
+                // return user id from JWT token if validation successful
+                return userId;
             }
             catch
             {
-                return false;
+                // return null if validation fails
+                return null;
             }
         }
-
-        public string RefreshToken(string token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-
-            // Validate token
-            if (!tokenHandler.CanReadToken(token))
-                throw new SecurityTokenException("Invalid token");
-
-            var jwtToken = tokenHandler.ReadJwtToken(token);
-
-            // Get claims from the token
-            var claims = jwtToken.Claims;
-
-            // Check if the token has the necessary claims to refresh
-            if (!claims.Any(c => c.Type == "id" && Guid.TryParse(c.Value, out _)) ||
-                !claims.Any(c => c.Type == "username"))
-                throw new SecurityTokenException("Invalid token");
-
-            var userId = Guid.Parse(claims.First(c => c.Type == "id").Value);
-            var username = claims.First(c => c.Type == "username").Value;
-
-            // Get user by ID and username
-            var user = _context.Users.FirstOrDefault(u => u.Id == userId && u.Username == username);
-
-            if (user == null)
-                throw new SecurityTokenException("User not found");
-
-            // Generate new token
-            return GenerateToken(user);
-        }
     }
-
 
 }

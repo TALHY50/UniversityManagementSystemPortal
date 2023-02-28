@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace UniversityManagementSystemPortal.ModelDto
+namespace UniversityManagementSystemPortal.ModelDto.NewFolder
 {
     public class Login
     {

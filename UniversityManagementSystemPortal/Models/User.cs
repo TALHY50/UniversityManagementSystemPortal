@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementsystem.Models;
 
@@ -17,7 +18,7 @@ public partial class User
 
     public DateTime? DateOfBirth { get; set; }
 
-    public int? Gender { get; set; }
+    public Gender Gender { get; set; }
 
     public int? BloodGroup { get; set; }
 

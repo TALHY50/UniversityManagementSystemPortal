@@ -27,7 +27,7 @@ namespace UniversityManagementSystemPortal.Repository
                 throw new AppException("Username or password is incorrect");
 
             // authentication successful
-            var jwtToken = _jwtTokenService.GenerateToken(user);
+            var jwtToken = _jwtTokenService.GenerateJwtToken(user);
 
             return new LoginView(user, jwtToken);
         }

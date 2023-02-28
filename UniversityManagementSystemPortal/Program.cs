@@ -8,13 +8,17 @@ using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto;
 using UniversityManagementSystemPortal.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using UniversityManagementSystemPortal.RoleManager;
 
 var builder = WebApplication.CreateBuilder(args);
 {
     var services = builder.Services;
     var env = builder.Environment;
     builder.Services.AddDbContext<UmspContext>(opt =>
-     opt.UseSqlServer("NewAPI"));
+     opt.UseSqlServer("UniversityManagementSystemPortal"));
     builder.Services.AddControllersWithViews()
    .AddNewtonsoftJson(options =>
    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -26,13 +30,19 @@ var builder = WebApplication.CreateBuilder(args);
     // configure DI for application services
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-  
+    //builder.Services.AddScoped<IUserRoleManager, UserRoleManager>();
+    services.AddScoped<JwtMiddleware>();
+    //    builder.Services.AddIdentity<User, Role>(options => {
+    //        // Configure identity options
+    //    })
+    //.AddEntityFrameworkStores<UmspContext>()
+    //.AddDefaultTokenProviders();
 }
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "NEWS API", Version = "PRO" });
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "University Portal API", Version = "PRO" });
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -62,6 +72,22 @@ using (var rng = RandomNumberGenerator.Create())
 {
     rng.GetBytes(secret);
 }
+//var appSettings = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppSettings>();
+//var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        options.RequireHttpsMetadata = false;
+//        options.SaveToken = true;
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuerSigningKey = true,
+//            IssuerSigningKey = new SymmetricSecurityKey(key),
+//            ValidateIssuer = false,
+//            ValidateAudience = false,
+//            ClockSkew = TimeSpan.Zero
+//        };
+//    });
 var app = builder.Build();
 // global cors policy
 app.UseCors(x => x
@@ -74,6 +100,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseHttpsRedirection();
 // global error handler
 app.UseMiddleware<ErrorHandlerMiddleware>();
