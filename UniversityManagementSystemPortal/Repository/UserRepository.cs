@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto;
+using UniversityManagementSystemPortal.ModelDto.NewFolder;
+using UniversityManagementSystemPortal.ModelDto.UserDto;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -12,7 +16,9 @@ namespace UniversityManagementSystemPortal.Repository
         private readonly UmspContext _context;
         private IJwtTokenService _jwtTokenService;
         private readonly AppSettings _appSettings;
-        public UserRepository(UmspContext context, IJwtTokenService jwtTokenService, IOptions<AppSettings> appSettings)
+        public UserRepository(UmspContext context,
+            IJwtTokenService jwtTokenService,
+            IOptions<AppSettings> appSettings)
         {
             _context = context;
             _jwtTokenService = jwtTokenService;
@@ -32,10 +38,41 @@ namespace UniversityManagementSystemPortal.Repository
             return new LoginView(user, jwtToken);
         }
 
-
-        public Task<User> Delete(int id)
+        public async Task<User> RegisterAsUser(User model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (_context.Users.Any(x => x.Username == model.Username))
+                    throw new AppException("Username '" + model.Username + "' is already taken");
+
+                // set other properties
+                model.Id = Guid.NewGuid(); // generate a unique ID
+                model.EmailConfirmed = false;
+                model.IsActive = false;
+
+                // create a new UserRole object and assign it to the user
+                var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleType == RoleType.SuperAdmin);
+                var userRole = new UserRole
+                {
+                    User = model,
+                    Role = defaultRole
+                };
+                model.UserRoles.Add(userRole);
+
+                _context.Users.Add(model);
+                await _context.SaveChangesAsync();
+                return model;
+            }
+            catch (Exception ex)
+            {
+                throw new AppException($"An error occurred while registering user: {ex.Message}");
+            }
+        }
+
+
+        public async Task<IEnumerable<User>> GetAllAsync()
+        {
+            return await _context.Users.ToListAsync();
         }
 
         public List<User> GetAll()
@@ -43,19 +80,24 @@ namespace UniversityManagementSystemPortal.Repository
             throw new NotImplementedException();
         }
 
-        public Task<User> GetById(int id)
+        public async Task<User> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
+        public async Task UpdateAsync(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<User> Register(User model)
+        public async Task DeleteAsync(User user)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<User> Update(User model)
-        {
-            throw new NotImplementedException();
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
         }
     }
 }
+

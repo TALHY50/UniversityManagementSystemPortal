@@ -2,10 +2,8 @@
 
 namespace UniversityManagementSystemPortal.ModelDto.UserDto
 {
-    public class UserViewModel
+    public class RegistorViewModel
     {
-        public Guid Id { get; set; }
-
         public string FirstName { get; set; } = null!;
 
         public string? MiddleName { get; set; }
@@ -18,8 +16,6 @@ namespace UniversityManagementSystemPortal.ModelDto.UserDto
 
         public Gender Gender { get; set; }
 
-        public int? BloodGroup { get; set; }
-
         public string Email { get; set; } = null!;
 
         public string Username { get; set; } = null!;
@@ -28,16 +24,5 @@ namespace UniversityManagementSystemPortal.ModelDto.UserDto
 
         public string Password { get; set; } = null!;
 
-        public bool IsActive { get; set; }
-
-        public DateTime? LastLoggedIn { get; set; }
-
-        public DateTime? CreatedAt { get; set; }
-
-        public Guid? CreatedBy { get; set; }
-
-        public DateTime? UpdatedAt { get; set; }
-
-        public Guid? UpdatedBy { get; set; }
     }
 }

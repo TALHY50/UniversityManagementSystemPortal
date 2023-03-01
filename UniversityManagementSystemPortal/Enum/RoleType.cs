@@ -1,6 +1,11 @@
 ﻿namespace UniversityManagementSystemPortal.Enum
 {
-    public class RoleType
+    public enum RoleType
     {
+        SuperAdmin,
+        Admin,
+        Teacher,
+        Staff,
+        User,
     }
 }

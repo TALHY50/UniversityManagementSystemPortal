@@ -11,7 +11,7 @@ using UniversityManagementSystemPortal.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using UniversityManagementSystemPortal.RoleManager;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -26,12 +26,17 @@ var builder = WebApplication.CreateBuilder(args);
     // configure strongly typed settings object
     builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
     builder.Services.AddCors();
-    builder.Services.AddControllers();
+    builder.Services.AddControllers().AddJsonOptions(x =>
+    {
+        // serialize enums as strings in api responses (e.g. Role)
+        x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
     // configure DI for application services
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
     //builder.Services.AddScoped<IUserRoleManager, UserRoleManager>();
     services.AddScoped<JwtMiddleware>();
+    builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     //    builder.Services.AddIdentity<User, Role>(options => {
     //        // Configure identity options
     //    })

@@ -4,7 +4,8 @@ using System.Data;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfce;
-using UniversityManagementSystemPortal.ModelDto;
+using UniversityManagementSystemPortal.ModelDto.NewFolder;
+using UniversityManagementSystemPortal.ModelDto.UserDto;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -23,15 +24,15 @@ namespace UniversityManagementSystemPortal.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        {
-            if (_context.Users == null)
+        public async Task<ActionResult<IEnumerable<UserViewModel>>> GetUsers()
+        { 
+            if(_userRepository == null)
             {
-                return NotFound();
+                return BadRequest();
             }
-            return await _context.Users.ToListAsync();
+       var getUser =    await _userRepository.GetAllAsync();
+            return Ok(getUser);
         }
-        [JwtAuthorize("SuperAdmin")]
         [HttpPost("Login")]
         public async Task<ActionResult<LoginView>> Login(Login model)
         {
@@ -40,97 +41,47 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(Guid id)
+        public async Task<ActionResult<UserViewModel>> GetUser(Guid id)
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
+            if (_userRepository == null)
             {
-                return NotFound();
+                return BadRequest();
             }
-
-            return user;
+          var getUser=   await _userRepository.GetByIdAsync(id);
+            return Ok(getUser);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(Guid id, User user)
+        public async Task<ActionResult<RegistorViewModel>> PutUser(Guid id, User user)
         {
             if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            var updateUser =  _userRepository.UpdateAsync(user);
+            return Ok(updateUser);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
         }
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+     
+            [HttpPost]
+        public async Task<ActionResult<RegistorViewModel>> Post(RegistorViewModel user)
         {
-          if (_context.Users == null)
-          {
-              return Problem("Entity set 'UmspContext.Users'  is null.");
-          }
-            _context.Users.Add(user);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (UserExists(user.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
-        {
-            if (_context.Users == null)
-            {
-                return NotFound();
-            }
-            var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return BadRequest();
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            await _userRepository.RegisterAsUser(user);
+            return user;
         }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteUser(Guid id)
+        //{
+        //    _userRepository.DeleteAsync(id);
+        //}
 
-        private bool UserExists(Guid id)
-        {
-            return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        //private bool UserExists(Guid id)
+        //{
+        //    return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
+        //}
     }
 }

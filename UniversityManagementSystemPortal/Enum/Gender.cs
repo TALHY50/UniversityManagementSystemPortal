@@ -1,6 +1,8 @@
 ﻿namespace UniversityManagementSystemPortal.Enum
 {
-    public class Gender
+    public enum Gender
     {
+       Female,
+       Male
     }
 }
