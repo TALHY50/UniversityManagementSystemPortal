@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
@@ -11,7 +12,7 @@ using UniversityManagementSystemPortal.ModelDto.UserDto;
 namespace UniversityManagementSystemPortal.Repository
 {
 
-    public class UserRepository : IUserRepository
+    public class UserRepository : IUserInterface
     {
         private readonly UmspContext _context;
         private IJwtTokenService _jwtTokenService;
@@ -38,36 +39,19 @@ namespace UniversityManagementSystemPortal.Repository
             return new LoginView(user, jwtToken);
         }
 
-        public async Task<User> RegisterAsUser(User model)
+        public async Task<User> RegisterAsUser(User user)
         {
-            try
-            {
-                if (_context.Users.Any(x => x.Username == model.Username))
-                    throw new AppException("Username '" + model.Username + "' is already taken");
+            user.EmailConfirmed = false;
+            user.IsActive = true;
+            user.CreatedAt = DateTime.UtcNow;
+            user.Id = Guid.NewGuid();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
 
-                // set other properties
-                model.Id = Guid.NewGuid(); // generate a unique ID
-                model.EmailConfirmed = false;
-                model.IsActive = false;
-
-                // create a new UserRole object and assign it to the user
-                var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleType == RoleType.SuperAdmin);
-                var userRole = new UserRole
-                {
-                    User = model,
-                    Role = defaultRole
-                };
-                model.UserRoles.Add(userRole);
-
-                _context.Users.Add(model);
-                await _context.SaveChangesAsync();
-                return model;
-            }
-            catch (Exception ex)
-            {
-                throw new AppException($"An error occurred while registering user: {ex.Message}");
-            }
+            return user;
         }
+
+
 
 
         public async Task<IEnumerable<User>> GetAllAsync()
@@ -95,7 +79,7 @@ namespace UniversityManagementSystemPortal.Repository
 
         public async Task DeleteAsync(User user)
         {
-            _context.Users.Remove(user);
+            _context.Users.RemoveRange(user);
             await _context.SaveChangesAsync();
         }
     }

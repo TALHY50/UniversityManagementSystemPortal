@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class User
+public partial class User : IdentityUser<Guid>
 {
     public Guid Id { get; set; }
 

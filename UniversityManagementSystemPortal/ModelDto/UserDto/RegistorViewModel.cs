@@ -20,8 +20,6 @@ namespace UniversityManagementSystemPortal.ModelDto.UserDto
 
         public string Username { get; set; } = null!;
 
-        public bool EmailConfirmed { get; set; }
-
         public string Password { get; set; } = null!;
 
     }

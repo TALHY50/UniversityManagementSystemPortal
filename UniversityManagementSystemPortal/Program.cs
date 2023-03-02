@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
+using UniversityManagementSystemPortal.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -25,6 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
     // Add services to the container.
     // configure strongly typed settings object
     builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+    builder.Services.AddAutoMapper(typeof(Program).Assembly);
     builder.Services.AddCors();
     builder.Services.AddControllers().AddJsonOptions(x =>
     {
@@ -32,46 +35,52 @@ var builder = WebApplication.CreateBuilder(args);
         x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
     // configure DI for application services
-    builder.Services.AddScoped<IUserRepository, UserRepository>();
+    builder.Services.AddScoped<IUserInterface, UserRepository>();
     builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-    //builder.Services.AddScoped<IUserRoleManager, UserRoleManager>();
+    builder.Services.AddScoped<IRoleInterface, RoleRepository>();
+    builder.Services.AddScoped<IUserRoleInterface, UserRoleRepository>();
     services.AddScoped<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-    //    builder.Services.AddIdentity<User, Role>(options => {
-    //        // Configure identity options
-    //    })
-    //.AddEntityFrameworkStores<UmspContext>()
-    //.AddDefaultTokenProviders();
+    builder.Services.AddIdentity<User, Role>(options =>
+    {
+        // Configure identity options
+    })
+.AddEntityFrameworkStores<UmspContext>()
+.AddDefaultTokenProviders();
 }
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(option =>
+builder.Services.AddSwaggerGen(c =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "University Portal API", Version = "PRO" });
-    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "University Portal API", Version = "1.0" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
-        Name = "Authorization",
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
         Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
+        Scheme = "bearer",
+        BearerFormat = "JWT"
     });
-    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
                 Reference = new OpenApiReference
                 {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
-                }
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
             },
-            new string[]{}
+            new List<string>()
         }
     });
 });
+
 var secret = new byte[32];
 using (var rng = RandomNumberGenerator.Create())
 {

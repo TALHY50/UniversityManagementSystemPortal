@@ -9,7 +9,7 @@ using UniversityManagementSystemPortal.ModelDto.NewFolder;
 namespace UniversityManagementSystemPortal.Interfce
 {
 
-    public interface IUserRepository
+    public interface IUserInterface
     {
        LoginView Authenticate(Login model);
         Task<User> GetByIdAsync(Guid id);
