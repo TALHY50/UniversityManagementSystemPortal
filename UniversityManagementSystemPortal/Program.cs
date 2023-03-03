@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using UniversityManagementSystemPortal.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using UniversityManagementSystemPortal;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -39,14 +40,18 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
     builder.Services.AddScoped<IRoleInterface, RoleRepository>();
     builder.Services.AddScoped<IUserRoleInterface, UserRoleRepository>();
+    builder.Services.AddScoped<IInstituteAdminRepository, InstituteAdminRepository>();
+    builder.Services.AddScoped<IInstituteRepository, InstituteRepository>();
+    builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+    builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
     services.AddScoped<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-    builder.Services.AddIdentity<User, Role>(options =>
-    {
-        // Configure identity options
-    })
-.AddEntityFrameworkStores<UmspContext>()
-.AddDefaultTokenProviders();
+    //    builder.Services.AddIdentity<User, Role>(options =>
+    //    {
+    //        // Configure identity options
+    //    })
+    //.AddEntityFrameworkStores<UmspContext>()
+    //.AddDefaultTokenProviders();
 }
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

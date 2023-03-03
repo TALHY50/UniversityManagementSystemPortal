@@ -5,7 +5,7 @@ using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class User : IdentityUser<Guid>
+public partial class User 
 {
     public Guid Id { get; set; }
 

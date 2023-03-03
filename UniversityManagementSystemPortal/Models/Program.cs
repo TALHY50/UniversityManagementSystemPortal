@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementsystem.Models;
 
@@ -12,8 +14,9 @@ public partial class Program
     public string Name { get; set; } = null!;
 
     public string SectionName { get; set; } = null!;
-
-    public int GradingType { get; set; }
+    [JsonPropertyName("GradeType")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public GradeType GradingType { get; set; }
 
     public Guid? DepartmentId { get; set; }
 
