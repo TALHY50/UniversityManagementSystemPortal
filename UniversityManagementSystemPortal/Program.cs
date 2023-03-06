@@ -1,20 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System.Configuration;
-using System.Security.Cryptography;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto;
 using UniversityManagementSystemPortal.Repository;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using System.Text.Json.Serialization;
 using UniversityManagementSystemPortal.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using UniversityManagementSystemPortal;
+using UniversityManagementSystemPortal.PictureManager;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -43,6 +38,9 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IInstituteAdminRepository, InstituteAdminRepository>();
     builder.Services.AddScoped<IInstituteRepository, InstituteRepository>();
     builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+    builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+    builder.Services.AddScoped<IPictureManager, PictureManager>();
+    builder.Services.AddScoped<IStudentRepository, StudentRepository>();
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
     services.AddScoped<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -55,6 +53,7 @@ var builder = WebApplication.CreateBuilder(args);
 }
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "University Portal API", Version = "1.0" });
@@ -84,13 +83,15 @@ builder.Services.AddSwaggerGen(c =>
             new List<string>()
         }
     });
+
+    // Enable file upload in Swagger
+    c.OperationFilter<FileUploadOperationFilter>();
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1048576; // 1 MB limit
 });
 
-var secret = new byte[32];
-using (var rng = RandomNumberGenerator.Create())
-{
-    rng.GetBytes(secret);
-}
 //var appSettings = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppSettings>();
 //var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

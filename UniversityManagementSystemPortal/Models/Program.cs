@@ -14,6 +14,7 @@ public partial class Program
     public string Name { get; set; } = null!;
 
     public string SectionName { get; set; } = null!;
+    [JsonRequired]
     [JsonPropertyName("GradeType")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GradeType GradingType { get; set; }
