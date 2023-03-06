@@ -18,7 +18,7 @@
 //        private readonly IUserRoleInterface _userRoleRepository;
 //        private readonly IUserInterface _userRepository;
 
-//        public UserRoleController(IUserRoleInterface userRoleRepository, 
+//        public UserRoleController(IUserRoleInterface userRoleRepository,
 //            IUserInterface userRepository,
 //            UserManager<User> userManager,
 //            RoleManager<Role> roleManager)

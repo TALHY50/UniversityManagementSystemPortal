@@ -25,11 +25,6 @@ namespace UniversityManagementSystemPortal.Repository
                         .ThenInclude(p => p.Department)
                 .ToListAsync();
 
-            foreach (var student in students)
-            {
-                student.ProfilePath = GetProfilePicturePath(student.ProfilePath);
-            }
-
             return students;
         }
 

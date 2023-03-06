@@ -10,6 +10,10 @@ using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal;
 using UniversityManagementSystemPortal.PictureManager;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -40,8 +44,11 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
     builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
     builder.Services.AddScoped<IPictureManager, PictureManager>();
+    builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+    builder.Services.AddScoped<IPositionRepository, PositionRepository>();
     builder.Services.AddScoped<IStudentRepository, StudentRepository>();
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
+  //services.AddSingleton<IWebHostEnvironment>(env => new HostingEnvironment { EnvironmentName = env.EnvironmentName, WebRootPath = env.WebRootPath });
     services.AddScoped<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     //    builder.Services.AddIdentity<User, Role>(options =>
@@ -120,7 +127,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+//var NEWbuilder = WebHost.CreateDefaultBuilder(args)
+//    .UseContentRoot(Directory.GetCurrentDirectory())
+//    .UseStartup<Program>();
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+//    RequestPath = "/uploads"
+//});
 app.UseHttpsRedirection();
 // global error handler
 app.UseMiddleware<ErrorHandlerMiddleware>();

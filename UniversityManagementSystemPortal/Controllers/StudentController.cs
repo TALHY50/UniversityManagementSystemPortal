@@ -100,6 +100,13 @@ namespace UniversityManagementSystemPortal.Controllers
             {
                 return NotFound();
             }
+
+            // Delete profile picture
+            if (!string.IsNullOrEmpty(existingStudent.ProfilePath))
+            {
+                _pictureManager.Delete(existingStudent.ProfilePath);
+            }
+
             await _studentRepository.Delete(id);
             return NoContent();
         }

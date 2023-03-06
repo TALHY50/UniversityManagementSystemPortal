@@ -106,15 +106,15 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
     }
-    //[HttpDelete("{id}")]
-    //public async Task<IActionResult> DeleteUser(Guid id)
-    //{
-    //    _userRepository.DeleteAsync(id);
-    //}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(Guid id)
+    {
+        _userRepository.DeleteAsync(id);
+    }
 
-    //private bool UserExists(Guid id)
-    //{
-    //    return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
-    //}
+    private bool UserExists(Guid id)
+    {
+        return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
+    }
 
 }
