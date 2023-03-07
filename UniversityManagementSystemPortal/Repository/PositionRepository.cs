@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
 
 namespace UniversityManagementSystemPortal.Repository
@@ -22,8 +23,8 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (position == null)
             {
-                // handle null reference
-                throw new Exception($"Position with id {id} not found.");
+                
+                throw new AppException($"Position with id {id} not found.");
             }
 
             return position;
@@ -38,8 +39,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (positions == null)
             {
-                // handle null reference
-                throw new Exception("No positions found.");
+                throw new AppException("No positions found.");
             }
 
             return positions;
@@ -55,8 +55,8 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (positions == null)
             {
-                // handle null reference
-                throw new Exception($"No positions found with category id {categoryId}.");
+              
+                throw new AppException($"No positions found with category id {categoryId}.");
             }
 
             return positions;
@@ -66,8 +66,8 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (position == null)
             {
-                // handle null reference
-                throw new Exception("Position is null.");
+                
+                throw new AppException("Position is null.");
             }
 
             await _dbContext.Positions.AddAsync(position);
@@ -78,8 +78,7 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (position == null)
             {
-                // handle null reference
-                throw new Exception("Position is null.");
+                throw new AppException("Position is null.");
             }
 
             _dbContext.Positions.Update(position);
@@ -92,8 +91,8 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (position == null)
             {
-                // handle null reference
-                throw new Exception($"Position with id {id} not found.");
+                
+                throw new AppException($"Position with id {id} not found.");
             }
 
             _dbContext.Positions.Remove(position);

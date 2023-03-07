@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using UniversityManagementsystem.Models;
+using PorgramNamespace = UniversityManagementsystem.Models.Program;
 using UniversityManagementSystemPortal.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal
@@ -15,7 +16,7 @@ namespace UniversityManagementSystemPortal
 
             CreateMap<AddStudentDto, Student>();
             //.ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-            //.ForMember(dest => dest.Category, opt => opt.MapFrom(src => (Category)src.Category))
+            //.ForMember(dest => dest.Category, opt => opt.MapFrom(src => (Category)src.Category));
             //.ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
             //.ForMember(dest => dest.CreatedBy, opt => opt.MapFrom(src => src.CreatedBy.GetValueOrDefault()))
             //.ForMember(dest => dest.IsActive, opt => opt.MapFrom(_ => true))
@@ -23,6 +24,11 @@ namespace UniversityManagementSystemPortal
             //.ReverseMap();
 
             CreateMap<UpdateStudentDto, Student>();
+            CreateMap<User, UserReadModel>();
+            CreateMap<Department, DepartmentReadModel>();
+            CreateMap<PorgramNamespace, ProgramReadModel>();
+            CreateMap<StudentProgram, StudentProgramReadModel>();
+
         }
     }
 }

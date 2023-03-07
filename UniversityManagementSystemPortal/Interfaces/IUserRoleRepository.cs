@@ -2,13 +2,13 @@
 
 namespace UniversityManagementSystemPortal.Interfaces
 {
-    public interface IUserRoleInterface
+    public interface IUserRoleRepository
     {
-        Task AddUserRoleAsync(Guid roleId, Guid userId);
-        Task RemoveUserRoleAsync(Guid roleId, Guid userId);
         Task<UserRole> GetByIdAsync(Guid id);
         Task<IEnumerable<UserRole>> GetAllAsync();
+        Task AddAsync(UserRole userRole);
         Task UpdateAsync(UserRole userRole);
+        Task DeleteAsync(UserRole userRole);
     }
 
 }

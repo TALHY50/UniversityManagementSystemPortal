@@ -10,10 +10,15 @@ using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal;
 using UniversityManagementSystemPortal.PictureManager;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using UniversityManagementSystemPortal.IdentityServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Configuration;
+using UniversityManagementSystemPortal.CsvImport;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -38,7 +43,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IUserInterface, UserRepository>();
     builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
     builder.Services.AddScoped<IRoleInterface, RoleRepository>();
-    builder.Services.AddScoped<IUserRoleInterface, UserRoleRepository>();
+    builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
     builder.Services.AddScoped<IInstituteAdminRepository, InstituteAdminRepository>();
     builder.Services.AddScoped<IInstituteRepository, InstituteRepository>();
     builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -47,8 +52,11 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
     builder.Services.AddScoped<IPositionRepository, PositionRepository>();
     builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+    services.AddScoped(typeof(ImportExportService<>));
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
-  //services.AddSingleton<IWebHostEnvironment>(env => new HostingEnvironment { EnvironmentName = env.EnvironmentName, WebRootPath = env.WebRootPath });
+    builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+    builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityServices));
+    //services.AddSingleton<IWebHostEnvironment>(env => new HostingEnvironment { EnvironmentName = env.EnvironmentName, WebRootPath = env.WebRootPath });
     services.AddScoped<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     //    builder.Services.AddIdentity<User, Role>(options =>
@@ -99,22 +107,6 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = 1048576; // 1 MB limit
 });
 
-//var appSettings = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppSettings>();
-//var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddJwtBearer(options =>
-//    {
-//        options.RequireHttpsMetadata = false;
-//        options.SaveToken = true;
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuerSigningKey = true,
-//            IssuerSigningKey = new SymmetricSecurityKey(key),
-//            ValidateIssuer = false,
-//            ValidateAudience = false,
-//            ClockSkew = TimeSpan.Zero
-//        };
-//    });
 var app = builder.Build();
 // global cors policy
 app.UseCors(x => x
@@ -127,19 +119,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//var NEWbuilder = WebHost.CreateDefaultBuilder(args)
-//    .UseContentRoot(Directory.GetCurrentDirectory())
-//    .UseStartup<Program>();
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-//    RequestPath = "/uploads"
-//});
 app.UseHttpsRedirection();
 // global error handler
 app.UseMiddleware<ErrorHandlerMiddleware>();
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
