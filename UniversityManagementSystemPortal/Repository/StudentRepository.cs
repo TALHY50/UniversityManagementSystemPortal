@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.CsvImport;
+using UniversityManagementSystemPortal.CsvImport.dtomodels;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.PictureManager;
 
@@ -92,6 +95,38 @@ namespace UniversityManagementSystemPortal.Repository
         {
             return await _dbContext.Students.FirstOrDefaultAsync(s => s.AdmissionNo == admissionNo);
         }
-    }
+        //public void ImportStudentsFromCsv(string filePath)
+        //{
+        //    var studentDtos = ExcelHelper.ImportCsv<StudentDto>(filePath);
+        //    var students = _dbContext.Students
+        //        .Include(s => s.Institute)
+        //        .Include(s => s.StudentPrograms)
+        //            .ThenInclude(sp => sp.Program)
+        //                .ThenInclude(p => p.Department)
 
+        //         .Select(s => new CsvStudentDto
+        //         {
+        //             AdmissionNo = s.AdmissionNo,
+        //             FirstName = s.User.FirstName ?? string.Empty,
+        //             MiddleName = s.User.MiddleName,
+        //             LastName = s.User.LastName,
+        //             MobileNo = s.User.MobileNo,
+        //             DateOfBirth = s.User.DateOfBirth,
+        //             Gender = s.User.Gender ?? Gender.Male,
+        //             Email = s.User.Email ?? string.Empty,
+        //             Username = s.User.Username ?? string.Empty,
+        //             Category = s.Category,
+        //             Address = s.Address,
+        //             DepartmentCode = sp.de
+        //             DepartmentName = .Name ?? string.Empty,
+        //             InstituteName = s.Institute.Name,
+        //             InstituteType = (int)s.Institute.Type,
+        //             InstitutePhone = s.Institute.Phone,
+        //             InstituteEmail = s.Institute.Email,
+        //             InstituteAddress = s.Institute.Address
+        //         })
+        //         .ToList();
+        //}
+
+    }
 }

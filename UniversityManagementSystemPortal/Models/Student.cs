@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementsystem.Models;
 
@@ -11,7 +12,7 @@ public partial class Student
 
     public string AdmissionNo { get; set; } = null!;
 
-    public int? Category { get; set; }
+    public StudentCategory Category { get; set; }
 
     public string? Address { get; set; }
 
