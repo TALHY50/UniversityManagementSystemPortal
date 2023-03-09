@@ -30,7 +30,4 @@ namespace UniversityManagementSystemPortal.TrackableBaseEntity
             };
         }
     }
-
-
-}
 }
