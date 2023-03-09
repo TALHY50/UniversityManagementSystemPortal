@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Core.Types;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.CsvImport;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Student;
 using UniversityManagementSystemPortal.PictureManager;
@@ -16,21 +18,34 @@ namespace UniversityManagementSystemPortal.Controllers
         private readonly IMapper _mapper;
         private readonly IStudentRepository _studentRepository;
         private readonly IPictureManager _pictureManager;
-
-        public StudentController(IMapper mapper, IStudentRepository studentRepository, IPictureManager pictureManager)
+        private readonly ImportExportService<StudentDto> _importExportService;
+        public StudentController(IMapper mapper, IStudentRepository studentRepository, IPictureManager pictureManager, ImportExportService<StudentDto> importExportService)
         {
             _mapper = mapper;
             _studentRepository = studentRepository;
             _pictureManager = pictureManager;
+
+            _importExportService = importExportService;
         }
 
-        [HttpGet]
+        [HttpGet("ok")]
         public async Task<IActionResult> Get()
         {
             var students = await _studentRepository.Get();
             var studentDtos = _mapper.Map<List<StudentDto>>(students);
             return Ok(studentDtos);
         }
+        [HttpGet("export")]
+        public async Task<IActionResult> Export()
+        {
+            var students = await _studentRepository.Get();
+            var studentDtos = _mapper.Map<List<StudentDto>>(students);
+
+            var csvBytes = await _importExportService.ExportToCsvAsync(studentDtos);
+
+            return File(csvBytes, "text/csv", "students.csv");
+        }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -121,6 +136,30 @@ namespace UniversityManagementSystemPortal.Controllers
             var studentDto = _mapper.Map<StudentDto>(student);
             return Ok(studentDto);
         }
-    }
+        //[HttpPost]
+        //public IActionResult ImportStudents(IFormFile file)
+        //{
+        //    if (file == null || file.Length == 0)
+        //    {
+        //        return BadRequest("Please select a file to upload.");
+        //    }
 
+        //    var filePath = Path.GetTempFileName();
+
+        //    using (var stream = new FileStream(filePath, FileMode.Create))
+        //    {
+        //        file.CopyTo(stream);
+        //    }
+
+        //    var students = ExcelHelper.ImportCsv<StudentDto>(filePath);
+
+        //    foreach (var student in students)
+        //    {
+        //        _studentRepository.Add(student);
+        //    };
+
+        //    return Ok($"Imported {students.Count} students.");
+        //}
+    }
 }
+
