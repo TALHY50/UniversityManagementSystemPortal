@@ -13,7 +13,7 @@ namespace UniversityManagementSystemPortal.Authorization
   public interface IJwtTokenService
     {
         string GenerateJwtToken(User user);
-        int? ValidateJwtToken(string token);
+        Guid? ValidateJwtToken(string token);
     }
 
     public class JwtTokenService : IJwtTokenService
@@ -52,7 +52,7 @@ namespace UniversityManagementSystemPortal.Authorization
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        public int? ValidateJwtToken(string token)
+        public Guid? ValidateJwtToken(string token)
         {
             if (token == null)
                 return null;
@@ -61,7 +61,6 @@ namespace UniversityManagementSystemPortal.Authorization
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             try
             {
-
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     RequireExpirationTime = true,
@@ -75,7 +74,11 @@ namespace UniversityManagementSystemPortal.Authorization
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                var idClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "id");
+                if (idClaim == null || !Guid.TryParse(idClaim.Value, out Guid userId))
+                {
+                    return null;
+                }
 
                 // return user id from JWT token if validation successful
                 return userId;
@@ -86,6 +89,11 @@ namespace UniversityManagementSystemPortal.Authorization
                 return null;
             }
         }
+
+
+
+
+
     }
 
 }

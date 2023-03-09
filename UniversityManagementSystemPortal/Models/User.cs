@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using UniversityManagementSystemPortal.Enum;
+using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class User : IdentityUser<Guid>
+public partial class User : TrackableBaseEntity
 {
     public Guid Id { get; set; }
 

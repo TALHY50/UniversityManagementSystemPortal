@@ -14,16 +14,20 @@ namespace UniversityManagementSystemPortal.Repository
             _context = context;
         }
 
-        public async Task AddUserRoleAsync(Guid roleId, Guid userId)
+        public async Task AddUserRoleAsync(Guid? roleId, Guid? userId)
         {
-            var userRole = new UserRole {Id= Guid.NewGuid(), RoleId = roleId, UserId = userId };
+            if (!roleId.HasValue || !userId.HasValue)
+            {
+                throw new ArgumentException("RoleId and UserId cannot be null.");
+            }
+            var userRole = new UserRole { Id = Guid.NewGuid(), RoleId = roleId.Value, UserId = userId.Value };
             _context.UserRoles.Add(userRole);
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveUserRoleAsync(Guid roleId, Guid userId)
+        public async Task RemoveUserRoleAsync(Guid? roleId, Guid? userId)
         {
-            var userRole = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.RoleId == roleId && ur.UserId == userId);
+            var userRole = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.RoleId == roleId.Value && ur.UserId == userId.Value);
             if (userRole != null)
             {
                 _context.UserRoles.Remove(userRole);
