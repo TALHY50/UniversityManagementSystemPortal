@@ -56,6 +56,7 @@ namespace UniversityManagementSystemPortal.Repository
             return user;
         }
 
+
         public async Task UpdateAsync(User user)
         {
             if (user == null)
@@ -91,12 +92,6 @@ namespace UniversityManagementSystemPortal.Repository
             {
                 return null;
             }
-
-            if (!BCryptNet.Verify(model.Password, user.Password))
-            {
-                return null;
-            }
-
             return user;
         }
     }

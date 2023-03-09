@@ -2,24 +2,29 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Enum;
+using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Institute;
 using UniversityManagementSystemPortal.ModelDto.InstituteDto;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
+    [JwtAuthorize("SuperAdmin")]
     [Route("api/[controller]")]
     [ApiController]
     public class InstitutesController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IInstituteRepository _repository;
+        private readonly IIdentityServices _identityServices;
 
-        public InstitutesController(IMapper mapper, IInstituteRepository repository)
+        public InstitutesController(IMapper mapper, IInstituteRepository repository, IIdentityServices identityServices)
         {
             _mapper = mapper;
             _repository = repository;
+            _identityServices = identityServices;
         }
 
         [HttpGet("{id}")]
@@ -48,7 +53,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(InstituteCreateDto instituteCreateDto, InstituteType institutetype)
+        public async Task<ActionResult> Create([FromForm] InstituteCreateDto instituteCreateDto, InstituteType institutetype)
         {
             if (instituteCreateDto == null)
             {
@@ -56,16 +61,17 @@ namespace UniversityManagementSystemPortal.Controllers
             }
 
             var institute = _mapper.Map<Institute>(instituteCreateDto);
-            institute.IsAutoIncrementAdmissionNo = instituteCreateDto.IsAutoIncrementAdmissionNo; // Set the property value
+            institute.IsAutoIncrementAdmissionNo = instituteCreateDto.IsAutoIncrementAdmissionNo; 
 
+            institute.CreatedBy = _identityServices.GetUserId(); 
+            institute.UpdatedBy = _identityServices.GetUserId();
             await _repository.AddAsync(institute);
 
-            return CreatedAtAction(nameof(GetById), new { id = institute.Id }, institute);
+            return CreatedAtAction(nameof(GetById), new { id = institute.Id }, new { message = "Institute created successfully" });
         }
 
-
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(Guid id, InstituteUpdateDto instituteUpdateDto)
+        public async Task<ActionResult> Update([FromForm] Guid id, InstituteUpdateDto instituteUpdateDto)
         {
             if (instituteUpdateDto == null || id != instituteUpdateDto.Id)
             {
@@ -80,13 +86,30 @@ namespace UniversityManagementSystemPortal.Controllers
             }
 
             _mapper.Map(instituteUpdateDto, institute);
-            institute.IsAutoIncrementAdmissionNo = instituteUpdateDto.IsAutoIncrementAdmissionNo; // Set the property value
+            institute.IsAutoIncrementAdmissionNo = instituteUpdateDto.IsAutoIncrementAdmissionNo;
+
+            institute.UpdatedBy = _identityServices.GetUserId(); 
 
             await _repository.UpdateAsync(institute);
 
-            return NoContent();
+            return Ok(new { message = "Institute updated successfully" });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var institute = await _repository.GetByIdAsync(id);
+
+            if (institute == null)
+            {
+                return NotFound();
+            }
+            await _repository.DeleteAsync(id);
+
+            return Ok("Institute deleted successfully.");
         }
 
     }
+
 
 }

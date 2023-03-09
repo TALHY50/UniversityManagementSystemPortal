@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.ModelDto;
 
 namespace UniversityManagementSystemPortal.Authorization
@@ -29,10 +31,8 @@ namespace UniversityManagementSystemPortal.Authorization
 
         public string GenerateJwtToken(User user)
         {
-            // Get the user's roles
-            var roles = _context.UserRoles
-        .Where(ur => ur.UserId == user.Id)
-        .Select(ur => ur.Role);
+            // get user roles
+            var userRoles = _context.UserRoles.Include(ur => ur.Role).Where(ur => ur.UserId == user.Id).ToList();
 
             // generate token that is valid for 7 days
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -42,16 +42,18 @@ namespace UniversityManagementSystemPortal.Authorization
                 Subject = new ClaimsIdentity(new[] {
             new Claim("id", user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
-            // Add the user's roles to the claims
-            new Claim(ClaimTypes.Role, string.Join(",", roles.Select(r => r.Name)))
+            // add user roles as claims
+            new Claim(ClaimTypes.Role, string.Join(",", userRoles.Select(ur => ur.Role.Name)))
         }),
                 Expires = DateTime.UtcNow.AddDays(7),
-                Issuer = "https://localhost:7003",
+                Issuer = "https://localhost:7092",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+
         public Guid? ValidateJwtToken(string token)
         {
             if (token == null)

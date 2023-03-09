@@ -1,11 +1,8 @@
-﻿using UniversityManagementsystem.Models;
-using UniversityManagementSystemPortal.Enum;
-using UniversityManagementSystemPortal.ModelDto.InstituteDto;
-using UniversityManagementSystemPortal.ModelDto.Student;
+﻿using UniversityManagementSystemPortal.Enum;
 
-namespace UniversityManagementSystemPortal
+namespace UniversityManagementSystemPortal.ModelDto.Student
 {
-    public class StudentDto
+    public class StudentReadModel
     {
         public string AdmissionNo { get; set; } = null!;
         public string RoleNo { get; set; } = null!;
@@ -27,15 +24,12 @@ namespace UniversityManagementSystemPortal
 
         public string? Address { get; set; }
         public bool? IsActive { get; set; }
-        public BloodGroup? BloodGroup { get; set; }
+        public BloodGroup? BloodGroup { get; set; } 
 
         public string ProgramName { get; set; }
         public string? UserName { get; set; }
         public bool? EmailConfirm { get; set; }
-        public string? Password
-        {
-            get; set;
-
-        }
+        public string? Password { get; set; }
     }
+    
 }

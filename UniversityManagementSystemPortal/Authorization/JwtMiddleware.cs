@@ -1,37 +1,41 @@
-﻿namespace UniversityManagementSystemPortal.Authorization
+﻿using Microsoft.Extensions.Options;
+using UniversityManagementSystemPortal.Interfce;
+using UniversityManagementSystemPortal.ModelDto;
+using UniversityManagementSystemPortal.Repository;
+
+namespace UniversityManagementSystemPortal.Authorization
 { 
 
-    public class JwtMiddleware : IMiddleware
-{
-    private readonly IJwtTokenService _jwtAuth;
+    public class JwtMiddleware
+    { 
 
-    public JwtMiddleware(IJwtTokenService jwtAuth)
-    {
-        _jwtAuth = jwtAuth;
-    }
+        private readonly RequestDelegate _next;
+        private readonly AppSettings _appSettings;
+        private readonly string[] _roles;
 
-    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
-    {
-        // Check if the HTTP request has an Authorization header with a JWT token
-        if (context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+        public JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appSettings, string[] roles = null)
         {
-            // Extract the JWT token from the Authorization header
-            var token = authHeader.ToString().Split(" ").Last();
-
-            // Validate the JWT token
-            var userId = _jwtAuth.ValidateJwtToken(token);
-
-            if (userId != null)
-            {
-                // If the JWT token is valid, set the authenticated user ID in the HTTP context
-                context.Items["UserId"] = userId;
-            }
+            _next = next;
+            _appSettings = appSettings.Value;
+            _roles = roles;
         }
 
-        // Call the next middleware in the pipeline
-        await next(context);
+
+        public async Task InvokeAsync(HttpContext context, IUserInterface _userRepository, IJwtTokenService jwtTokenService)
+        {
+            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (token != null)
+            {
+                var userId = jwtTokenService.ValidateJwtToken(token);
+                if (userId != null)
+                {
+                    var user =await _userRepository.GetByIdAsync(userId.Value);
+                    context.Items["User"] = user;
+                }
+            }
+
+            await _next(context);
+        }
+
     }
-}
-
-
 }

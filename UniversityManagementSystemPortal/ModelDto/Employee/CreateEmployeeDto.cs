@@ -7,8 +7,8 @@
         public string? Address { get; set; }
         public DateTime? JoiningDate { get; set; }
         public Guid InstituteId { get; set; }
-        public IFormFile? ProfilePicture { get; set; }
         public Guid? DepartmentId { get; set; }
         public Guid? PositionId { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

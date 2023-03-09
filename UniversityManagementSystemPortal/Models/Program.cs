@@ -1,22 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using UniversityManagementSystemPortal.Enum;
+using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class Program
+public partial class Program : TrackableBaseEntity
 {
-    public Guid Id { get; set; }
+    [Key]
+    public Guid? Id { get; set; }
 
+    [Required]
+    [StringLength(50)]
     public string? Code { get; set; }
 
-    public string Name { get; set; } = null!;
+    [Required]
+    [StringLength(100)]
+    public string? Name { get; set; }
 
-    public string SectionName { get; set; } = null!;
-    [JsonRequired]
-    [JsonPropertyName("GradeType")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Required]
+    [StringLength(100)]
+    public string? SectionName { get; set; }
+
+    [Display(Name = "GradeType")]
+    [EnumDataType(typeof(GradeType))]
     public GradeType GradingType { get; set; }
 
     public Guid? DepartmentId { get; set; }

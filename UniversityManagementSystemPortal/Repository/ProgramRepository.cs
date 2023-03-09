@@ -2,6 +2,7 @@
 using PorgramNamespace = UniversityManagementsystem.Models.Program;
 using UniversityManagementsystem.Models;
 using Microsoft.AspNetCore.OutputCaching;
+using UniversityManagementSystemPortal.Authorization;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -24,7 +25,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (program == null)
             {
-                throw new ArgumentException($"Program with id {id} not found.");
+                throw new AppException($"Program with id {id} not found.");
             }
 
             return program;
@@ -39,7 +40,7 @@ namespace UniversityManagementSystemPortal.Repository
                 .ToListAsync();
             if(program == null)
             {
-                throw new ArgumentException($"Program not found.");
+                throw new AppException($"Program not found.");
             }
             return program;
         }
@@ -48,9 +49,10 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (program == null)
             {
-                throw new ArgumentNullException(nameof(program));
+                throw new AppException(nameof(program));
             }
             program.Id = Guid.NewGuid();
+            program.IsActive = false;
             _context.Programs.Add(program);
             await _context.SaveChangesAsync();
         }
@@ -59,7 +61,7 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (program == null)
             {
-                throw new ArgumentNullException(nameof(program));
+                throw new AppException(nameof(program));
             }
 
             _context.Entry(program).State = EntityState.Modified;
@@ -72,7 +74,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (programToDelete == null)
             {
-                throw new ArgumentException($"Program with id {id} not found.");
+                throw new AppException($"Program with id {id} not found.");
             }
 
             _context.Programs.Remove(programToDelete);

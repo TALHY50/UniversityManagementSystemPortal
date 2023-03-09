@@ -1,8 +1,14 @@
-﻿namespace UniversityManagementSystemPortal.Enum
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using System.ComponentModel.DataAnnotations;
+
+namespace UniversityManagementSystemPortal.Enum
 {
     public enum GradeType
     {
+        [Display(Name = "Relative Grade")]
         Relative,
-        absolute
+
+        [Display(Name = "Absolute Grade")]
+        Absolute
     }
 }

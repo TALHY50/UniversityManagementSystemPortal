@@ -1,16 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.Enum;
+using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
-using UniversityManagementSystemPortal.Repository;
 using AllowAnonymous = UniversityManagementSystemPortal.Authorization.AllowAnonymousAttribute;
 
 namespace UniversityManagementSystemPortal.Controllers
@@ -18,20 +15,22 @@ namespace UniversityManagementSystemPortal.Controllers
     [JwtAuthorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class AccountController : ControllerBase
     {
         private readonly IUserInterface _userRepository;
+        private readonly IIdentityServices _identityServices;
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
 
-        public UsersController(IUserInterface userRepository, IMapper mapper, IJwtTokenService jwtTokenService)
+        public AccountController(IUserInterface userRepository, IMapper mapper, IJwtTokenService jwtTokenService, IIdentityServices identityServices)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _jwtTokenService = jwtTokenService;
+            _identityServices = identityServices;
         }
-        [JwtAuthorize(RoleType.Admin, RoleType.User)]
-        // GET: api/Users
+
+        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserViewModel>>> GetUsers()
         {
@@ -39,8 +38,8 @@ namespace UniversityManagementSystemPortal.Controllers
             var userViewModels = _mapper.Map<IEnumerable<UserViewModel>>(getUsers);
             return Ok(new { message = "Successfully retrieved all users.", data = userViewModels });
         }
-        [JwtAuthorize(RoleType.Admin, RoleType.User)]
-        // GET: api/Users/5
+      
+   
         [HttpGet("{id}")]
         public async Task<ActionResult<UserViewModel>> GetUser(Guid id)
         {
@@ -54,16 +53,17 @@ namespace UniversityManagementSystemPortal.Controllers
             var userViewModel = _mapper.Map<UserViewModel>(getUser);
             return Ok(new { message = "Successfully retrieved user.", data = userViewModel });
         }
-        //[JwtAuthorize(RoleType.Admin, RoleType.User)]
-        [HttpPost]
-        public async Task<ActionResult<RegistorViewModel>> Post([FromBody] RegistorViewModel userViewModel)
+        [AllowAnonymous]
+        [HttpPost("post")]
+        public async Task<ActionResult<RegistorViewModel>> Post([FromForm] RegistorViewModel userViewModel)
         {
             if (userViewModel == null)
             {
                 return BadRequest(new { message = "User data is required." });
             }
-
             var user = _mapper.Map<User>(userViewModel);
+            user.CreatedBy = _identityServices.GetUserId();
+            user.UpdatedBy = _identityServices.GetUserId();
             var registeredUser = await _userRepository.RegisterAsUser(user);
 
             if (registeredUser == null)
@@ -74,16 +74,26 @@ namespace UniversityManagementSystemPortal.Controllers
             var mappedUserViewModel = _mapper.Map<RegistorViewModel>(registeredUser);
             return Ok(new { message = "Successfully registered user.", data = mappedUserViewModel });
         }
-        [JwtAuthorize(RoleType.Admin, RoleType.User)]
+
+        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<RegistorViewModel>> PutUser(Guid id, User user)
+        public async Task<ActionResult<RegistorViewModel>> PutUser([FromForm] Guid id, User user)
         {
             if (id != user.Id)
             {
                 return BadRequest(new { message = $"User ID in request body ({user.Id}) does not match ID in URL ({id})." });
             }
 
-            var updatedUser = _userRepository.UpdateAsync(user);
+            var userId = _identityServices.GetUserId();
+            if (userId == null)
+            {
+                return BadRequest(new { message = "User ID could not be retrieved." });
+            }
+
+            user.UpdatedBy = userId;
+           
+
+            var updatedUser =  _userRepository.UpdateAsync(user);
 
             if (updatedUser == null)
             {
@@ -94,6 +104,7 @@ namespace UniversityManagementSystemPortal.Controllers
             return Ok(new { message = "Successfully updated user.", data = updatedUserViewModel });
         }
 
+        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
@@ -122,9 +133,5 @@ namespace UniversityManagementSystemPortal.Controllers
             var loginView = new LoginView(user, jwtToken);
             return Ok(new { message = "Successfully logged in.", data = loginView });
         }
-
-
-
-
     }
 }

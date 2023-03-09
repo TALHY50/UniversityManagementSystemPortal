@@ -16,30 +16,22 @@ namespace UniversityManagementSystemPortal.Repository
 
         public async Task<InstituteAdmin> GetByIdAsync(Guid id)
         {
-            return await _context.InstituteAdmins
+            var instituteAdmin = await _context.InstituteAdmins
                 .Include(i => i.Institute)
                 .Include(i => i.User)
-                .FirstOrDefaultAsync(i => i.Id == id);
+                .SingleOrDefaultAsync(i => i.Id == id);
+
+            return instituteAdmin;
         }
 
         public async Task<InstituteAdmin> GetByUserIdAsync(Guid userId)
         {
-            return await _context.InstituteAdmins
+            var instituteAdmin = await _context.InstituteAdmins
                 .Include(i => i.Institute)
                 .Include(i => i.User)
-                .FirstOrDefaultAsync(i => i.UserId == userId);
-        }
+                .SingleOrDefaultAsync(i => i.UserId == userId);
 
-        public async Task<bool> IsSuperAdminAsync(Guid userId)
-        {
-            return await _context.InstituteAdmins
-                .AnyAsync(i => i.UserId == userId && i.InstituteId == null);
-        }
-
-        public async Task<bool> IsAdminAsync(Guid userId, Guid instituteId)
-        {
-            return await _context.InstituteAdmins
-                .AnyAsync(i => i.UserId == userId && i.InstituteId == instituteId);
+            return instituteAdmin;
         }
 
         public async Task AddAsync(InstituteAdmin instituteAdmin)
@@ -62,12 +54,13 @@ namespace UniversityManagementSystemPortal.Repository
 
         public async Task<IEnumerable<InstituteAdmin>> GetInstituteAdminsAsync(Guid instituteId)
         {
-            return await _context.InstituteAdmins
+            return await _context.InstituteAdmins.AsNoTracking()
                 .Include(i => i.User)
                 .Where(i => i.InstituteId == instituteId)
                 .ToListAsync();
         }
     }
+
 
 
 

@@ -3,8 +3,9 @@ using System.Data;
 using System.Globalization;
 using System.Reflection;
 using CsvHelper;
-using LinqToExcel.Attributes;
+using CsvHelper.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using UniversityManagementsystem.Models;
 namespace UniversityManagementSystemPortal.CsvImport
@@ -18,14 +19,37 @@ namespace UniversityManagementSystemPortal.CsvImport
             _dbContext = dbContext;
         }
 
+        public class CsvHelper<T>
+        {
+            public async Task<List<T>> ReadFromCsvAsync(Stream stream, ClassMap<T> map)
+            {
+                using var reader = new StreamReader(stream);
+                var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HeaderValidated = null, // disable header validation
+                    MissingFieldFound = null, // disable missing field validation
+                    PrepareHeaderForMatch = header => header.Header.ToLower(), // ignore case sensitivity
+                };
+                using var csv = new CsvReader(reader, csvConfig);
+                csv.Context.RegisterClassMap(map); // map the CSV columns to the class properties
+                var records = csv.GetRecords<T>().ToList();
+                return records;
+            }
+
         public async Task<List<T>> ReadFromCsvAsync(Stream stream)
         {
             using var reader = new StreamReader(stream);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HeaderValidated = null, // disable header validation
+                    MissingFieldFound = null, // disable missing field validation
+                    PrepareHeaderForMatch = header => header.Header.ToLower(), // ignore case sensitivity
+                };
+                using var csv = new CsvReader(reader, csvConfig);
             var records = csv.GetRecords<T>().ToList();
             return records;
         }
-
+        }
         public async Task<byte[]> ExportToCsvAsync(IEnumerable<T> data)
         {
             using var stream = new MemoryStream();
@@ -60,5 +84,4 @@ namespace UniversityManagementSystemPortal.CsvImport
             }
         }
     }
-
 }

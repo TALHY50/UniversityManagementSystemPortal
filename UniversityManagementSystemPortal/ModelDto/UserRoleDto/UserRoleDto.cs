@@ -1,4 +1,7 @@
-﻿namespace UniversityManagementSystemPortal.ModelDto.UserRoleDto
+﻿using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
+
+namespace UniversityManagementSystemPortal.ModelDto.UserRoleDto
 {
     public class UserRoleDto
     {
@@ -6,5 +9,8 @@
         public Guid? UserId { get; set; }
 
         public Guid? RoleId { get; set; }
+
+        public string? UserName { get; set; }
+        public string Roletype { get; set; }
     }
 }

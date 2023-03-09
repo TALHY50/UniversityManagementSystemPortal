@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.TrackableBaseEntity;
 
@@ -10,27 +12,42 @@ public partial class User : TrackableBaseEntity
 {
     public Guid Id { get; set; }
 
-    public string FirstName { get; set; } = null!;
+    [Required(ErrorMessage = "First name is required")]
+    [StringLength(50, ErrorMessage = "First name cannot exceed 50 characters")]
+    public string FirstName { get; set; }
 
     public string? MiddleName { get; set; }
 
+    [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
     public string? LastName { get; set; }
 
+    [RegularExpression(@"^\d{10}$", ErrorMessage = "Mobile number must be 10 digits")]
     public string? MobileNo { get; set; }
 
+    [DataType(DataType.Date)]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime? DateOfBirth { get; set; }
-
+    [Display(Name = "Gender")]
+    [EnumDataType(typeof(Gender))]
     public Gender Gender { get; set; }
 
-    public int? BloodGroup { get; set; }
+    [Display(Name = "BloodGroup")]
+    [EnumDataType(typeof(BloodGroup))]
+    public BloodGroup BloodGroup { get; set; }
 
-    public string Email { get; set; } = null!;
+    [Required(ErrorMessage = "Email is required")]
+    [EmailAddress(ErrorMessage = "Invalid email address")]
+    public string Email { get; set; }
 
-    public string Username { get; set; } = null!;
+    [Required(ErrorMessage = "Username is required")]
+    [StringLength(50, ErrorMessage = "Username cannot exceed 50 characters")]
+    public string Username { get; set; }
 
     public bool EmailConfirmed { get; set; }
 
-    public string Password { get; set; } = null!;
+    [Required(ErrorMessage = "Password is required")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character")]
+    public string Password { get; set; }
 
     public bool IsActive { get; set; }
 
@@ -51,4 +68,6 @@ public partial class User : TrackableBaseEntity
     public virtual ICollection<Student> Students { get; } = new List<Student>();
 
     public virtual ICollection<UserRole> UserRoles { get; } = new List<UserRole>();
+
+
 }

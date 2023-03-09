@@ -10,6 +10,7 @@
         public IFormFile? ProfilePicture { get; set; }
         public Guid? DepartmentId { get; set; }
         public Guid? PositionId { get; set; }
+        public Guid? UserId { get; set; }
         public bool? IsActive { get; set; }
     }
 }

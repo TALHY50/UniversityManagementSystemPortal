@@ -112,31 +112,7 @@ namespace UniversityManagementSystemPortal.Controllers
             return Ok(instituteAdminsDto);
         }
 
-        [HttpGet("user/{userId}/is-super-admin")]
-        public async Task<ActionResult<bool>> IsSuperAdmin(Guid userId)
-        {
-            var isSuperAdmin = await _repository.IsSuperAdminAsync(userId);
 
-            if (!isSuperAdmin)
-            {
-                return NotFound("User is not a super admin.");
-            }
-
-            return Ok(isSuperAdmin);
-        }
-
-        [HttpGet("user/{userId}/is-admin/{instituteId}")]
-        public async Task<ActionResult<bool>> IsAdmin(Guid userId, Guid instituteId)
-        {
-            var isAdmin = await _repository.IsAdminAsync(userId, instituteId);
-
-            if (!isAdmin)
-            {
-                return NotFound("User is not an admin for the specified institute.");
-            }
-
-            return Ok(isAdmin);
-        }
     }
 
 }

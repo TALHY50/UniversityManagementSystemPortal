@@ -5,7 +5,7 @@ using UniversityManagementSystemPortal.Interfaces;
 
 namespace UniversityManagementSystemPortal.Repository
 {
-    public class UserRoleRepository : IUserRoleInterface
+    public class UserRoleRepository : IUserRoleRepository
     {
         private readonly UmspContext _context;
 
@@ -14,45 +14,66 @@ namespace UniversityManagementSystemPortal.Repository
             _context = context;
         }
 
-        public async Task AddUserRoleAsync(Guid? roleId, Guid? userId)
-        {
-            if (!roleId.HasValue || !userId.HasValue)
-            {
-                throw new ArgumentException("RoleId and UserId cannot be null.");
-            }
-            var userRole = new UserRole { Id = Guid.NewGuid(), RoleId = roleId.Value, UserId = userId.Value };
-            _context.UserRoles.Add(userRole);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task RemoveUserRoleAsync(Guid? roleId, Guid? userId)
-        {
-            var userRole = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.RoleId == roleId.Value && ur.UserId == userId.Value);
-            if (userRole != null)
-            {
-                _context.UserRoles.Remove(userRole);
-                await _context.SaveChangesAsync();
-            }
-        }
-
         public async Task<UserRole> GetByIdAsync(Guid id)
         {
-            var userRole = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.Id == id);
+            if (id == Guid.Empty)
+            {
+                throw new ArgumentException("Invalid Guid value.", nameof(id));
+            }
+
+            var userRole = await _context.UserRoles
+                .Include(ur => ur.User)
+                .Include(ur => ur.Role)
+                .FirstOrDefaultAsync(ur => ur.Id == id);
+
             return userRole;
         }
 
         public async Task<IEnumerable<UserRole>> GetAllAsync()
         {
-            var userRoles = await _context.UserRoles.ToListAsync();
+            var userRoles = await _context.UserRoles
+                .Include(ur => ur.User)
+                .Include(ur => ur.Role)
+                .ToListAsync();
+
             return userRoles;
+        }
+
+        public async Task AddAsync(UserRole userRole)
+        {
+            if (userRole == null)
+            {
+                throw new ArgumentNullException(nameof(userRole));
+            }
+            userRole.Id = Guid.NewGuid();
+            await _context.UserRoles.AddAsync(userRole);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(UserRole userRole)
         {
+            if (userRole == null)
+            {
+                throw new ArgumentNullException(nameof(userRole));
+            }
+
             _context.UserRoles.Update(userRole);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(UserRole userRole)
+        {
+            if (userRole == null)
+            {
+                throw new ArgumentNullException(nameof(userRole));
+            }
+
+            _context.UserRoles.Remove(userRole);
+            await _context.SaveChangesAsync();
+        }
     }
+
+
 
 
 }

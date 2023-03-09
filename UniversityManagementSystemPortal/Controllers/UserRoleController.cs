@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto.UserRoleDto;
@@ -10,83 +14,90 @@ using UniversityManagementSystemPortal.ModelDto.UserRoleDto;
 namespace UniversityManagementSystemPortal.Controllers
 {
     [ApiController]
-    [Route("api/userroles")]
-    public class UserRoleController : ControllerBase
+    [Route("api/[controller]")]
+    public class UserRolesController : ControllerBase
     {
-        private readonly IUserRoleInterface _userRoleRepository;
-        private readonly IUserInterface _userRepository;
+        private readonly IUserRoleRepository _repository;
+        private readonly IMapper _mapper;
 
-        public UserRoleController(IUserRoleInterface userRoleRepository,
-            IUserInterface userRepository)
+        public UserRolesController(IUserRoleRepository repository, IMapper mapper)
         {
-            _userRoleRepository = userRoleRepository;
-            _userRepository = userRepository;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserRole>>> GetAllUserRoles()
-        {
-            var userRoles = await _userRoleRepository.GetAllAsync();
-            return Ok(userRoles);
+            _repository = repository;
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserRole>> GetUserRoleById(Guid id)
+        public async Task<ActionResult<UserRoleDto>> GetById(Guid id)
         {
-            var userRole = await _userRoleRepository.GetByIdAsync(id);
+            var userRole = await _repository.GetByIdAsync(id);
+
             if (userRole == null)
             {
                 return NotFound();
             }
-            return Ok(userRole);
+
+            var userRoleDto = _mapper.Map<UserRoleDto>(userRole);
+
+            return userRoleDto;
+        }
+        [JwtAuthorize("Admin")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAll()
+        {
+            var userRoles = await _repository.GetAllAsync();
+
+            var userRoleDtos = _mapper.Map<IEnumerable<UserRoleDto>>(userRoles);
+
+            return Ok(userRoleDtos);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUserRole([FromBody] UserRoleDto userRoleDto)
+        public async Task<ActionResult<UserRoleDto>> Create([FromQuery]CreateUserRoleDto createUserRoleDto)
         {
-            var user = await _userRepository.GetByIdAsync(userRoleDto.Id);
-            if (user == null)
-            {
-                return BadRequest(new { message = "User not found." });
-            }
+            var userRole = _mapper.Map<UserRole>(createUserRoleDto);
 
-            await _userRoleRepository.AddUserRoleAsync(userRoleDto.UserId, userRoleDto.RoleId);
-
-            return Ok(new { message = "User role created." });
+            await _repository.AddAsync(userRole);
+//        private readonly IUserRoleInterface _userRoleRepository;
+            var userRoleDto = _mapper.Map<UserRoleDto>(userRole);
+//            _userRepository = userRepository;
+            return CreatedAtAction(nameof(GetById), new { id = userRole.Id }, userRoleDto);
         }
-
-
+//            return Ok(userRoles);
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserRole(Guid id, [FromBody] UserRoleDto userRoleDto)
+        public async Task<IActionResult> Update([FromQuery] Guid id, CreateUserRoleDto createUserRoleDto)
         {
-            var userRole = await _userRoleRepository.GetByIdAsync(id);
+            var userRole = await _repository.GetByIdAsync(id);
+//            return Ok(userRole);
             if (userRole == null)
             {
-                return NotFound(new { message = "User role not found." });
+                return NotFound();
             }
+//                return BadRequest("User not found.");
+            _mapper.Map(createUserRoleDto, userRole);
 
-            userRole.RoleId = userRoleDto.RoleId;
-            userRole.UserId = userRoleDto.UserId;
-
-            await _userRoleRepository.UpdateAsync(userRole);
-
-            return Ok(new { message = "User role updated." });
+            await _repository.UpdateAsync(userRole);
+//            return CreatedAtAction(nameof(GetUserRoleById), new { id = createdUserRole.Id }, createdUserRole);
+            return NoContent();
         }
-
+//                return NotFound();
         [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveUserRole(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var userRole = await _userRoleRepository.GetByIdAsync(id);
+            var userRole = await _repository.GetByIdAsync(id);
+//            userRole.RoleId = userRoleDto.RoleId;
             if (userRole == null)
             {
-                return NotFound(new { message = "User role not found." });
+                return NotFound();
             }
 
-            await _userRoleRepository.RemoveUserRoleAsync(userRole.RoleId, userRole.UserId);
-
-            return Ok(new { message = "User role removed." });
+            await _repository.DeleteAsync(userRole);
+//            return NoContent();
+            return NoContent();
         }
     }
+//                return NotFound();
+
+//            await _userRoleRepository.RemoveUserRoleAsync(userRole.RoleId, userRole.UserId);
 
 
 

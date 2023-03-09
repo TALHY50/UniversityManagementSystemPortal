@@ -56,12 +56,17 @@ namespace UniversityManagementSystemPortal.Repository
             {
                 throw new AppException(nameof(category));
             }
+
             category.Id = Guid.NewGuid();
+            category.IsActive = true;
+            category.IsStaff = false;
+            category.IsFaculty = false;
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
 
             return category;
         }
+
 
         public async Task<Category> UpdateAsync(Category category)
         {
@@ -70,11 +75,23 @@ namespace UniversityManagementSystemPortal.Repository
                 throw new AppException(nameof(category));
             }
 
-            _context.Categories.Update(category);
+            var existingCategory = await GetByIdAsync(category.Id);
+            if (existingCategory == null)
+            {
+                throw new InvalidOperationException($"Category with ID {category.Id} not found.");
+            }
+
+            existingCategory.Name = category.Name;
+            existingCategory.IsActive = category.IsActive;
+            existingCategory.IsStaff = category.IsStaff;
+            existingCategory.IsFaculty = category.IsFaculty;
+
+            _context.Categories.Update(existingCategory);
             await _context.SaveChangesAsync();
 
-            return category;
+            return existingCategory;
         }
+
 
         public async Task DeleteAsync(Category category)
         {

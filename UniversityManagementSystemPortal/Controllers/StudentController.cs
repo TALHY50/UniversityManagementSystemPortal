@@ -1,16 +1,20 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol.Core.Types;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.CsvImport;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Student;
+using UniversityManagementSystemPortal.ModelDto.UserDto;
 using UniversityManagementSystemPortal.PictureManager;
+using UniversityManagementSystemPortal.Repository;
+
 
 namespace UniversityManagementSystemPortal.Controllers
 {
+    [JwtAuthorize]
     [ApiController]
     [Route("api/[controller]")]
     public class StudentController : ControllerBase
@@ -24,29 +28,30 @@ namespace UniversityManagementSystemPortal.Controllers
             _mapper = mapper;
             _studentRepository = studentRepository;
             _pictureManager = pictureManager;
-
             _importExportService = importExportService;
         }
-
-        [HttpGet("ok")]
+        [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
+        [HttpGet]
         public async Task<IActionResult> Get()
         {
             var students = await _studentRepository.Get();
             var studentDtos = _mapper.Map<List<StudentDto>>(students);
             return Ok(studentDtos);
         }
+        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpGet("export")]
         public async Task<IActionResult> Export()
         {
             var students = await _studentRepository.Get();
-            var studentDtos = _mapper.Map<List<StudentDto>>(students);
+            var studentDtos = _mapper.Map<List<StudentReadModel>>(students);
+            var studentDtosEnumerable = studentDtos.Select(s => _mapper.Map<StudentDto>(s));
+            var csvBytes = await _importExportService.ExportToCsvAsync(studentDtosEnumerable);
 
-            var csvBytes = await _importExportService.ExportToCsvAsync(studentDtos);
 
             return File(csvBytes, "text/csv", "students.csv");
         }
 
-
+        [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -58,7 +63,7 @@ namespace UniversityManagementSystemPortal.Controllers
             var studentDto = _mapper.Map<StudentDto>(student);
             return Ok(studentDto);
         }
-
+        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPost]
         public async Task<IActionResult> Add([FromForm] AddStudentDto addStudentDto, IFormFile picture)
         {
@@ -90,11 +95,34 @@ namespace UniversityManagementSystemPortal.Controllers
             var addedStudentDto = _mapper.Map<StudentDto>(addedStudent);
             return Ok(addedStudentDto);
         }
-    
+        
 
+        [HttpGet("{admissionNo}")]
+        public async Task<IActionResult> GetByAdmissionNo(string admissionNo)
+        {
+            var student = await _studentRepository.GetByAdmissionNo(admissionNo);
+            if (student == null)
+            {
+                return NotFound();
+            }
+            var studentDto = _mapper.Map<StudentDto>(student);
+            return Ok(studentDto);
+        }
+        [JwtAuthorize("Admin", "SuperAdmin")]
+        [HttpPost("Import")]
+        public IActionResult Uploads(IFormFile file)
+        {
+            var result = _studentRepository.Upload(file);
 
+            //if (result is null)
+            //{
+            //    return BadRequest("Unable to upload file.");
+            //}
 
-    [HttpPut("{id}")]
+            return Ok(result);
+        }
+        [JwtAuthorize("Admin", "SuperAdmin")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromForm] UpdateStudentDto updateStudentDto)
         {
             var existingStudent = await _studentRepository.GetById(id);
@@ -106,7 +134,7 @@ namespace UniversityManagementSystemPortal.Controllers
             var updatedStudentDto = _mapper.Map<StudentDto>(updatedStudent);
             return Ok(updatedStudentDto);
         }
-
+        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -125,41 +153,8 @@ namespace UniversityManagementSystemPortal.Controllers
             await _studentRepository.Delete(id);
             return NoContent();
         }
-        [HttpGet("{admissionNo}")]
-        public async Task<IActionResult> GetByAdmissionNo(string admissionNo)
-        {
-            var student = await _studentRepository.GetByAdmissionNo(admissionNo);
-            if (student == null)
-            {
-                return NotFound();
-            }
-            var studentDto = _mapper.Map<StudentDto>(student);
-            return Ok(studentDto);
-        }
-        //[HttpPost]
-        //public IActionResult ImportStudents(IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0)
-        //    {
-        //        return BadRequest("Please select a file to upload.");
-        //    }
+        
 
-        //    var filePath = Path.GetTempFileName();
-
-        //    using (var stream = new FileStream(filePath, FileMode.Create))
-        //    {
-        //        file.CopyTo(stream);
-        //    }
-
-        //    var students = ExcelHelper.ImportCsv<StudentDto>(filePath);
-
-        //    foreach (var student in students)
-        //    {
-        //        _studentRepository.Add(student);
-        //    };
-
-        //    return Ok($"Imported {students.Count} students.");
-        //}
     }
 }
 

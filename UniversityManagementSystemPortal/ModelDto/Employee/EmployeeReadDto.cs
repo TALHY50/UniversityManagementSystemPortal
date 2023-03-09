@@ -2,8 +2,7 @@
 
 namespace UniversityManagementSystemPortal.ModelDto.Employee
 {
-    public class EmployeeDto
-
+    public class EmployeeReadDto
     {
         public Guid Id { get; set; }
         public string FirstName { get; set; } = null!;

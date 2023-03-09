@@ -43,7 +43,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IUserInterface, UserRepository>();
     builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
     builder.Services.AddScoped<IRoleInterface, RoleRepository>();
-    builder.Services.AddScoped<IUserRoleInterface, UserRoleRepository>();
+    builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
     builder.Services.AddScoped<IInstituteAdminRepository, InstituteAdminRepository>();
     builder.Services.AddScoped<IInstituteRepository, InstituteRepository>();
     builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -55,9 +55,9 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped(typeof(ImportExportService<>));
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
     builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-    builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityServices));
+    builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityService));
     //services.AddSingleton<IWebHostEnvironment>(env => new HostingEnvironment { EnvironmentName = env.EnvironmentName, WebRootPath = env.WebRootPath });
-    services.AddScoped<JwtMiddleware>();
+    //services.AddTransient<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     //    builder.Services.AddIdentity<User, Role>(options =>
     //    {
@@ -129,3 +129,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
