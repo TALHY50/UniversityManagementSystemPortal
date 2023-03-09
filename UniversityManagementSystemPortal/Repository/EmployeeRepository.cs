@@ -1,16 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.PictureManager;
 
 namespace UniversityManagementSystemPortal.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {
+      
         private readonly UmspContext _dbContext;
 
         public EmployeeRepository(UmspContext dbContext)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _dbContext = dbContext;
+          
         }
 
         public async Task<Employee> GetByIdAsync(Guid id)
@@ -21,8 +24,9 @@ namespace UniversityManagementSystemPortal.Repository
                 .Include(e => e.Position)
                 .Include(e => e.User)
                 .FirstOrDefaultAsync(e => e.Id == id);
+            employee.ProfilePath = GetProfilePicturePath(employee.ProfilePath);
+            return employee;
 
-            return employee ?? throw new InvalidOperationException($"Employee with ID {id} not found.");
         }
 
         public async Task<IEnumerable<Employee>> GetAllAsync()
@@ -33,7 +37,7 @@ namespace UniversityManagementSystemPortal.Repository
                 .Include(e => e.Position)
                 .Include(e => e.User)
                 .ToListAsync();
-
+            
             return employees ?? Enumerable.Empty<Employee>();
         }
 
@@ -85,6 +89,15 @@ namespace UniversityManagementSystemPortal.Repository
             await _dbContext.SaveChangesAsync();
         }
 
+        private string GetProfilePicturePath(string filePath)
+        {
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                return Path.Combine("uploads", filePath);
+            }
+
+            return null;
+        }
         public async Task DeleteAsync(Guid id)
         {
             var employee = await GetByIdAsync(id);

@@ -69,7 +69,8 @@ namespace UniversityManagementSystemPortal.Repository
                 
                 throw new AppException("Position is null.");
             }
-
+            position.Id = Guid.NewGuid();
+            position.IsActive = true;
             await _dbContext.Positions.AddAsync(position);
             await _dbContext.SaveChangesAsync();
         }

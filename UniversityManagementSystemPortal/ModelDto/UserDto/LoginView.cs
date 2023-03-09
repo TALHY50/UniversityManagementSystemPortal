@@ -1,4 +1,5 @@
 ﻿using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementSystemPortal.ModelDto.NewFolder
 {
@@ -7,7 +8,7 @@ namespace UniversityManagementSystemPortal.ModelDto.NewFolder
         public Guid Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
-        public Guid Role { get; set; }
+
         public string Token { get; set; }
 
         public LoginView(User user, string token)
@@ -15,7 +16,6 @@ namespace UniversityManagementSystemPortal.ModelDto.NewFolder
             Id = user.Id;
             Username = user.Username;
             Email = user.Email;
-            //Role = ;
             Token = token;
         }
     }

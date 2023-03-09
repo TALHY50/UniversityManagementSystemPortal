@@ -13,6 +13,7 @@ namespace UniversityManagementSystemPortal.AutoMapper.UserAutoMapper
                    .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
             .ForMember(dest => dest.MiddleName, opt => opt.MapFrom(src => src.MiddleName))
             .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+            .ForMember(dest => dest.BloodGroup, opt => opt.MapFrom(src => src.BloodGroup))
             .ForMember(dest => dest.MobileNo, opt => opt.MapFrom(src => src.MobileNo))
             .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth))
             .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender))

@@ -8,5 +8,6 @@
         public bool IsActive { get; set; }
         public bool IsStaff { get; set; }
         public bool IsFaculty { get; set; }
+
     }
 }

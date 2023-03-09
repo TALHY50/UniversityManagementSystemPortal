@@ -1,11 +1,11 @@
-﻿using System.Text.Json.Serialization;
-using UniversityManagementSystemPortal.Enum;
+﻿using UniversityManagementSystemPortal.Enum;
 
-namespace UniversityManagementSystemPortal.CsvImport.dtomodels
+namespace UniversityManagementSystemPortal.ModelDto.Student
 {
-    public class CsvStudentDto
+    public class StudentReadModel
     {
         public string AdmissionNo { get; set; } = null!;
+        public string RoleNo { get; set; } = null!;
         public string FirstName { get; set; } = null!;
 
         public string? MiddleName { get; set; }
@@ -23,6 +23,13 @@ namespace UniversityManagementSystemPortal.CsvImport.dtomodels
         public StudentCategory Category { get; set; }
 
         public string? Address { get; set; }
+        public bool? IsActive { get; set; }
+        public BloodGroup? BloodGroup { get; set; } 
 
+        public string ProgramName { get; set; }
+        public string? UserName { get; set; }
+        public bool? EmailConfirm { get; set; }
+        public string? Password { get; set; }
     }
+    
 }

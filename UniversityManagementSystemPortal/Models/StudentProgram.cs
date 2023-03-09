@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class StudentProgram
+public partial class StudentProgram: TrackableBaseEntity
 {
     public Guid Id { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using UniversityManagementsystem.Models;
+﻿using System.Security.Claims;
+using UniversityManagementsystem.Models;
 
 namespace UniversityManagementSystemPortal.IdentityServices
 {
@@ -6,21 +7,25 @@ namespace UniversityManagementSystemPortal.IdentityServices
     {
         public Guid? GetUserId();
     }
-    public class IdentityServices : IIdentityServices
+    public class IdentityService : IIdentityServices
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public IdentityServices(IHttpContextAccessor httpContextAccessor)
+        public IdentityService(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
+
         public Guid? GetUserId()
         {
-            return GetUser()?.Id;
-        }
+            var claimsPrincipal = _httpContextAccessor.HttpContext?.User;
+            var userId = claimsPrincipal?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        private User? GetUser()
-        {
-            return (User?)_httpContextAccessor.HttpContext?.Items.FirstOrDefault(item => item.Key.Equals("User")).Value;
+            if (userId == null || !Guid.TryParse(userId, out var guidUserId))
+            {
+                return null;
+            }
+
+            return guidUserId;
         }
     }
 }

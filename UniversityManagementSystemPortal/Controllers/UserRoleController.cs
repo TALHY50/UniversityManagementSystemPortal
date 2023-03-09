@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto.UserRoleDto;
@@ -24,7 +27,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserRoleDto>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<UserRoleDto>> GetById(Guid id)
         {
             var userRole = await _repository.GetByIdAsync(id);
 
@@ -37,9 +40,9 @@ namespace UniversityManagementSystemPortal.Controllers
 
             return userRoleDto;
         }
-
+        [JwtAuthorize("Admin")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAll()
         {
             var userRoles = await _repository.GetAllAsync();
 
@@ -49,7 +52,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserRoleDto>> CreateAsync([FromQuery]CreateUserRoleDto createUserRoleDto)
+        public async Task<ActionResult<UserRoleDto>> Create([FromQuery]CreateUserRoleDto createUserRoleDto)
         {
             var userRole = _mapper.Map<UserRole>(createUserRoleDto);
 
@@ -57,11 +60,11 @@ namespace UniversityManagementSystemPortal.Controllers
 
             var userRoleDto = _mapper.Map<UserRoleDto>(userRole);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = userRole.Id }, userRoleDto);
+            return CreatedAtAction(nameof(GetById), new { id = userRole.Id }, userRoleDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync([FromQuery] Guid id, CreateUserRoleDto createUserRoleDto)
+        public async Task<IActionResult> Update([FromQuery] Guid id, CreateUserRoleDto createUserRoleDto)
         {
             var userRole = await _repository.GetByIdAsync(id);
 
@@ -78,7 +81,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             var userRole = await _repository.GetByIdAsync(id);
 

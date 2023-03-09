@@ -28,8 +28,6 @@ namespace UniversityManagementSystemPortal.Repository
             user.IsActive = true;
             //user.CreatedAt = DateTime.UtcNow;
             user.Id = Guid.NewGuid();
-            user.Password = BCryptNet.HashPassword(user.Password);
-
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
@@ -91,12 +89,6 @@ namespace UniversityManagementSystemPortal.Repository
             {
                 return null;
             }
-
-            if (!BCryptNet.Verify(model.Password, user.Password))
-            {
-                return null;
-            }
-
             return user;
         }
     }

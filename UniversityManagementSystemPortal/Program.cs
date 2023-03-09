@@ -55,9 +55,9 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped(typeof(ImportExportService<>));
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
     builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-    builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityServices));
+    builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityService));
     //services.AddSingleton<IWebHostEnvironment>(env => new HostingEnvironment { EnvironmentName = env.EnvironmentName, WebRootPath = env.WebRootPath });
-    services.AddScoped<JwtMiddleware>();
+    //services.AddTransient<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     //    builder.Services.AddIdentity<User, Role>(options =>
     //    {
@@ -124,8 +124,7 @@ app.UseHttpsRedirection();
 app.UseMiddleware<ErrorHandlerMiddleware>();
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

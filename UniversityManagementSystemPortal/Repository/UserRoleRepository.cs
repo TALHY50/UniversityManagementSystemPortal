@@ -45,7 +45,7 @@ namespace UniversityManagementSystemPortal.Repository
             {
                 throw new ArgumentNullException(nameof(userRole));
             }
-
+            userRole.Id = Guid.NewGuid();
             await _context.UserRoles.AddAsync(userRole);
             await _context.SaveChangesAsync();
         }

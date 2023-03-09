@@ -1,70 +1,53 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
+using System.Linq;
 
 namespace UniversityManagementSystemPortal.Authorization
 {
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Filters;
+    using Microsoft.AspNetCore.Http;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-    using System.Security.Claims;
-    using UniversityManagementSystemPortal.Enum;
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class JwtAuthorizeAttribute : Attribute, IAuthorizationFilter
+    namespace UniversityManagementSystemPortal.Authorization
     {
-        private readonly RoleType[] _roles;
-
-        public JwtAuthorizeAttribute(params RoleType[] roles)
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+        public class JwtAuthorizeAttribute : Attribute, IAuthorizationFilter
         {
-            _roles = roles;
-        }
+            private readonly IList<string> _roles;
 
-        public void OnAuthorization(AuthorizationFilterContext context)
-        {
-            // Allow anonymous access
-            if (context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any())
-                return;
-
-            // Get authorization header
-            var authorizationHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-
-            // Check if header exists and starts with "Bearer"
-            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer"))
+            public JwtAuthorizeAttribute(params string[] roles)
             {
-                context.Result = new UnauthorizedResult();
-                return;
+                _roles = roles ?? new string[] { };
             }
 
-            // Get token from header
-            var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-
-            // Check if token is valid
-            var jwtTokenService = context.HttpContext.RequestServices.GetService<IJwtTokenService>();
-            var userId = jwtTokenService?.ValidateJwtToken(token);
-
-            if (userId == null)
+            public void OnAuthorization(AuthorizationFilterContext context)
             {
-                context.Result = new UnauthorizedResult();
-                return;
-            }
-
-            // Check if user has the required roles
-            if (_roles != null && _roles.Length > 0)
-            {
-                var requiredRoles = _roles.Select(r => Enum.GetName(typeof(RoleType), r)).ToArray();
-                var hasRequiredRole = context.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Role && requiredRoles.Contains(c.Value));
-                if (!hasRequiredRole)
+                // skip authorization if action is decorated with [AllowAnonymous] attribute
+                var allowAnonymous = context.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any();
+                if (allowAnonymous)
                 {
-                    context.Result = new ForbidResult();
                     return;
                 }
+
+                // authorization
+                var userId = (User)context.HttpContext.Items["User"];
+                if (userId == null || (_roles.Any() && !_roles.Any(role => userId.UserRoles.Any(userRole => userRole.Role.Name == role))))
+                {
+                    // not logged in or role not authorized
+                    context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+                }
             }
-        }
-    }
+}   }   }
 
 
 
-}
+
+
+
+

@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Role;
 using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
+    [JwtAuthorize("SuperAdmin")]
     [ApiController]
     [Route("api/[controller]")]
     public class RolesController : ControllerBase
@@ -50,7 +52,7 @@ namespace UniversityManagementSystemPortal.Controllers
             await _roleRepository.CreateAsync(role);
 
             var roleDto = _mapper.Map<RoleDto>(role);
-            return CreatedAtAction(nameof(Get), new { id = roleDto.Id }, roleDto);
+            return CreatedAtAction(roleDto.ToString(), "Role created successfully.");
         }
 
         [HttpPut("{id}")]
@@ -66,7 +68,7 @@ namespace UniversityManagementSystemPortal.Controllers
             _mapper.Map(updateRoleDto, role);
             await _roleRepository.UpdateAsync(role);
 
-            return NoContent();
+            return Ok("Role updated successfully.");
         }
 
         [HttpDelete("{id}")]
@@ -81,8 +83,9 @@ namespace UniversityManagementSystemPortal.Controllers
 
             await _roleRepository.DeleteAsync(role);
 
-            return NoContent();
+            return Ok("Role deleted successfully.");
         }
+
 
         [HttpGet("byRoleType/{roleType}")]
         public async Task<ActionResult<RoleDto>> GetByRoleType(int roleType)

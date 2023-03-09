@@ -12,6 +12,7 @@ namespace UniversityManagementSystemPortal.Controllers
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using UniversityManagementsystem.Models;
+    using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
     using UniversityManagementSystemPortal.Interfaces;
     using UniversityManagementSystemPortal.ModelDto.Position;
   
@@ -30,7 +31,7 @@ namespace UniversityManagementSystemPortal.Controllers
                 _repository = repository;
                 _mapper = mapper;
             }
-
+            [JwtAuthorize("Admin", "SuperAdmin")]
             [HttpGet]
             public async Task<ActionResult<IEnumerable<PositionDto>>> GetAll()
             {
