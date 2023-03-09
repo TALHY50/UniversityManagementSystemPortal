@@ -1,120 +1,130 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Repository;
+using AllowAnonymous = UniversityManagementSystemPortal.Authorization.AllowAnonymousAttribute;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
+    [JwtAuthorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<Role> _roleManager;
         private readonly IUserInterface _userRepository;
         private readonly IMapper _mapper;
-        public UsersController(IUserInterface userRepository,
-            IMapper mapper, 
-            UserManager<User> userManager,
-            RoleManager<Role> roleManager)
+        private readonly IJwtTokenService _jwtTokenService;
+
+        public UsersController(IUserInterface userRepository, IMapper mapper, IJwtTokenService jwtTokenService)
         {
-           
             _userRepository = userRepository;
-                _mapper = mapper;
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _mapper = mapper;
+            _jwtTokenService = jwtTokenService;
         }
-
-
+        [JwtAuthorize(RoleType.Admin, RoleType.User)]
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserViewModel>>> GetUsers()
-        { 
-            if(_userRepository == null)
-            {
-                return BadRequest();
-            }
-       var getUser =    await _userRepository.GetAllAsync();
-            return Ok(getUser);
-        }
-        [HttpPost("Login")]
-        public async Task<ActionResult<LoginView>> Login(Login model)
         {
-            var response = _userRepository.Authenticate(model);
-            return Ok(response);
+            var getUsers = await _userRepository.GetAllAsync();
+            var userViewModels = _mapper.Map<IEnumerable<UserViewModel>>(getUsers);
+            return Ok(new { message = "Successfully retrieved all users.", data = userViewModels });
         }
+        [JwtAuthorize(RoleType.Admin, RoleType.User)]
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserViewModel>> GetUser(Guid id)
         {
-            if (_userRepository == null)
+            var getUser = await _userRepository.GetByIdAsync(id);
+
+            if (getUser == null)
             {
-                return BadRequest();
+                return NotFound(new { message = $"User with ID {id} not found." });
             }
-          var getUser=   await _userRepository.GetByIdAsync(id);
-            return Ok(getUser);
+
+            var userViewModel = _mapper.Map<UserViewModel>(getUser);
+            return Ok(new { message = "Successfully retrieved user.", data = userViewModel });
         }
+        //[JwtAuthorize(RoleType.Admin, RoleType.User)]
+        [HttpPost]
+        public async Task<ActionResult<RegistorViewModel>> Post([FromBody] RegistorViewModel userViewModel)
+        {
+            if (userViewModel == null)
+            {
+                return BadRequest(new { message = "User data is required." });
+            }
+
+            var user = _mapper.Map<User>(userViewModel);
+            var registeredUser = await _userRepository.RegisterAsUser(user);
+
+            if (registeredUser == null)
+            {
+                return BadRequest(new { message = "Failed to register user." });
+            }
+
+            var mappedUserViewModel = _mapper.Map<RegistorViewModel>(registeredUser);
+            return Ok(new { message = "Successfully registered user.", data = mappedUserViewModel });
+        }
+        [JwtAuthorize(RoleType.Admin, RoleType.User)]
         [HttpPut("{id}")]
         public async Task<ActionResult<RegistorViewModel>> PutUser(Guid id, User user)
         {
             if (id != user.Id)
             {
-                return BadRequest();
+                return BadRequest(new { message = $"User ID in request body ({user.Id}) does not match ID in URL ({id})." });
             }
 
-            var updateUser =  _userRepository.UpdateAsync(user);
-            return Ok(updateUser);
+            var updatedUser = _userRepository.UpdateAsync(user);
 
+            if (updatedUser == null)
+            {
+                return BadRequest(new { message = "Failed to update user." });
+            }
+
+            var updatedUserViewModel = _mapper.Map<RegistorViewModel>(updatedUser);
+            return Ok(new { message = "Successfully updated user.", data = updatedUserViewModel });
         }
-     
-            [HttpPost]
 
-        public async Task<ActionResult<RegistorViewModel>> Post([FromBody] RegistorViewModel userViewModel)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
-            if (userViewModel == null)
+            var userToDelete = await _userRepository.GetByIdAsync(id);
+
+            if (userToDelete == null)
             {
-                return BadRequest();
+                return NotFound(new { message = $"User with ID {id} not found." });
             }
 
-            var user = _mapper.Map<User>(userViewModel);
-            var result = await _userManager.CreateAsync(user);
-
-            if (result.Succeeded)
-            {
-                // Assign default role to the user
-                var defaultRole = await _roleManager.FindByNameAsync("User");
-                if (defaultRole != null)
-                {
-                    await _userManager.AddToRoleAsync(user, defaultRole.Name);
-                }
-
-                await _userRepository.RegisterAsUser(user);
-
-                var mappedUserViewModel = _mapper.Map<RegistorViewModel>(user);
-                return Ok(mappedUserViewModel);
-            }
-            else
-            {
-                return BadRequest(result.Errors);
-            }
+            await _userRepository.DeleteAsync(userToDelete);
+            return Ok(new { message = "Successfully deleted user." });
         }
+        [AllowAnonymous]
+        [HttpPost("Login")]
+        public async Task<ActionResult<LoginView>> Login(Login model)
+        {
+            var user = await _userRepository.Authenticate(model);
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Invalid username or password." });
+            }
+
+            var jwtToken = _jwtTokenService.GenerateJwtToken(user);
+            var loginView = new LoginView(user, jwtToken);
+            return Ok(new { message = "Successfully logged in.", data = loginView });
+        }
+
+
+
 
     }
-    //[HttpDelete("{id}")]
-    //public async Task<IActionResult> DeleteUser(Guid id)
-    //{
-    //    _userRepository.DeleteAsync(id);
-    //}
-
-    //private bool UserExists(Guid id)
-    //{
-    //    return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
-    //}
-
 }

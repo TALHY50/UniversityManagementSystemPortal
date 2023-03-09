@@ -10,6 +10,7 @@ public partial class Institute
     public Guid Id { get; set; }
 
     public string Name { get; set; } = null!;
+    [JsonRequired]
     [JsonPropertyName("Type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public InstituteType Type { get; set; }
