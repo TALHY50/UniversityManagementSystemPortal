@@ -16,6 +16,7 @@ namespace UniversityManagementSystemPortal.TrackableBaseEntity
         {
             Triggers<TrackableBaseEntity>.Inserting += entry =>
             {
+                var userId = ServiceLocator.Current.GetInstance<IIdentityServices>().GetUserId();
                 entry.Entity.Id = Guid.NewGuid();
                 entry.Entity.CreatedAt = entry.Entity.UpdatedAt = DateTime.UtcNow;
               
@@ -23,11 +24,13 @@ namespace UniversityManagementSystemPortal.TrackableBaseEntity
 
             Triggers<TrackableBaseEntity>.Updating += entry =>
             {
+                var userId = ServiceLocator.Current.GetInstance<IIdentityServices>().GetUserId();
                 entry.Entity.UpdatedAt = DateTime.UtcNow;
                
             };
         }
-
-        
     }
+
+
+}
 }

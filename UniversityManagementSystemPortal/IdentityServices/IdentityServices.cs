@@ -23,7 +23,7 @@ namespace UniversityManagementSystemPortal.IdentityServices
             if (userId == null || !Guid.TryParse(userId, out var guidUserId))
             {
                 return null;
-            }
+        }
 
             return guidUserId;
         }

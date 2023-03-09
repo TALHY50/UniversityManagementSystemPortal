@@ -36,9 +36,9 @@ namespace UniversityManagementSystemPortal.CsvImport
                 return records;
             }
 
-            public async Task<List<T>> ReadFromCsvAsync(Stream stream)
-            {
-                using var reader = new StreamReader(stream);
+        public async Task<List<T>> ReadFromCsvAsync(Stream stream)
+        {
+            using var reader = new StreamReader(stream);
                 var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     HeaderValidated = null, // disable header validation
@@ -46,9 +46,9 @@ namespace UniversityManagementSystemPortal.CsvImport
                     PrepareHeaderForMatch = header => header.Header.ToLower(), // ignore case sensitivity
                 };
                 using var csv = new CsvReader(reader, csvConfig);
-                var records = csv.GetRecords<T>().ToList();
-                return records;
-            }
+            var records = csv.GetRecords<T>().ToList();
+            return records;
+        }
         }
         public async Task<byte[]> ExportToCsvAsync(IEnumerable<T> data)
         {

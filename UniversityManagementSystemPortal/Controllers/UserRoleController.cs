@@ -57,45 +57,47 @@ namespace UniversityManagementSystemPortal.Controllers
             var userRole = _mapper.Map<UserRole>(createUserRoleDto);
 
             await _repository.AddAsync(userRole);
-
+//        private readonly IUserRoleInterface _userRoleRepository;
             var userRoleDto = _mapper.Map<UserRoleDto>(userRole);
-
+//            _userRepository = userRepository;
             return CreatedAtAction(nameof(GetById), new { id = userRole.Id }, userRoleDto);
         }
-
+//            return Ok(userRoles);
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromQuery] Guid id, CreateUserRoleDto createUserRoleDto)
         {
             var userRole = await _repository.GetByIdAsync(id);
-
+//            return Ok(userRole);
             if (userRole == null)
             {
                 return NotFound();
             }
-
+//                return BadRequest("User not found.");
             _mapper.Map(createUserRoleDto, userRole);
 
             await _repository.UpdateAsync(userRole);
-
+//            return CreatedAtAction(nameof(GetUserRoleById), new { id = createdUserRole.Id }, createdUserRole);
             return NoContent();
         }
-
+//                return NotFound();
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var userRole = await _repository.GetByIdAsync(id);
-
+//            userRole.RoleId = userRoleDto.RoleId;
             if (userRole == null)
             {
                 return NotFound();
             }
 
             await _repository.DeleteAsync(userRole);
-
+//            return NoContent();
             return NoContent();
         }
     }
+//                return NotFound();
 
+//            await _userRoleRepository.RemoveUserRoleAsync(userRole.RoleId, userRole.UserId);
 
 
 
