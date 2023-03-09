@@ -10,12 +10,14 @@ namespace UniversityManagementSystemPortal.Authorization
     using System;
     using System.Linq;
     using System.Security.Claims;
+    using UniversityManagementSystemPortal.Enum;
+
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class JwtAuthorizeAttribute : Attribute, IAuthorizationFilter
     {
-        private readonly string[] _roles;
+        private readonly RoleType[] _roles;
 
-        public JwtAuthorizeAttribute(params string[] roles)
+        public JwtAuthorizeAttribute(params RoleType[] roles)
         {
             _roles = roles;
         }
@@ -41,9 +43,9 @@ namespace UniversityManagementSystemPortal.Authorization
 
             // Check if token is valid
             var jwtTokenService = context.HttpContext.RequestServices.GetService<IJwtTokenService>();
-            var userId = jwtTokenService?.ValidateJwtToken(token) ?? -1;
+            var userId = jwtTokenService?.ValidateJwtToken(token);
 
-            if (userId == -1)
+            if (userId == null)
             {
                 context.Result = new UnauthorizedResult();
                 return;
@@ -52,7 +54,8 @@ namespace UniversityManagementSystemPortal.Authorization
             // Check if user has the required roles
             if (_roles != null && _roles.Length > 0)
             {
-                var hasRequiredRole = context.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Role && _roles.Contains(c.Value));
+                var requiredRoles = _roles.Select(r => Enum.GetName(typeof(RoleType), r)).ToArray();
+                var hasRequiredRole = context.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Role && requiredRoles.Contains(c.Value));
                 if (!hasRequiredRole)
                 {
                     context.Result = new ForbidResult();
@@ -61,6 +64,7 @@ namespace UniversityManagementSystemPortal.Authorization
             }
         }
     }
+
 
 
 }

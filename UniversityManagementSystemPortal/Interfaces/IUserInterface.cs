@@ -11,7 +11,7 @@ namespace UniversityManagementSystemPortal.Interfce
 
     public interface IUserInterface
     {
-       LoginView Authenticate(Login model);
+        Task<User> Authenticate(Login model);
         Task<User> GetByIdAsync(Guid id);
         Task<IEnumerable<User>> GetAllAsync();
         Task UpdateAsync(User user);

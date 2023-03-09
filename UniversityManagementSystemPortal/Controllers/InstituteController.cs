@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Institute;
 using UniversityManagementSystemPortal.ModelDto.InstituteDto;
@@ -47,7 +48,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(InstituteCreateDto instituteCreateDto)
+        public async Task<ActionResult> Create(InstituteCreateDto instituteCreateDto, InstituteType institutetype)
         {
             if (instituteCreateDto == null)
             {
