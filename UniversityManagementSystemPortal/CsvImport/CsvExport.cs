@@ -84,28 +84,4 @@ namespace UniversityManagementSystemPortal.CsvImport
             }
         }
     }
-//    public interface IImportExportService
-//{
-//    Task<IEnumerable<T>> ReadFromCsvAsync<T>(Stream stream, ClassMap<T> map) where T : class, new();
-//    Task<byte[]> WriteToCsvAsync<T>(IEnumerable<T> data, ClassMap<T> map) where T : class;
-//}
-//    public class ImportExportService<T> : IImportExportService<T>
-//    {
-//        private readonly CsvConfiguration _csvConfiguration;
-
-//        public ImportExportService(IOptions<CsvConfiguration> csvConfiguration)
-//        {
-//            _csvConfiguration = csvConfiguration.Value;//        }
-
-//        public async Task<IEnumerable<T>> ReadFromCsvAsync(Stream stream, ClassMap<T> classMap)
-//        {
-//            using var reader = new StreamReader(stream);
-//            using var csv = new CsvReader(reader, _csvConfiguration);
-//            csv.Context.RegisterClassMap(classMap);
-//            var records = await csv.GetRecordsAsync<T>().ToListAsync();
-//            return records;
-//        }
-//    }
-
-
 }

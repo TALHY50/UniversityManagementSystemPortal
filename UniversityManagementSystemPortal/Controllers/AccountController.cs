@@ -1,18 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
-using UniversityManagementSystemPortal.Repository;
 using AllowAnonymous = UniversityManagementSystemPortal.Authorization.AllowAnonymousAttribute;
 
 namespace UniversityManagementSystemPortal.Controllers
