@@ -36,7 +36,7 @@ namespace UniversityManagementSystemPortal.Authorization
                 }
 
                 // authorization
-                var userId = (User)context.HttpContext.Items["User"];
+                var userId = context.HttpContext.Items["User"] as User;
                 if (userId == null || (_roles.Any() && !_roles.Any(role => userId.UserRoles.Any(userRole => userRole.Role.Name == role))))
                 {
                     // not logged in or role not authorized

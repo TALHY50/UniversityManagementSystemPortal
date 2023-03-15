@@ -1,5 +1,6 @@
 ﻿using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
@@ -23,14 +24,7 @@ namespace UniversityManagementSystemPortal.Repository
 
         public async Task<List<Student>> Get()
         {
-            var students = await _dbContext.Students
-                .Include(s => s.User)
-                .Include(s => s.Institute)
-                .Include(s => s.StudentPrograms)
-                    .ThenInclude(sp => sp.Program)
-                        .ThenInclude(p => p.Department)
-                .ToListAsync();
-
+            var students = await _dbContext.Students.ToListAsync();
             return students;
         }
 
@@ -57,10 +51,9 @@ namespace UniversityManagementSystemPortal.Repository
             await _dbContext.SaveChangesAsync();
             return student;
         }
-        
+
         public async Task<StudentReadModel> AddToImport(StudentReadModel student)
         {
-
             var user = new User
             {
                 FirstName = student.FirstName,
@@ -80,7 +73,7 @@ namespace UniversityManagementSystemPortal.Repository
             };
             _dbContext.Users.Add(user);
 
-            var studentRole = _dbContext.Roles.FirstOrDefault(r => r.Name == "Student");
+            var studentRole = _dbContext.Roles.FirstOrDefault(r => r.Name == "Students");
             var userRole = new UserRole
             {
                 Id = Guid.NewGuid(),
@@ -116,9 +109,11 @@ namespace UniversityManagementSystemPortal.Repository
                 UpdatedBy = _identityService.GetUserId().Value,
                 CreatedBy = _identityService.GetUserId().Value
             };
-            _dbContext.Students.Add(students);
+            _dbContext.Students.AddRange(students);
+             _dbContext.SaveChanges(); // Add this line to save the changes to the database
             return student;
         }
+
 
 
         public async Task<Student> Update(Student student, IFormFile picture)
@@ -238,7 +233,7 @@ namespace UniversityManagementSystemPortal.Repository
                             continue;
                         }
                         // Get the program based on the user input
-                        var program = _dbContext.Programs.FirstOrDefault(p => p.Name == studentData.ProgramName);
+                        var program = _dbContext.StudentPrograms.FirstOrDefault(p => p.Program.Name == studentData.ProgramName);
                         if (program == null)
                         {
                             skippedEntries.Add($"Skipped Row {i + 1} Reason: Program does not exist against this program name");

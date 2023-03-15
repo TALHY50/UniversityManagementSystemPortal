@@ -7,25 +7,23 @@ namespace UniversityManagementSystemPortal.IdentityServices
     {
         public Guid? GetUserId();
     }
-    public class IdentityService : IIdentityServices
-    {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public IdentityService(IHttpContextAccessor httpContextAccessor)
+        public class IdentityServices : IIdentityServices
         {
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        }
+            private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public Guid? GetUserId()
-        {
-            var claimsPrincipal = _httpContextAccessor.HttpContext?.User;
-            var userId = claimsPrincipal?.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (userId == null || !Guid.TryParse(userId, out var guidUserId))
+            public IdentityServices(IHttpContextAccessor httpContextAccessor)
             {
-                return null;
-        }
+                _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            }
 
-            return guidUserId;
+            public Guid? GetUserId()
+            {
+                return GetUser()?.Id;
+            }
+
+            private User? GetUser()
+            {
+                return (User?)_httpContextAccessor.HttpContext?.Items.FirstOrDefault(item => item.Key.Equals("User")).Value;
+            }
         }
-    }
-}
+}   

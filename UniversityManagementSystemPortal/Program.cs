@@ -19,6 +19,7 @@ using System.Configuration;
 using UniversityManagementSystemPortal.CsvImport;
 using Microsoft.AspNetCore.Hosting;
 using OfficeOpenXml;
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -55,7 +56,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped(typeof(ImportExportService<>));
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
     builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-    builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityService));
+    builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityServices));
     //services.AddSingleton<IWebHostEnvironment>(env => new HostingEnvironment { EnvironmentName = env.EnvironmentName, WebRootPath = env.WebRootPath });
     //services.AddTransient<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -127,6 +128,12 @@ app.UseMiddleware<JwtMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
+    {
+        { ".csv", "text/csv" },
+    })
+});
 app.Run();
 

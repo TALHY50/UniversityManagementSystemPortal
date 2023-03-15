@@ -22,7 +22,10 @@ namespace UniversityManagementSystemPortal.Controllers
         private readonly IMapper _mapper;
         private readonly IJwtTokenService _jwtTokenService;
 
-        public AccountController(IUserInterface userRepository, IMapper mapper, IJwtTokenService jwtTokenService, IIdentityServices identityServices)
+        public AccountController(IUserInterface userRepository,
+            IMapper mapper, 
+            IJwtTokenService jwtTokenService, 
+            IIdentityServices identityServices)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -63,6 +66,7 @@ namespace UniversityManagementSystemPortal.Controllers
             }
             var user = _mapper.Map<User>(userViewModel);
             user.CreatedBy = _identityServices.GetUserId();
+            user.LastLoggedIn = DateTime.Now;
             user.UpdatedBy = _identityServices.GetUserId();
             var registeredUser = await _userRepository.RegisterAsUser(user);
 

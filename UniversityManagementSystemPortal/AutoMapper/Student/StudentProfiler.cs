@@ -14,11 +14,11 @@ namespace UniversityManagementSystemPortal
             CreateMap<AddStudentDto, Student>();
             CreateMap<UpdateStudentDto, Student>();
             CreateMap<StudentReadModel, Student>()
-        .ForMember(dest => dest.AdmissionNo, opt => opt.MapFrom(src => src.AdmissionNo))
-        .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()))
-        .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-        .ForMember(dest => dest.InstituteId, opt => opt.Ignore())
-        .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+                .ForMember(dest => dest.AdmissionNo, opt => opt.MapFrom(src => src.AdmissionNo))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.InstituteId, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
             CreateMap<StudentReadModel, User>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
@@ -42,7 +42,8 @@ namespace UniversityManagementSystemPortal
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore());
-            CreateMap<StudentReadModel, StudentDto>();
+
+            CreateMap<Student, IEnumerable<StudentReadModel>>();
         }
     }
 }

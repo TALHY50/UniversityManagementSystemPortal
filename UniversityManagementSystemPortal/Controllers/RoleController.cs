@@ -9,7 +9,7 @@ using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
-    [JwtAuthorize("SuperAdmin")]
+    [JwtAuthorize("Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class RolesController : ControllerBase

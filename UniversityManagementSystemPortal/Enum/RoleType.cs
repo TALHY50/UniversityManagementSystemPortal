@@ -7,5 +7,6 @@
         Teacher,
         Staff,
         User,
+        Students=7
     }
 }

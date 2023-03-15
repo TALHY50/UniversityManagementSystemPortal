@@ -7,6 +7,7 @@ namespace UniversityManagementSystemPortal
 {
     public class StudentDto
     {
+        public Guid Id { get; set; }
         public string AdmissionNo { get; set; } = null!;
         public string RoleNo { get; set; } = null!;
         public string FirstName { get; set; } = null!;

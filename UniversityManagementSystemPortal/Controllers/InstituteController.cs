@@ -11,7 +11,7 @@ using UniversityManagementSystemPortal.ModelDto.InstituteDto;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
-    [JwtAuthorize("SuperAdmin")]
+    [JwtAuthorize("Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class InstitutesController : ControllerBase

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.CsvImport;
@@ -10,7 +12,10 @@ using UniversityManagementSystemPortal.ModelDto.Student;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
 using UniversityManagementSystemPortal.PictureManager;
 using UniversityManagementSystemPortal.Repository;
-
+using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
+using System.Text;
+using System.Collections;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -40,16 +45,28 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpGet("export")]
-        public async Task<IActionResult> Export()
+        public async Task<IActionResult> ExportToCsv()
         {
             var students = await _studentRepository.Get();
-            var studentDtos = _mapper.Map<List<StudentReadModel>>(students);
-            var studentDtosEnumerable = studentDtos.Select(s => _mapper.Map<StudentDto>(s));
-            var csvBytes = await _importExportService.ExportToCsvAsync(studentDtosEnumerable);
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = ",",
+                Encoding = System.Text.Encoding.UTF8
+            };
 
+            var studentReadModels = _mapper.Map<IEnumerable<StudentReadModel>>(students);
 
-            return File(csvBytes, "text/csv", "students.csv");
+            using (var writer = new StringWriter())
+            using (var csv = new CsvWriter(writer, config))
+            {
+                csv.WriteRecords(studentReadModels);
+                return File(System.Text.Encoding.UTF8.GetBytes(writer.ToString()), "text/csv", "students.csv");
+            }
         }
+
+
+
+
 
         [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
         [HttpGet("{id}")]
