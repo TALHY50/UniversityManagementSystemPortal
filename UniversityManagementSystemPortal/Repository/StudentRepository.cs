@@ -24,7 +24,14 @@ namespace UniversityManagementSystemPortal.Repository
 
         public async Task<List<Student>> Get()
         {
-            var students = await _dbContext.Students.ToListAsync();
+            var students = await _dbContext.Students
+                .Include(s => s.User)
+                .Include(s => s.Institute)
+                .Include(s => s.StudentPrograms)
+                    .ThenInclude(sp => sp.Program)
+                        .ThenInclude(p => p.Department)
+                .ToListAsync();
+
             return students;
         }
 

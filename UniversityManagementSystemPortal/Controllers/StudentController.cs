@@ -16,6 +16,8 @@ using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using System.Text;
 using System.Collections;
+using UniversityManagementSystemPortal.IdentityServices;
+using UniversityManagementSystemPortal.Interfce;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -26,14 +28,33 @@ namespace UniversityManagementSystemPortal.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IStudentRepository _studentRepository;
+        private readonly IUserInterface _userInterface;
+        private readonly IInstituteRepository _instituteRepository;
         private readonly IPictureManager _pictureManager;
         private readonly ImportExportService<StudentDto> _importExportService;
-        public StudentController(IMapper mapper, IStudentRepository studentRepository, IPictureManager pictureManager, ImportExportService<StudentDto> importExportService)
+        private readonly IIdentityServices _identityServices;
+        private readonly ILogger<StudentController> _logger;
+        private readonly IInstituteAdminRepository _repository;
+        public StudentController(ILogger<StudentController> logger,
+            IMapper mapper,
+            IStudentRepository studentRepository,
+            IPictureManager pictureManager,
+            IInstituteRepository instituteRepository,
+            IUserInterface userInterface,
+            IInstituteAdminRepository repository,
+        ImportExportService<StudentDto> importExportService,
+            IIdentityServices identityServices)
         {
             _mapper = mapper;
             _studentRepository = studentRepository;
             _pictureManager = pictureManager;
             _importExportService = importExportService;
+            _identityServices = identityServices;
+            _userInterface = userInterface;
+            _logger = logger;
+            _instituteRepository = instituteRepository;
+            _repository = repository;
+
         }
         [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
         [HttpGet]
@@ -63,11 +84,53 @@ namespace UniversityManagementSystemPortal.Controllers
                 return File(System.Text.Encoding.UTF8.GetBytes(writer.ToString()), "text/csv", "students.csv");
             }
         }
+        [JwtAuthorize("Admin", "SuperAdmin")]
+        [HttpPost("Import")]
+        public async Task<IActionResult> ImportStudents(IFormFile file)
+        {
+            if (file == null || file.Length <= 0)
+            {
+                return BadRequest(new { message = "Please select a valid file." });
+            }
 
+            if (!file.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { message = "Invalid file format. Please select a CSV file." });
+            }
 
+            try
+            {
+                var instituteAdminId = _identityServices.GetUserId().GetValueOrDefault();
+                var instituteAdmin = await _repository.GetByUserIdAsync(instituteAdminId);
 
+                if (instituteAdmin == null)
+                {
+                    return BadRequest(new { message = "Invalid user. No associated institute found." });
+                }
 
+                using (var stream = file.OpenReadStream())
+                using (var reader = new StreamReader(stream))
+                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                {
+                    var records = csv.GetRecords<StudentReadModel>();
+                    var students = _mapper.Map<IEnumerable<Student>>(records);
 
+                    foreach (var student in students)
+                    {
+                        student.InstituteId = instituteAdmin.InstituteId;
+                        student.CreatedBy = instituteAdminId;
+                        await _studentRepository.Add(student);
+                    }
+                }
+
+                return Ok(new { message = "Students added successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while importing students.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while importing students. Please try again later." });
+            }
+        }
         [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -112,7 +175,7 @@ namespace UniversityManagementSystemPortal.Controllers
             var addedStudentDto = _mapper.Map<StudentDto>(addedStudent);
             return Ok(addedStudentDto);
         }
-        
+
 
         [HttpGet("{admissionNo}")]
         public async Task<IActionResult> GetByAdmissionNo(string admissionNo)
@@ -124,19 +187,6 @@ namespace UniversityManagementSystemPortal.Controllers
             }
             var studentDto = _mapper.Map<StudentDto>(student);
             return Ok(studentDto);
-        }
-        [JwtAuthorize("Admin", "SuperAdmin")]
-        [HttpPost("Import")]
-        public IActionResult Uploads(IFormFile file)
-        {
-            var result = _studentRepository.Upload(file);
-
-            //if (result is null)
-            //{
-            //    return BadRequest("Unable to upload file.");
-            //}
-
-            return Ok(result);
         }
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPut("{id}")]
@@ -170,7 +220,7 @@ namespace UniversityManagementSystemPortal.Controllers
             await _studentRepository.Delete(id);
             return NoContent();
         }
-        
+
 
     }
 }

@@ -17,13 +17,11 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task<Category> GetByIdAsync(Guid id)
         {
             var category = await _context.Categories
-                .Include(c => c.Institute)
-                .Include(c => c.Positions)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (category == null)
             {
-                throw new InvalidOperationException($"Category with ID {id} not found.");
+                return null;
             }
 
             return category;
@@ -32,9 +30,9 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
             var categories = await _context.Categories
-                .Include(c => c.Institute)
-                .Include(c => c.Positions)
-                .ToListAsync();
+            .Include(c => c.Institute)
+            .Include(c => c.Positions)
+            .ToListAsync();
 
             return categories ?? Enumerable.Empty<Category>();
         }
@@ -42,8 +40,6 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task<IEnumerable<Category>> GetByInstituteIdAsync(Guid instituteId)
         {
             var categories = await _context.Categories
-                .Include(c => c.Institute)
-                .Include(c => c.Positions)
                 .Where(c => c.InstituteId == instituteId)
                 .ToListAsync();
 
@@ -54,31 +50,32 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (category == null)
             {
-                throw new AppException(nameof(category));
+                return null;
             }
 
             category.Id = Guid.NewGuid();
             category.IsActive = true;
             category.IsStaff = false;
             category.IsFaculty = false;
+
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
 
             return category;
         }
 
-
         public async Task<Category> UpdateAsync(Category category)
         {
             if (category == null)
             {
-                throw new AppException(nameof(category));
+                return null;
             }
 
             var existingCategory = await GetByIdAsync(category.Id);
+
             if (existingCategory == null)
             {
-                throw new InvalidOperationException($"Category with ID {category.Id} not found.");
+                return null;
             }
 
             existingCategory.Name = category.Name;
@@ -92,18 +89,18 @@ namespace UniversityManagementSystemPortal.Repository
             return existingCategory;
         }
 
-
         public async Task DeleteAsync(Category category)
         {
             if (category == null)
             {
-                throw new AppException(nameof(category));
+                return;
             }
 
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
         }
     }
+
 
 
 }

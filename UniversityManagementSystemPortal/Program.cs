@@ -122,7 +122,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 // global error handler
-app.UseMiddleware<ErrorHandlerMiddleware>();
+//app.UseMiddleware<ErrorHandlerMiddleware>();
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
 app.UseAuthentication();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Interfaces;
 
@@ -10,10 +11,6 @@ namespace UniversityManagementSystemPortal.Repository
 
         public DepartmentRepository(UmspContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
 
             _context = context;
         }
@@ -26,7 +23,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (departments == null)
             {
-                throw new InvalidOperationException("Unable to retrieve departments");
+                return null;
             }
 
             return departments;
@@ -36,7 +33,7 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (departmentId == Guid.Empty)
             {
-                throw new ArgumentException("Department ID cannot be empty", nameof(departmentId));
+                return null;
             }
 
             var department = await _context.Departments
@@ -45,7 +42,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (department == null)
             {
-                throw new InvalidOperationException($"Department with ID {departmentId} not found");
+                return null;
             }
 
             return department;
@@ -55,7 +52,7 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (instituteId == Guid.Empty)
             {
-                throw new ArgumentException("Institute ID cannot be empty", nameof(instituteId));
+                return null;
             }
 
             var departments = await _context.Departments
@@ -65,7 +62,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             if (departments == null)
             {
-                throw new InvalidOperationException($"Unable to retrieve departments for institute with ID {instituteId}");
+                return null;
             }
 
             return departments;
@@ -75,10 +72,10 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (department == null)
             {
-                throw new ArgumentNullException(nameof(department));
+                return null;
             }
 
-            department.Id = Guid.NewGuid();
+                department.Id = Guid.NewGuid();
             department.CreatedAt = DateTime.UtcNow;
             department.IsActive = false;
             department.IsAcademics = false;
