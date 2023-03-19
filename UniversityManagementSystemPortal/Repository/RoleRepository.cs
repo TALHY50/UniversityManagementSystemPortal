@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfaces;
 
 namespace UniversityManagementSystemPortal.Repository
@@ -74,17 +75,12 @@ namespace UniversityManagementSystemPortal.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Role> GetByRoleTypeAsync(int roleType)
+        public async Task<Role> GetByRoleTypeAsync(RoleType roleType)
         {
-            if (roleType == null)
-            {
-                return null;
-            }
-
             var role = await _context.Roles
                 .Include(r => r.UserRoles)
                 .ThenInclude(ur => ur.User)
-                .FirstOrDefaultAsync(r => r.RoleType.HasValue);
+                .FirstOrDefaultAsync(r => (int)r.RoleType == Convert.ToInt32(roleType));
 
             return role;
         }

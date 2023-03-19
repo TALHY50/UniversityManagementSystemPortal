@@ -1,11 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Application.Command.Roles;
+using UniversityManagementSystemPortal.Application.Qurey.Roles;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.ModelDto.Role;
-using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -14,92 +13,75 @@ namespace UniversityManagementSystemPortal.Controllers
     [Route("api/[controller]")]
     public class RolesController : ControllerBase
     {
-        private readonly IRoleInterface _roleRepository;
-        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public RolesController(IRoleInterface roleRepository, IMapper mapper)
+        public RolesController(IMediator mediator)
         {
-            _roleRepository = roleRepository;
-            _mapper = mapper;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RoleDto>>> Get()
         {
-            var roles = await _roleRepository.GetAllAsync();
-            var roleDtos = _mapper.Map<IEnumerable<RoleDto>>(roles);
-            return Ok(roleDtos);
+            var roles = await _mediator.Send(new GetAllRolesQuery());
+            return Ok(roles);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<RoleDto>> GetById(Guid id)
         {
-            var role = await _roleRepository.GetByIdAsync(id);
+            var role = await _mediator.Send(new GetRoleByIdQuery { Id = id });
 
             if (role == null)
             {
                 return NotFound();
             }
 
-            var roleDto = _mapper.Map<RoleDto>(role);
-            return Ok(roleDto);
+            return Ok(role);
         }
 
         [HttpPost]
-        public async Task<ActionResult<RoleDto>> Create(CreateRoleDto createRoleDto)
+        public async Task<ActionResult<RoleDto>> Create(AddRoleDto createRoleDto)
         {
-            var role = _mapper.Map<Role>(createRoleDto);
-            await _roleRepository.CreateAsync(role);
+            var command = new AddRoleCommand { Name = createRoleDto.Name, RoleType = (RoleType)createRoleDto.RoleType };
 
-            var roleDto = _mapper.Map<RoleDto>(role);
-            return CreatedAtAction(roleDto.ToString(), "Role created successfully.");
+            var role = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), role);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, UpdateRoleDto updateRoleDto)
         {
-            var role = await _roleRepository.GetByIdAsync(id);
-
-            if (role == null)
+            if (id != updateRoleDto.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            _mapper.Map(updateRoleDto, role);
-            await _roleRepository.UpdateAsync(role);
-
-            return Ok("Role updated successfully.");
+            await _mediator.Send(new UpdateRoleCommand { Id = id, Name = updateRoleDto.Name, RoleType = updateRoleDto.RoleType });
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var role = await _roleRepository.GetByIdAsync(id);
-
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            await _roleRepository.DeleteAsync(role);
-
-            return Ok("Role deleted successfully.");
+            await _mediator.Send(new DeleteRoleCommand { Id = id });
+            return NoContent();
         }
 
+        //[HttpGet("byRoleType/{roleType}")]
+        //public async Task<ActionResult<RoleDto>> GetByRoleType(int roleType)
+        //{
+        //    var role = await _mediator.Send(new GetRoleByRoleTypeQuery { RoleType = roleType });
 
-        [HttpGet("byRoleType/{roleType}")]
-        public async Task<ActionResult<RoleDto>> GetByRoleType(int roleType)
-        {
-            var role = await _roleRepository.GetByRoleTypeAsync(roleType);
+        //    if (role == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            var roleDto = _mapper.Map<RoleDto>(role);
-            return Ok(roleDto);
-        }
+        //    return Ok(role);
+        //}
     }
+
 
 }

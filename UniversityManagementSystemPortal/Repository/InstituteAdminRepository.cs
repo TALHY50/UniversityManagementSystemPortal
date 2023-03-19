@@ -1,17 +1,20 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 
 namespace UniversityManagementSystemPortal.Repository
 {
     public class InstituteAdminRepository : IInstituteAdminRepository
     {
+        private readonly IIdentityServices _identityService;
         private readonly UmspContext _context;
 
-        public InstituteAdminRepository(UmspContext context)
+        public InstituteAdminRepository(UmspContext context, IIdentityServices identityService)
         {
             _context = context;
+            _identityService = identityService;
         }
 
         public async Task<InstituteAdmin> GetByIdAsync(Guid id)
@@ -58,7 +61,14 @@ namespace UniversityManagementSystemPortal.Repository
                 .Include(i => i.User)
                 .Where(i => i.InstituteId == instituteId)
                 .ToListAsync();
+        }      
+        public async Task<Guid?> GetInstituteIdByActiveUserId(Guid activeUserId)
+        {
+            var instituteAdmin = await _context.InstituteAdmins
+                .FirstOrDefaultAsync(i => i.UserId == activeUserId);
+            return instituteAdmin?.InstituteId;
         }
+
     }
 
 

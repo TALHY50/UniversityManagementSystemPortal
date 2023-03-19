@@ -1,4 +1,5 @@
 ﻿using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementSystemPortal.Interfaces
 {
@@ -9,6 +10,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<Role> CreateAsync(Role role);
         Task UpdateAsync(Role role);
         Task DeleteAsync(Role role);
-        Task<Role> GetByRoleTypeAsync(int roleType);
+        Task<Role> GetByRoleTypeAsync(RoleType roleType);
     }
 }

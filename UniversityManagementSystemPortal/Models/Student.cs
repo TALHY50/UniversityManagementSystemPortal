@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using UniversityManagementSystemPortal.Enum;
+using UniversityManagementSystemPortal.IdentityServices;
+using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class Student 
+public partial class Student : TrackableBaseEntity
 {
     public Guid Id { get; set; }
 

@@ -87,6 +87,10 @@ namespace UniversityManagementSystemPortal.Repository
 
             return program.StudentPrograms;
         }
+        public async Task<PorgramNamespace> GetProgramByName(string programName)
+        {
+            return  _context.Programs.FirstOrDefault(p => p.Name == programName);
+        }
     }
 
 }

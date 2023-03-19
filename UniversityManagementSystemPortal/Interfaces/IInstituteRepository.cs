@@ -8,6 +8,8 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<IEnumerable<Institute>> GetAllAsync();
         Task AddAsync(Institute institute);
         Task UpdateAsync(Institute institute);
+
         Task DeleteAsync(Guid id);
+    
     }
 }

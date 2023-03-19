@@ -10,6 +10,7 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task UpdateAsync(InstituteAdmin instituteAdmin);
         Task DeleteAsync(InstituteAdmin instituteAdmin);
         Task<IEnumerable<InstituteAdmin>> GetInstituteAdminsAsync(Guid instituteId);
+        Task<Guid?> GetInstituteIdByActiveUserId(Guid activeUserId);
     }
 
 }

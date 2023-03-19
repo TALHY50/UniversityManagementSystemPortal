@@ -1,6 +1,6 @@
 ﻿namespace UniversityManagementSystemPortal.ModelDto.Role
 {
-    public class CreateRoleDto
+    public class AddRoleDto
     {
         public string? Name { get; set; }
 

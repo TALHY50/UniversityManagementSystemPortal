@@ -10,16 +10,14 @@ using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal;
 using UniversityManagementSystemPortal.PictureManager;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using UniversityManagementSystemPortal.IdentityServices;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Configuration;
 using UniversityManagementSystemPortal.CsvImport;
-using Microsoft.AspNetCore.Hosting;
-using OfficeOpenXml;
 using Microsoft.AspNetCore.StaticFiles;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -51,23 +49,19 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
     builder.Services.AddScoped<IPictureManager, PictureManager>();
     builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+    builder.Services.AddScoped<IStudentProgramRepository, StudentProgramRepository>();
     builder.Services.AddScoped<IPositionRepository, PositionRepository>();
     builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+    services.AddMediatR(typeof(AddStudentCommandHandler).Assembly);
     services.AddScoped(typeof(ImportExportService<>));
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
     builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityServices));
-    //services.AddSingleton<IWebHostEnvironment>(env => new HostingEnvironment { EnvironmentName = env.EnvironmentName, WebRootPath = env.WebRootPath });
-    //services.AddTransient<JwtMiddleware>();
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-    //    builder.Services.AddIdentity<User, Role>(options =>
-    //    {
-    //        // Configure identity options
-    //    })
-    //.AddEntityFrameworkStores<UmspContext>()
-    //.AddDefaultTokenProviders();
+    builder.Services.AddMediatR(typeof(Program).GetTypeInfo().Assembly);
+    services.AddAutoMapper(typeof(Program));
+
 }
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>

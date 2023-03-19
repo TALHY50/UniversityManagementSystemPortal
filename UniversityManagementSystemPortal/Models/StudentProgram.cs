@@ -4,13 +4,13 @@ using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class StudentProgram: TrackableBaseEntity
+public partial class StudentProgram
 {
     public Guid Id { get; set; }
 
     public Guid StudentId { get; set; }
 
-    public Guid ProgramId { get; set; }
+    public Guid? ProgramId { get; set; }
 
     public string RoleNo { get; set; } = null!;
 

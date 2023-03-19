@@ -1,6 +1,17 @@
-﻿namespace UniversityManagementSystemPortal.Interfaces
+﻿using UniversityManagementsystem.Models;
+
+namespace UniversityManagementSystemPortal.Interfaces
 {
-    public class IStudentProgramRepository
+    public interface IStudentProgramRepository
     {
+        Task AddStudentProgramAsync(StudentProgram studentProgram);
+
+        Task<IEnumerable<StudentProgram>> GetAllStudentProgramsAsync();
+
+        Task<StudentProgram> GetStudentProgramByIdAsync(Guid id);
+
+        Task UpdateStudentProgramAsync(StudentProgram studentProgram);
+
+        Task DeleteStudentProgramAsync(Guid id);
     }
 }

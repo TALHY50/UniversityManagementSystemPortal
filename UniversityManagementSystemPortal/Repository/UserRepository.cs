@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfce;
@@ -91,6 +92,10 @@ namespace UniversityManagementSystemPortal.Repository
                 return null;
             }
             return user;
+        }
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            return await _context.Set<User>().SingleOrDefaultAsync(u => u.Email == email);
         }
     }
 

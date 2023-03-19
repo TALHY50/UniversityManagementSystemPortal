@@ -11,7 +11,7 @@ namespace UniversityManagementSystemPortal
         public RoleMapper() {
 
             CreateMap<Role, RoleDto>();
-            CreateMap<CreateRoleDto, Role>();
+            CreateMap<AddRoleDto, Role>();
             CreateMap<UpdateRoleDto, Role>();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace UniversityManagementsystem.Models;
@@ -40,8 +41,14 @@ public partial class UmspContext : DbContext
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-JVIBG7N;Database=UMSP;Encrypt=False;Trusted_Connection=True; User ID=sa;Password=1122");
+    {
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile("appsettings.json")
+            .Build();
+
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

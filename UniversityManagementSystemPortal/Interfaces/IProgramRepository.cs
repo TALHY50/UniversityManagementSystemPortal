@@ -11,5 +11,6 @@ namespace UniversityManagementSystemPortal
         Task UpdateAsync(PorgramNamespace program);
         Task DeleteAsync(Guid id);
         Task<IEnumerable<StudentProgram>> GetStudentProgramsAsync(Guid programId);
+        Task<PorgramNamespace> GetProgramByName(string programName);
     }
 }

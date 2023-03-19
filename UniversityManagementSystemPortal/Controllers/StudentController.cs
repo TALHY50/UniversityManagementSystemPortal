@@ -1,23 +1,17 @@
 ﻿using AutoMapper;
-using CsvHelper;
-using Microsoft.AspNetCore.Authorization;
+using LINQtoCSV;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Globalization;
-using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Application.Command.Student;
+using UniversityManagementSystemPortal.Application.Qurey.Student;
+using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.CsvImport;
-using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.ModelDto.Student;
-using UniversityManagementSystemPortal.ModelDto.UserDto;
-using UniversityManagementSystemPortal.PictureManager;
-using UniversityManagementSystemPortal.Repository;
-using CsvHelper.Configuration;
-using CsvHelper.Configuration.Attributes;
-using System.Text;
-using System.Collections;
 using UniversityManagementSystemPortal.IdentityServices;
+using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.Interfce;
+using UniversityManagementSystemPortal.ModelDto.Student;
+using UniversityManagementSystemPortal.PictureManager;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -26,200 +20,127 @@ namespace UniversityManagementSystemPortal.Controllers
     [Route("api/[controller]")]
     public class StudentController : ControllerBase
     {
-        private readonly IMapper _mapper;
-        private readonly IStudentRepository _studentRepository;
-        private readonly IUserInterface _userInterface;
-        private readonly IInstituteRepository _instituteRepository;
-        private readonly IPictureManager _pictureManager;
-        private readonly ImportExportService<StudentDto> _importExportService;
-        private readonly IIdentityServices _identityServices;
+        private readonly IMediator _mediator;
         private readonly ILogger<StudentController> _logger;
-        private readonly IInstituteAdminRepository _repository;
-        public StudentController(ILogger<StudentController> logger,
-            IMapper mapper,
-            IStudentRepository studentRepository,
-            IPictureManager pictureManager,
-            IInstituteRepository instituteRepository,
-            IUserInterface userInterface,
-            IInstituteAdminRepository repository,
-        ImportExportService<StudentDto> importExportService,
-            IIdentityServices identityServices)
+        public StudentController(ILogger<StudentController> logger,IMediator mediator)
         {
-            _mapper = mapper;
-            _studentRepository = studentRepository;
-            _pictureManager = pictureManager;
-            _importExportService = importExportService;
-            _identityServices = identityServices;
-            _userInterface = userInterface;
+            _mediator = mediator;
             _logger = logger;
-            _instituteRepository = instituteRepository;
-            _repository = repository;
-
         }
         [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var students = await _studentRepository.Get();
-            var studentDtos = _mapper.Map<List<StudentDto>>(students);
-            return Ok(studentDtos);
-        }
-        [JwtAuthorize("Admin", "SuperAdmin")]
-        [HttpGet("export")]
-        public async Task<IActionResult> ExportToCsv()
-        {
-            var students = await _studentRepository.Get();
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = ",",
-                Encoding = System.Text.Encoding.UTF8
-            };
-
-            var studentReadModels = _mapper.Map<IEnumerable<StudentReadModel>>(students);
-
-            using (var writer = new StringWriter())
-            using (var csv = new CsvWriter(writer, config))
-            {
-                csv.WriteRecords(studentReadModels);
-                return File(System.Text.Encoding.UTF8.GetBytes(writer.ToString()), "text/csv", "students.csv");
-            }
-        }
-        [JwtAuthorize("Admin", "SuperAdmin")]
-        [HttpPost("Import")]
-        public async Task<IActionResult> ImportStudents(IFormFile file)
-        {
-            if (file == null || file.Length <= 0)
-            {
-                return BadRequest(new { message = "Please select a valid file." });
-            }
-
-            if (!file.FileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest(new { message = "Invalid file format. Please select a CSV file." });
-            }
-
-            try
-            {
-                var instituteAdminId = _identityServices.GetUserId().GetValueOrDefault();
-                var instituteAdmin = await _repository.GetByUserIdAsync(instituteAdminId);
-
-                if (instituteAdmin == null)
-                {
-                    return BadRequest(new { message = "Invalid user. No associated institute found." });
-                }
-
-                using (var stream = file.OpenReadStream())
-                using (var reader = new StreamReader(stream))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-                {
-                    var records = csv.GetRecords<StudentReadModel>();
-                    var students = _mapper.Map<IEnumerable<Student>>(records);
-
-                    foreach (var student in students)
-                    {
-                        student.InstituteId = instituteAdmin.InstituteId;
-                        student.CreatedBy = instituteAdminId;
-                        await _studentRepository.Add(student);
-                    }
-                }
-
-                return Ok(new { message = "Students added successfully." });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while importing students.");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while importing students. Please try again later." });
-            }
+            var query = new GetStudentListQurey();
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
         [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var student = await _studentRepository.GetById(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
-            var studentDto = _mapper.Map<StudentDto>(student);
-            return Ok(studentDto);
+            var query = new GetStudentByIdQurey(id);
+            var result = await _mediator.Send(query);
+
+            return Ok(result);
         }
         [JwtAuthorize("Admin", "SuperAdmin")]
-        [HttpPost]
-        public async Task<IActionResult> Add([FromForm] AddStudentDto addStudentDto, IFormFile picture)
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportStudents()
         {
-            if (addStudentDto == null)
+            var query = new ExportStudentListQuery();
+            var data = await _mediator.Send(query);
+
+            return File(data, "text/csv", "students.csv");
+        }
+        [JwtAuthorize("Admin", "SuperAdmin")]
+        [HttpPost("Import")]
+        public async Task<IActionResult> UploadFileAndProcessData(IFormFile file)
+        {
+            var csvFileDescription = new CsvFileDescription
             {
-                return BadRequest("The student data is empty.");
+                FirstLineHasColumnNames = true,
+                IgnoreUnknownColumns = true,
+                SeparatorChar = ',',
+                UseFieldIndexForReadingData = false
+            };
+
+            using (var streamReader = new StreamReader(file.OpenReadStream()))
+            {
+                var csvContext = new LINQtoCSV.CsvContext();
+                var studentsData = csvContext.Read<StudentReadModel>(streamReader, csvFileDescription).ToList();
+
+                var command = new ImportStudentsCommand(studentsData);
+                await _mediator.Send(command);
             }
 
-            if (addStudentDto.InstituteId == null)
+            _logger.LogInformation("Processing file {FileName} for user {UserId}.", file.FileName);
+
+            return Ok(new { message = "File Imported Successfully" });
+        }
+
+
+        [JwtAuthorize("Admin", "SuperAdmin")]
+        [HttpPost]
+        public async Task<ActionResult<AddStudentDto>> AddStudent([FromForm] AddStudentCommand command)
+        {
+            try
             {
-                return BadRequest("The Institute ID is required.");
+                var result = await _mediator.Send(command);
+                return Ok(result);
             }
-
-            // Check if the student with the same admission number already exists
-            var existingStudent = await _studentRepository.GetByAdmissionNo(addStudentDto.AdmissionNo);
-            if (existingStudent != null)
+            catch (Exception ex)
             {
-                return Conflict("A student with the same admission number already exists.");
+                return BadRequest(ex.Message);
             }
-
-            var student = _mapper.Map<Student>(addStudentDto);
-
-            if (picture != null)
-            {
-                student.ProfilePath = await _pictureManager.Upload(picture);
-            }
-
-            var addedStudent = await _studentRepository.Add(student);
-            var addedStudentDto = _mapper.Map<StudentDto>(addedStudent);
-            return Ok(addedStudentDto);
         }
 
 
         [HttpGet("{admissionNo}")]
         public async Task<IActionResult> GetByAdmissionNo(string admissionNo)
         {
-            var student = await _studentRepository.GetByAdmissionNo(admissionNo);
-            if (student == null)
-            {
-                return NotFound();
-            }
-            var studentDto = _mapper.Map<StudentDto>(student);
+            var query = new GetStudentByAdmissionNoQuery { AdmissionNo = admissionNo };
+            var studentDto = await _mediator.Send(query);
             return Ok(studentDto);
         }
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] UpdateStudentDto updateStudentDto)
+        public async Task<IActionResult> UpdateStudent(Guid id, [FromForm] UpdateStudentCommand command)
         {
-            var existingStudent = await _studentRepository.GetById(id);
-            if (existingStudent == null)
+            if (id != command.Id)
+            {
+                return BadRequest("The ID in the URL doesn't match the ID in the request body.");
+            }
+
+            var result = await _mediator.Send(command);
+            if (result == null)
             {
                 return NotFound();
             }
-            var updatedStudent = _mapper.Map(updateStudentDto, existingStudent);
-            var updatedStudentDto = _mapper.Map<StudentDto>(updatedStudent);
-            return Ok(updatedStudentDto);
+
+            return Ok(result);
         }
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var existingStudent = await _studentRepository.GetById(id);
-            if (existingStudent == null)
+            try
             {
-                return NotFound();
+                await _mediator.Send(new DeleteStudentCommand { Id = id });
+                return Ok(new { message = "Student deleted successfully." });
             }
-
-            // Delete profile picture
-            if (!string.IsNullOrEmpty(existingStudent.ProfilePath))
+            catch (AppException ex)
             {
-                _pictureManager.Delete(existingStudent.ProfilePath);
+                _logger.LogError(ex, ex.Message);
+                return NotFound(new { error = ex.Message });
             }
-
-            await _studentRepository.Delete(id);
-            return NoContent();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while deleting student with Id {Id}", id);
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Internal server error" });
+            }
         }
+
 
 
     }

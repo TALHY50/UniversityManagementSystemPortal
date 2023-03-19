@@ -10,8 +10,8 @@ namespace UniversityManagementSystemPortal
         public Guid Id { get; set; }
         public string AdmissionNo { get; set; } = null!;
         public string RoleNo { get; set; } = null!;
+        public string SectionName { get; set; }
         public string FirstName { get; set; } = null!;
-
         public string? MiddleName { get; set; }
 
         public string? LastName { get; set; }
@@ -33,10 +33,6 @@ namespace UniversityManagementSystemPortal
         public string ProgramName { get; set; }
         public string? UserName { get; set; }
         public bool? EmailConfirm { get; set; }
-        public string? Password
-        {
-            get; set;
-
-        }
+        
     }
 }

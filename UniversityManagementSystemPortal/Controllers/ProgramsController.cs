@@ -10,7 +10,7 @@ using UniversityManagementSystemPortal.IdentityServices;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
-    [JwtAuthorize]
+    //[JwtAuthorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProgramsController : ControllerBase
@@ -44,7 +44,7 @@ namespace UniversityManagementSystemPortal.Controllers
 
             return Ok(_mapper.Map<ProgramReadDto>(program));
         }
-        [JwtAuthorize("Admin, SuperAdmin")]
+        //[JwtAuthorize("Admin, SuperAdmin")]
         [HttpPost]
         public async Task<ActionResult<ProgramReadDto>> Create(ProgramCreateDto programCreateDto)
         {

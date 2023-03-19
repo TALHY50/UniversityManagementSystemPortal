@@ -170,7 +170,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Login")]
-        public async Task<ActionResult<LoginView>> Login(Login model)
+        public async Task<ActionResult<LoginView>> Login([FromForm]Login model)
         {
             try
             {

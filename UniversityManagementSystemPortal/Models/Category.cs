@@ -4,7 +4,7 @@ using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class Category: TrackableBaseEntity
+public partial class Category
 {
     public Guid Id { get; set; }
 

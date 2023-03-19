@@ -17,6 +17,7 @@ namespace UniversityManagementSystemPortal.Interfce
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);
         Task<User> RegisterAsUser(User model);
- 
+        Task<User> GetByEmailAsync(string email);
+
     }
 }

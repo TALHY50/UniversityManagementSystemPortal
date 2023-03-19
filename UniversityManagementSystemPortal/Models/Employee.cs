@@ -4,8 +4,8 @@ using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class Employee : TrackableBaseEntity
-{
+public partial class Employee
+{ 
     public Guid Id { get; set; }
 
     public Guid? UserId { get; set; }

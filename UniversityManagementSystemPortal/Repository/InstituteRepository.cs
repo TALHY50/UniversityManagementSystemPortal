@@ -78,6 +78,8 @@ namespace UniversityManagementSystemPortal.Repository
             _context.Institutes.Remove(institute);
             await _context.SaveChangesAsync();
         }
+
+
     }
 
 }

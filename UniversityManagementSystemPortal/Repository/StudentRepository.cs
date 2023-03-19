@@ -1,5 +1,7 @@
-﻿using LINQtoCSV;
+﻿using DocumentFormat.OpenXml.InkML;
+using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGeneration.Design;
 using NuGet.Versioning;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.IdentityServices;
@@ -121,16 +123,10 @@ namespace UniversityManagementSystemPortal.Repository
             return student;
         }
 
-
-
-        public async Task<Student> Update(Student student, IFormFile picture)
+        public async Task<Student> Update(Student student)
         {
-            if (picture != null)
-            {
-                student.ProfilePath = await _pictureManager.Update(student.Id, picture, student.ProfilePath);
-            }
+           
             student.Id = Guid.NewGuid();
-
             _dbContext.Students.Update(student);
             await _dbContext.SaveChangesAsync();
 
@@ -309,6 +305,48 @@ namespace UniversityManagementSystemPortal.Repository
 
 
 
+        }
+
+        public Student AddBulk(Student student, User user, StudentReadModel dto)
+        {
+          
+            user.CreatedBy = _identityService.GetUserId().Value;
+            user.UpdatedBy = _identityService.GetUserId().Value;
+
+            _dbContext.Users.Add(user);
+
+            var activeUserId = _identityService.GetUserId().GetValueOrDefault();
+            var institute = _dbContext.InstituteAdmins
+                                  .Where(a => a.UserId == activeUserId)
+                                  .Select(a => a.Institute)
+                                  .FirstOrDefault();
+
+            student.InstituteId = institute.Id;
+            student.ProfilePath = null;
+            student.CreatedBy = _identityService.GetUserId().Value;
+            student.UpdatedBy = _identityService.GetUserId().Value;
+
+            _dbContext.Students.Add(student);
+
+            var program = _dbContext.Programs.FirstOrDefault(p => p.Name == dto.ProgramName);
+            if (program == null)
+                return null;
+
+            var studentProgram = new StudentProgram
+            {
+                Id = Guid.NewGuid(),
+                StudentId = student.Id,
+                ProgramId = program.Id,
+                RoleNo = dto.RoleNo,
+                IsActive = true,
+                CreatedBy = _identityService.GetUserId().Value,
+                UpdatedBy = _identityService.GetUserId().Value
+            };
+
+            _dbContext.StudentPrograms.Add(studentProgram);
+
+            _dbContext.SaveChanges();
+            return student;
         }
     }
 }
