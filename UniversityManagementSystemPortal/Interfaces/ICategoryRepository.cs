@@ -11,5 +11,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<Category> AddAsync(Category category);
         Task<Category> UpdateAsync(Category category);
         Task DeleteAsync(Category category);
+        Task<Category> GetCategoryByName(string categoryName);
     }
 }

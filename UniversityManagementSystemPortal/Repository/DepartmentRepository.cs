@@ -119,6 +119,12 @@ namespace UniversityManagementSystemPortal.Repository
             _context.Departments.Remove(department);
             await _context.SaveChangesAsync();
         }
+        public async Task<Department> GetDepartmentByNameAsync(string departmentName)
+        {
+            // Retrieve the department with the specified name
+            var department = await _context.Departments.FirstOrDefaultAsync(d => d.Name == departmentName);
+            return department;
+        }
     }
 
 }

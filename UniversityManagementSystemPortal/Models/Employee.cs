@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class Employee
+public partial class Employee : TrackableBaseEntity
 { 
     public Guid Id { get; set; }
 
@@ -12,7 +13,7 @@ public partial class Employee
 
     public string EmployeeNo { get; set; } = null!;
 
-    public int? EmployeeType { get; set; }
+    public EmployeeType EmployeeType { get; set; }
 
     public string? Address { get; set; }
 

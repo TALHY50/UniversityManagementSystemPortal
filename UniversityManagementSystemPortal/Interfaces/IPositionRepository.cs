@@ -11,5 +11,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task CreateAsync(Position position);
         Task UpdateAsync(Position position);
         Task DeleteAsync(Guid id);
+        Task<Position> GetPositionByName(string positionName);
     }
 }

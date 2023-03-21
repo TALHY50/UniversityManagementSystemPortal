@@ -21,7 +21,7 @@ public partial class User : TrackableBaseEntity
     [StringLength(50, ErrorMessage = "Last name cannot exceed 50 characters")]
     public string? LastName { get; set; }
 
-    [RegularExpression(@"^\d{10}$", ErrorMessage = "Mobile number must be 10 digits")]
+    [RegularExpression(@"^\d{11}$", ErrorMessage = "Mobile number must be 11 digits")]
     public string? MobileNo { get; set; }
 
     [DataType(DataType.Date)]

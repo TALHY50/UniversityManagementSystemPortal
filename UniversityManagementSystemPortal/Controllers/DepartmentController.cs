@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Application.Command.Department;
+using UniversityManagementSystemPortal.Application.Qurey.Department;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Department;
@@ -12,42 +15,43 @@ namespace UniversityManagementSystemPortal.Controllers
     [Route("api/[controller]")]
     public class DepartmentController : ControllerBase
     {
+        private readonly IMediator _mediator;
         private readonly IDepartmentRepository _departmentRepository;
         private readonly IMapper _mapper;
         private readonly IIdentityServices _identityService;
 
-        public DepartmentController(IDepartmentRepository departmentRepository, IMapper mapper, IIdentityServices identityService)
+        public DepartmentController(IDepartmentRepository departmentRepository, IMediator mediator, IMapper mapper, IIdentityServices identityService)
         {
             _departmentRepository = departmentRepository;
             _mapper = mapper;
             _identityService = identityService;
+            _mediator = mediator;
         }
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DepartmentDto>>> GetAll()
         {
-            var departments = await _departmentRepository.GetAllDepartmentsAsync();
-            var departmentDtos = _mapper.Map<IEnumerable<DepartmentDto>>(departments);
+            var query = new GetAllDepartmentsQuery();
+            var departmentDtos = await _mediator.Send(query);
             return Ok(departmentDtos);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<DepartmentDto>> GetById(Guid id)
         {
-            var department = await _departmentRepository.GetDepartmentByIdAsync(id);
-            if (department == null)
+            var query = new GetDepartmentByIdQuery { Id = id };
+            var departmentDto = await _mediator.Send(query);
+            if (departmentDto == null)
             {
                 return NotFound();
             }
-            var departmentDto = _mapper.Map<DepartmentDto>(department);
             return Ok(departmentDto);
         }
 
         [HttpGet("institute/{id}")]
         public async Task<ActionResult<IEnumerable<DepartmentDto>>> GetByInstituteId(Guid id)
         {
-            var departments = await _departmentRepository.GetDepartmentsByInstituteIdAsync(id);
-            var departmentDtos = _mapper.Map<IEnumerable<DepartmentDto>>(departments);
+            var query = new GetDepartmentsByInstituteIdQuery { InstituteId = id };
+            var departmentDtos = await _mediator.Send(query);
             return Ok(departmentDtos);
         }
         [HttpPost("departments")]
@@ -85,12 +89,8 @@ namespace UniversityManagementSystemPortal.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var department = await _departmentRepository.GetDepartmentByIdAsync(id);
-            if (department == null)
-            {
-                return NotFound();
-            }
-            await _departmentRepository.DeleteDepartmentAsync(id);
+            var command = new DeleteDepartmentCommand { DepartmentId = id };
+            await _mediator.Send(command);
             return NoContent();
         }
     }

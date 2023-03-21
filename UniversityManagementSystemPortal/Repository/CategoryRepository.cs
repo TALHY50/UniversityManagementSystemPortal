@@ -99,6 +99,10 @@ namespace UniversityManagementSystemPortal.Repository
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
         }
+        public async Task<Category> GetCategoryByName(string categoryName)
+        {
+            return  _context.Categories.FirstOrDefault(c => c.Name == categoryName);
+        }
     }
 
 

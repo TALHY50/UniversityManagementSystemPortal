@@ -33,7 +33,7 @@ namespace UniversityManagementSystemPortal.Application.Handler.Roles
                     _logger.LogError($"Role with ID {request.Id} does not exist.");
                     throw new AppException(nameof(Role), request.Id);
                 }
-                var existingRole = await _roleRepository.GetByRoleTypeAsync((int)request.RoleType);
+                var existingRole = await _roleRepository.GetByRoleTypeAsync(request.RoleType);
                 if (existingRole != null && existingRole.Id != request.Id)
                 {
                     _logger.LogError($"Role with type {request.RoleType} already exists.");

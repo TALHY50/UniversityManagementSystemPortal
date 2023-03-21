@@ -1,9 +1,9 @@
-﻿using AutoMapper;
+﻿using LINQtoCSV;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementsystem.Models;
-using UniversityManagementSystemPortal.CsvImport;
-using UniversityManagementSystemPortal.IdentityServices;
-using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Application.Command.Employee;
+using UniversityManagementSystemPortal.Application.Qurey.Employee;
+using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.ModelDto.Employee;
 
 namespace UniversityManagementSystemPortal.Controllers
@@ -12,103 +12,135 @@ namespace UniversityManagementSystemPortal.Controllers
     [Route("api/employees")]
     public class EmployeeController : ControllerBase
     {
-        private readonly ImportExportService<EmployeeDto> _importExportService;
-        private readonly IMapper _mapper;
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly IIdentityServices _identityServices;
-        public EmployeeController(IIdentityServices identityServices, IMapper mapper, IEmployeeRepository employeeRepository, ImportExportService<EmployeeDto> importExportService)
+        private readonly IMediator _mediator;
+        private readonly ILogger<EmployeeController> _logger;
+        public EmployeeController(ILogger<EmployeeController> logger, IMediator mediator)
         {
-            _mapper = mapper;
-            _employeeRepository = employeeRepository;
-            _importExportService = importExportService;
-            _identityServices = identityServices;
+            _mediator = mediator;
+            _logger = logger;
+
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAll()
         {
-            var employees = await _employeeRepository.GetAllAsync();
-            var employeeDtos = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+            var employees = await _mediator.Send(new GetAllEmployeesQuery());
 
-            return Ok(employeeDtos);
+            return Ok(employees);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeDto>> GetById(Guid id)
         {
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            if (employee == null)
+            try
             {
-                return NotFound();
+                var query = new GetEmployeeByIdQuery { Id = id };
+                var employee = await _mediator.Send(query);
+                return Ok(employee);
             }
-
-            var employeeDto = _mapper.Map<EmployeeDto>(employee);
-
-            return Ok(employeeDto);
+            catch (AppException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<EmployeeDto>> Add([FromForm] CreateEmployeeDto createEmployeeDto, IFormFile picture)
+        public async Task<IActionResult> Add([FromForm] CreateEmployeeCommand createEmployeeCommand)
         {
-            var userId = _identityServices.GetUserId();
-            if (userId == null)
+            try
             {
-                return Unauthorized(new { message = "You must be logged in to perform this action." });
+                var createdEmployee = await _mediator.Send(createEmployeeCommand);
+                return Ok(new { message = "Employee created successfully.", employee = createdEmployee });
             }
-
-            var employee = _mapper.Map<Employee>(createEmployeeDto);
-            employee.CreatedBy = userId.Value;
-
-            await _employeeRepository.AddAsync(employee);
-
-            var employeeDto = _mapper.Map<EmployeeDto>(employee);
-
-            return CreatedAtAction(nameof(GetById), new { id = employeeDto.Id }, employeeDto);
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating an employee");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while creating an employee." });
+            }
         }
+
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(Guid id, UpdateEmployeeDto updateEmployeeDto)
+        public async Task<ActionResult<UpdateEmployeeDto>> Update(Guid id, [FromForm] UpdateEmployeeCommand command)
         {
-            var userId = _identityServices.GetUserId();
-            if (userId == null)
+            if (id != command.Id)
             {
-                return Unauthorized(new { message = "You must be logged in to perform this action." });
+                return BadRequest("The provided ID does not match the ID in the request body.");
             }
 
-            var employee = await _employeeRepository.GetByIdAsync(id);
-
-            if (employee == null)
+            try
             {
-                return NotFound();
+                var updatedEmployee = await _mediator.Send(command);
+                return Ok(new { message = "Employee updated successfully", employee = updatedEmployee });
             }
-
-            _mapper.Map(updateEmployeeDto, employee);
-            employee.UpdatedBy = userId.Value;
-
-            await _employeeRepository.UpdateAsync(employee);
-
-            return NoContent();
+            catch (AppException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            await _employeeRepository.DeleteAsync(id);
+            await _mediator.Send(new DeleteEmployeeCommand { Id = id });
 
             return NoContent();
         }
-        [HttpPost("Export")]
+
+        [HttpGet("Export")]
         public async Task<IActionResult> Export()
         {
-            var students = await _employeeRepository.GetAllAsync();
-            var studentDtos = _mapper.Map<List<EmployeeReadDto>>(students);
-            var studentDtosEnumerable = studentDtos.Select(s => _mapper.Map<EmployeeDto>(s));
-            var csvBytes = await _importExportService.ExportToCsvAsync(studentDtosEnumerable);
-
-
-            return File(csvBytes, "text/csv", "students.csv");
+            var request = new ExportEmployeeListQuery();
+            var fileContent = await _mediator.Send(request);
+            var fileName = "employee_list.csv";
+            return File(fileContent, "text/csv", fileName);
         }
+        [HttpPost("Import")]
+        public async Task<IActionResult> UploadFileAndProcessData(IFormFile file)
+        {
+            var csvFileDescription = new CsvFileDescription
+            {
+                FirstLineHasColumnNames = true,
+                IgnoreUnknownColumns = true,
+                SeparatorChar = ',',
+                UseFieldIndexForReadingData = false
+            };
+
+            using (var streamReader = new StreamReader(file.OpenReadStream()))
+            {
+                var csvContext = new CsvContext();
+                var employeeData = csvContext.Read<EmployeeReadModel>(streamReader, csvFileDescription).ToList();
+
+                var command = new ImportEmployeeCommand(employeeData);
+                await _mediator.Send(command);
+            }
+
+            _logger.LogInformation("Processing file {FileName} for user {UserId}.", file.FileName);
+
+            return Ok(new { message = "File Imported Successfully" });
+        }
+
     }
 
 

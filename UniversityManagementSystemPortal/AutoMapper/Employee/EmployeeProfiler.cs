@@ -2,6 +2,7 @@
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.ModelDto.Employee;
+using UniversityManagementSystemPortal.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal
 {
@@ -37,6 +38,8 @@ namespace UniversityManagementSystemPortal
             CreateMap<UpdateEmployeeDto, Employee>()
                 .ForMember(dest => dest.ProfilePath, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ?? true));
+
+            CreateMap<Employee, EmployeeReadModel>();
         }
     }
 }

@@ -2,7 +2,8 @@
 {
     public enum EmployeeType
     {
-        TEACHING,
-        FACULITIY
+        Staff,
+        Faculty
+
     }
 }

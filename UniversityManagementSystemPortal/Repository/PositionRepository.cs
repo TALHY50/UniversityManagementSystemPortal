@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
@@ -98,6 +99,11 @@ namespace UniversityManagementSystemPortal.Repository
 
             _dbContext.Positions.Remove(position);
             await _dbContext.SaveChangesAsync();
+        }
+        public async Task<Position> GetPositionByName(string positionName)
+        {
+            var position =  _dbContext.Positions.FirstOrDefault(p => p.Name == positionName);
+            return position;
         }
     }
 

@@ -10,5 +10,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<Department> CreateDepartmentAsync(Department department);
         Task<Department> UpdateDepartmentAsync(Department department);
         Task DeleteDepartmentAsync(Guid departmentId);
+        Task<Department> GetDepartmentByNameAsync(string name);
     }
 }

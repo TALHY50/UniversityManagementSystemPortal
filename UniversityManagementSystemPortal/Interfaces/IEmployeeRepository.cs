@@ -8,8 +8,9 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<IEnumerable<Employee>> GetAllAsync();
         Task<IEnumerable<Employee>> GetByDepartmentIdAsync(Guid departmentId);
         Task<IEnumerable<Employee>> GetByPositionIdAsync(Guid positionId);
-        Task AddAsync(Employee employee);
-        Task UpdateAsync(Employee employee);
+        Task<Employee> AddAsync(Employee employee);
+        Task<Employee> UpdateAsync(Employee employee);
         Task DeleteAsync(Guid id);
+        Task<bool> EmployeeNoExistsAsync(string employeeNo);
     }
 }
