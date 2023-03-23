@@ -18,7 +18,7 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (id == Guid.Empty)
             {
-                throw new ArgumentException("Invalid Guid value.", nameof(id));
+                return null;
             }
 
             var userRole = await _context.UserRoles
@@ -47,7 +47,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
             userRole.Id = Guid.NewGuid();
             await _context.UserRoles.AddAsync(userRole);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task UpdateAsync(UserRole userRole)
@@ -58,7 +58,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.UserRoles.Update(userRole);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(UserRole userRole)
@@ -69,7 +69,11 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.UserRoles.Remove(userRole);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 

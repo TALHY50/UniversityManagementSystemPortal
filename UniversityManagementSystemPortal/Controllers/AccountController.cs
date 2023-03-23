@@ -11,6 +11,8 @@ using Serilog;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
 using AllowAnonymous = UniversityManagementSystemPortal.Authorization.AllowAnonymousAttribute;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
+using MediatR;
+using UniversityManagementSystemPortal.Application.Command.Account;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -19,6 +21,7 @@ namespace UniversityManagementSystemPortal.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private readonly IMediator _mediator;
         private readonly IUserInterface _userRepository;
         private readonly IIdentityServices _identityServices;
         private readonly IMapper _mapper;
@@ -26,6 +29,7 @@ namespace UniversityManagementSystemPortal.Controllers
         private readonly ILogger<AccountController> _logger;
 
         public AccountController(IUserInterface userRepository,
+            IMediator mediator,
             IMapper mapper,
             IJwtTokenService jwtTokenService,
             IIdentityServices identityServices,
@@ -36,6 +40,7 @@ namespace UniversityManagementSystemPortal.Controllers
             _jwtTokenService = jwtTokenService;
             _identityServices = identityServices;
             _logger = logger;
+            _mediator = mediator; 
         }
 
         [JwtAuthorize("Admin", "SuperAdmin")]
@@ -80,7 +85,7 @@ namespace UniversityManagementSystemPortal.Controllers
 
         [AllowAnonymous]
         [HttpPost("post")]
-        public async Task<ActionResult<RegistorViewModel>> Post([FromForm] RegistorViewModel userViewModel)
+        public async Task<ActionResult<RegistorUserDto>> Post([FromForm] RegistorUserDto userViewModel)
         {
             try
             {
@@ -99,7 +104,7 @@ namespace UniversityManagementSystemPortal.Controllers
                     return BadRequest(new { message = "Failed to register user." });
                 }
 
-                var mappedUserViewModel = _mapper.Map<RegistorViewModel>(registeredUser);
+                var mappedUserViewModel = _mapper.Map<RegistorUserDto>(registeredUser);
                 return Ok(new { message = "Successfully registered user.", data = mappedUserViewModel });
             }
             catch (Exception ex)
@@ -110,7 +115,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<RegistorViewModel>> Put([FromForm] Guid id, User user)
+        public async Task<ActionResult<RegistorUserDto>> Put([FromForm] Guid id, User user)
 
         {
             try
@@ -134,7 +139,7 @@ namespace UniversityManagementSystemPortal.Controllers
                     return BadRequest(new { message = "Failed to update user." });
                 }
 
-                var updatedUserViewModel = _mapper.Map<RegistorViewModel>(updatedUser);
+                var updatedUserViewModel = _mapper.Map<RegistorUserDto>(updatedUser);
                 return Ok(new { message = "Successfully updated user.", data = updatedUserViewModel });
             }
             catch (Exception ex)
@@ -149,18 +154,15 @@ namespace UniversityManagementSystemPortal.Controllers
         {
             try
             {
-                var userToDelete = await _userRepository.GetByIdAsync(id);
-
-                if (userToDelete == null)
-                {
-                    return NotFound(new { message = $"User with ID {id} not found." });
-                }
-
-                await _userRepository.DeleteAsync(userToDelete);
+                await _mediator.Send(new DeleteUserCommand { UserId = id });
 
                 _logger.LogInformation("User with ID {UserId} deleted successfully.", id);
 
                 return Ok(new { message = "Successfully deleted user." });
+            }
+            catch (AppException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -169,20 +171,12 @@ namespace UniversityManagementSystemPortal.Controllers
             }
         }
         [AllowAnonymous]
-        [HttpPost("Login")]
-        public async Task<ActionResult<LoginView>> Login([FromForm]Login model)
+        [HttpPost("Authenticate")]
+        public async Task<ActionResult<LoginView>> Login(LoginCommand loginCommand)
         {
             try
             {
-                var user = await _userRepository.Authenticate(model);
-
-                if (user == null)
-                {
-                    return Unauthorized(new { message = "Invalid username or password." });
-                }
-
-                var jwtToken = _jwtTokenService.GenerateJwtToken(user);
-                var loginView = new LoginView(user, jwtToken);
+                var loginView = await _mediator.Send(loginCommand);
                 return Ok(new { message = "Successfully logged in.", data = loginView });
             }
             catch (Exception ex)

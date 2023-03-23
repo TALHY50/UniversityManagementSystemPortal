@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Department;
 using UniversityManagementSystemPortal.Application.Qurey.Department;
+using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Department;
@@ -16,15 +16,10 @@ namespace UniversityManagementSystemPortal.Controllers
     public class DepartmentController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IDepartmentRepository _departmentRepository;
-        private readonly IMapper _mapper;
-        private readonly IIdentityServices _identityService;
 
-        public DepartmentController(IDepartmentRepository departmentRepository, IMediator mediator, IMapper mapper, IIdentityServices identityService)
+        public DepartmentController(IMediator mediator)
         {
-            _departmentRepository = departmentRepository;
-            _mapper = mapper;
-            _identityService = identityService;
+
             _mediator = mediator;
         }
         [HttpGet]
@@ -54,38 +49,49 @@ namespace UniversityManagementSystemPortal.Controllers
             var departmentDtos = await _mediator.Send(query);
             return Ok(departmentDtos);
         }
-        [HttpPost("departments")]
-
-        public async Task<ActionResult<DepartmentDto>> Create(DepartmentCreateDto departmentCreateDto)
+        [HttpPost]
+        public async Task<ActionResult<DepartmentCreateDto>> Create([FromForm]CreateDepartmentCommand command)
         {
-            var department = _mapper.Map<Department>(departmentCreateDto);
-
-            department.CreatedBy = _identityService.GetUserId();
-            department.UpdatedBy = _identityService.GetUserId();
-
-            department = await _departmentRepository.CreateDepartmentAsync(department);
-
-            var departmentDto = _mapper.Map<DepartmentDto>(department);
-            return departmentDto;
+            try
+            {
+                var result = await _mediator.Send(command);
+                return Ok(result);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                return StatusCode(StatusCodes.Status500InternalServerError, new { error = "An error occurred while creating the department" });
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, DepartmentUpdateDto updateDepartmentDto)
+        public async Task<ActionResult<DepartmentUpdateDto>> UpdateDepartment(Guid id, [FromBody] UpdateDepartmentCommand request)
         {
-            var department = await _departmentRepository.GetDepartmentByIdAsync(id);
-            if (department == null)
+            try
             {
-                return NotFound();
+                var command = new UpdateDepartmentCommand { Id = id, Name = request.Name, Code = request.Code };
+                var departmentDto = await _mediator.Send(command);
+
+                return Ok(departmentDto);
             }
-
-            department.UpdatedBy = _identityService.GetUserId();
-
-            _mapper.Map(updateDepartmentDto, department);
-
-            await _departmentRepository.UpdateDepartmentAsync(department);
-            return NoContent();
+            catch (AppException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // log the exception message here
+                return StatusCode(500, "An error occurred while updating the department.");
+            }
         }
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

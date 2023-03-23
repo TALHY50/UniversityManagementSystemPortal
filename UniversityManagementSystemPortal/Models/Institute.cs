@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using UniversityManagementSystemPortal.Enum;
-using UniversityManagementSystemPortal.TrackableBaseEntity;
+using UniversityManagementSystemPortal.Models.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 

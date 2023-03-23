@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Application.Command.UserRoles;
+using UniversityManagementSystemPortal.Application.Qurey.UserRoles;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Enum;
@@ -17,26 +20,22 @@ namespace UniversityManagementSystemPortal.Controllers
     [Route("api/[controller]")]
     public class UserRolesController : ControllerBase
     {
-        private readonly IUserRoleRepository _repository;
-        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
+       
 
-        public UserRolesController(IUserRoleRepository repository, IMapper mapper)
+        public UserRolesController(IMediator mediator)
         {
-            _repository = repository;
-            _mapper = mapper;
+            
+            _mediator = mediator;
+           
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserRoleDto>> GetById(Guid id)
         {
-            var userRole = await _repository.GetByIdAsync(id);
+            var query = new GetUserRoleByIdQuery { Id = id };
 
-            if (userRole == null)
-            {
-                return NotFound();
-            }
-
-            var userRoleDto = _mapper.Map<UserRoleDto>(userRole);
+            var userRoleDto = await _mediator.Send(query);
 
             return userRoleDto;
         }
@@ -44,62 +43,40 @@ namespace UniversityManagementSystemPortal.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAll()
         {
-            var userRoles = await _repository.GetAllAsync();
+            var query = new GetAllUserRolesQuery();
 
-            var userRoleDtos = _mapper.Map<IEnumerable<UserRoleDto>>(userRoles);
+            var userRoleDtos = await _mediator.Send(query);
 
             return Ok(userRoleDtos);
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserRoleDto>> Create([FromQuery]CreateUserRoleDto createUserRoleDto)
+        public async Task<ActionResult<UserRoleDto>> Create([FromBody] CreateUserRoleDto createUserRoleDto)
         {
-            var userRole = _mapper.Map<UserRole>(createUserRoleDto);
+            var command = new CreateUserCommand { CreateUserRoleDto = createUserRoleDto };
 
-            await _repository.AddAsync(userRole);
-//        private readonly IUserRoleInterface _userRoleRepository;
-            var userRoleDto = _mapper.Map<UserRoleDto>(userRole);
-//            _userRepository = userRepository;
-            return CreatedAtAction(nameof(GetById), new { id = userRole.Id }, userRoleDto);
+            var userRoleDto = await _mediator.Send(command);
+
+            return CreatedAtAction(nameof(GetById), new { id = userRoleDto.Id }, userRoleDto);
         }
-//            return Ok(userRoles);
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromQuery] Guid id, CreateUserRoleDto createUserRoleDto)
         {
-            var userRole = await _repository.GetByIdAsync(id);
-//            return Ok(userRole);
-            if (userRole == null)
-            {
-                return NotFound();
-            }
-//                return BadRequest("User not found.");
-            _mapper.Map(createUserRoleDto, userRole);
+            var command = new UpdateUserRoleCommand { Id = id, UserRoleUpdateDto = createUserRoleDto };
 
-            await _repository.UpdateAsync(userRole);
-//            return CreatedAtAction(nameof(GetUserRoleById), new { id = createdUserRole.Id }, createdUserRole);
+            await _mediator.Send(command);
+
             return NoContent();
         }
-//                return NotFound();
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var userRole = await _repository.GetByIdAsync(id);
-//            userRole.RoleId = userRoleDto.RoleId;
-            if (userRole == null)
-            {
-                return NotFound();
-            }
+            var command = new DeleteUserRoleCommand { Id = id };
 
-            await _repository.DeleteAsync(userRole);
-//            return NoContent();
+            await _mediator.Send(command);
+
             return NoContent();
         }
     }
-//                return NotFound();
-
-//            await _userRoleRepository.RemoveUserRoleAsync(userRole.RoleId, userRole.UserId);
-
-
-
 
 }

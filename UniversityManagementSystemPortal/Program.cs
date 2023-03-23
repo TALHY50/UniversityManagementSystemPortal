@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 {
+
     var services = builder.Services;
     var env = builder.Environment;
     builder.Services.AddDbContext<UmspContext>(opt =>
@@ -32,6 +33,8 @@ var builder = WebApplication.CreateBuilder(args);
     // configure strongly typed settings object
     builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
+    //builder.Host.UseSerilog(SerilogConfig.CreateLogger()); 
+    builder.Services.AddLogging();
     builder.Services.AddCors();
     builder.Services.AddControllers().AddJsonOptions(x =>
     {
@@ -60,6 +63,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     builder.Services.AddMediatR(typeof(Program).GetTypeInfo().Assembly);
     services.AddAutoMapper(typeof(Program));
+    //builder.Services.AddScoped(typeof(CreateLogger());
 
 }
 builder.Services.AddEndpointsApiExplorer();

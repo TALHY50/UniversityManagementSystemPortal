@@ -13,6 +13,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<Student> Update(Student student);
         Task Delete(Guid id);
         Task<Student> GetByAdmissionNo(string admissionNo);
-        (string message, List<string> skippedEntries) Upload(IFormFile file);
+        //List<string> Upload(List<StudentReadModel> studentDataList);
     }
 }

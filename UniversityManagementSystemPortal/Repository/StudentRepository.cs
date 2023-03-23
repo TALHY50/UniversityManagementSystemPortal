@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGeneration.Design;
 using NuGet.Versioning;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Student;
@@ -161,151 +162,133 @@ namespace UniversityManagementSystemPortal.Repository
         {
             return await _dbContext.Students.FirstOrDefaultAsync(s => s.AdmissionNo == admissionNo);
         }
-        public (string message, List<string> skippedEntries) Upload(IFormFile file)
-        {
-            var skippedEntries = new List<string>();
+        //public List<string> Upload(List<StudentReadModel> studentDataList)
+        //{
+        //    var skippedEntries = new List<string>();
 
-            if (file == null || file.Length == 0)
-                return ("File is empty.", skippedEntries);
+        //    // Loop through each student in the list and perform the necessary checks before adding to the database
+        //    for (int i = 0; i < studentDataList.Count(); i++)
+        //    {
+        //        var studentData = studentDataList.ElementAt(i);
 
-            if (!Path.GetExtension(file.FileName).Equals(".csv", StringComparison.OrdinalIgnoreCase))
-                return ("Invalid file format. Only CSV files are allowed.", skippedEntries);
+        //        if (studentData.UserName == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value Username Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.ProgramName == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value ProgramName Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.Password == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value Password Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.Gender.ToString() == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value GenderName Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.DateOfBirth == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value DateOfBirth Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.FirstName == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value FirstName Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.AdmissionNo == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value AdmissionNo Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.RoleNo == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value RoleNo Can not be null");
+        //            continue;
+        //        }
+        //        if (studentData.Email == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value Email Can not be null");
+        //            continue;
+        //        }
 
-            var csvFileDescription = new CsvFileDescription
-            {
-                FirstLineHasColumnNames = true,
-                IgnoreUnknownColumns = true,
-                SeparatorChar = ',',
-                UseFieldIndexForReadingData = false
-            };
+        //        var program = _dbContext.Programs.FirstOrDefault(p => p.Name == studentData.ProgramName);
+        //        if (program == null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Program does not exist against this program name");
+        //            continue;
+        //        }
 
-            using (var streamReader = new StreamReader(file.OpenReadStream()))
-            {
-                var csvContext = new LINQtoCSV.CsvContext();
-                var studentsData = csvContext.Read<StudentReadModel>(streamReader, csvFileDescription);
+        //        var roleNo = _dbContext.StudentPrograms.FirstOrDefault(p => p.RoleNo == studentData.RoleNo);
+        //        if (roleNo != null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1} Reason: Role number already exists");
+        //            continue;
+        //        }
 
-                for (int i = 0; i < studentsData.Count(); i++)
-                {
-                    var studentData = studentsData.ElementAt(i);
+        //        var email = _dbContext.Users.FirstOrDefault(p => p.Email == studentData.Email);
 
-                    try
-                    {
-                        if (string.IsNullOrEmpty(studentData.AdmissionNo))
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Required value AdmissionNo cannot be null or empty");
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(studentData.RoleNo))
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Required value RoleNo cannot be null or empty");
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(studentData.FirstName))
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Required value FirstName cannot be null or empty");
-                            continue;
-                        }
-                        if (studentData.Password == null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value Password Can not be null");
-                            continue;
-                        }
-                        if (studentData.UserName == null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required value Username Can not be null");
-                            continue;
-                        }
-                        if (studentData.DateOfBirth==null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Required value DateOfBirth cannot be null or empty");
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(studentData.Gender.ToString()))
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Required value Gender cannot be null or empty");
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(studentData.Email))
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Required value Email cannot be null or empty");
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(studentData.Category.ToString()))
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Required value Category cannot be null or empty");
-                            continue;
-                        }
-                        // Get the program based on the user input
-                        var program = _dbContext.StudentPrograms.FirstOrDefault(p => p.Program.Name == studentData.ProgramName);
-                        if (program == null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Program does not exist against this program name");
-                            continue;
-                        }
+        //        if (email != null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Email cannot be duplicated");
+        //            continue;
+        //        }
 
-                        var email = _dbContext.Users.FirstOrDefault(p => p.Email == studentData.Email);
-                        if (email != null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Email already exists");
-                            continue;
-                        }
-                        var password = _dbContext.Users.FirstOrDefault(p => p.Password == studentData.Password);
-                        if (password != null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Password already exists");
-                            continue;
-                        }
-                        var userName = _dbContext.Users.FirstOrDefault(p => p.Username == studentData.UserName);
-                        if (userName != null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Password already exists");
-                            continue;
-                        }
-                        var admissionNo = _dbContext.Students.FirstOrDefault(p => p.AdmissionNo == studentData.AdmissionNo);
-                        if (admissionNo != null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Admission number already exists");
-                            continue;
-                        }
-                        var roleNo = _dbContext.StudentPrograms.FirstOrDefault(p => p.RoleNo == studentData.RoleNo);
-                        if (roleNo != null)
-                        {
-                            skippedEntries.Add($"Skipped Row {i + 1} Reason: Role number already exists");
-                            continue;
-                        }
+        //        var addmissionNo = _dbContext.Students.FirstOrDefault(p => p.AdmissionNo == studentData.AdmissionNo);
 
-                        // Create the student
-                        var student = AddToImport(studentData);
-                    }
-                    catch (Exception ex)
-                    {
-                        skippedEntries.Add($"Skipped entry with Roll No: {studentData.RoleNo}. Reason: {ex.Message}. Line: {i + 2}");
-                    }
-                }
-                if (skippedEntries.Any())
-                {
-                    var message = $"File imported successfully with {skippedEntries.Count} skipped entries.\n\n";
-                    message += string.Join("\n\n", skippedEntries);
-                    return (message, skippedEntries);
-                }
-            }
+        //        if (addmissionNo != null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: Student already exists against this admissionNo");
+        //            continue;
+        //        }
 
-            return ("File uploaded successfully.", skippedEntries);
+        //        var userName = _dbContext.Users.FirstOrDefault(p => p.Username == studentData.UserName);
 
+        //        if (userName != null)
+        //        {
+        //            skippedEntries.Add($"Skipped Row {i + 1}  Reason: userName already exists.");
+        //            continue;
+        //        }
 
+        //        var user = new User
+        //        {
+        //            FirstName = studentData.FirstName,
+        //            MiddleName = studentData.MiddleName,
+        //            LastName = studentData.LastName,
+        //            MobileNo = studentData.MobileNo,
+        //            DateOfBirth = studentData.DateOfBirth,
+        //            Gender =studentData.Gender,
+        //            BloodGroup = studentData.BloodGroup.Value,
+        //            Email = studentData.Email,
+        //            Username = studentData.UserName,
+        //            EmailConfirmed = studentData.EmailConfirm.Value,
+        //            IsActive = studentData.IsActive.Value,
+        //            Password = studentData.Password,
+        //        };
 
+        //        var student = new Student
+        //        {
+        //            AdmissionNo = studentData.AdmissionNo,
+        //            Category = studentData.Category,
+        //            Address = studentData.Address,
+        //            IsActive = studentData.IsActive.Value,
+        //        };
 
+        //        var addStudent = Add(student, user, studentData);
 
+        //        if (addStudent == null)
+        //        {
+        //            skippedEntries.Add($"Skipped entry with Roll No: {studentData.RoleNo}. Reason: Required value(s) missing. Line: {i + 1}");
+        //        }
+        //    }
 
-
-
-
-
-
-
-
-
-        }
+        //    return skippedEntries;
+        //}
 
         public Student AddBulk(Student student, User user, StudentReadModel dto)
         {

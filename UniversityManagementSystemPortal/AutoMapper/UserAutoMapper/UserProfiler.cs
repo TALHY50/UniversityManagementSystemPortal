@@ -9,7 +9,7 @@ namespace UniversityManagementSystemPortal.AutoMapper.UserAutoMapper
         public UserProfiler()
         {
             CreateMap<User, UserViewModel>();
-            CreateMap<User, RegistorViewModel>()
+            CreateMap<User, RegistorUserDto>()
                    .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
             .ForMember(dest => dest.MiddleName, opt => opt.MapFrom(src => src.MiddleName))
             .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))

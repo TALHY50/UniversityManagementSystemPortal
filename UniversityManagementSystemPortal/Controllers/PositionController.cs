@@ -9,9 +9,13 @@ namespace UniversityManagementSystemPortal.Controllers
     using System.Threading.Tasks;
     using AutoMapper;
     using global::AutoMapper;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using UniversityManagementsystem.Models;
+    using UniversityManagementSystemPortal.Application.Command.Position;
+    using UniversityManagementSystemPortal.Application.Qurey.Position;
+    using UniversityManagementSystemPortal.Authorization;
     using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
     using UniversityManagementSystemPortal.Interfaces;
     using UniversityManagementSystemPortal.ModelDto.Position;
@@ -23,67 +27,77 @@ namespace UniversityManagementSystemPortal.Controllers
         [ApiController]
         public class PositionController : ControllerBase
         {
+            private readonly IMediator _mediator;
             private readonly IPositionRepository _repository;
             private readonly IMapper _mapper;
 
-            public PositionController(IPositionRepository repository, IMapper mapper)
+            public PositionController(IPositionRepository repository, IMapper mapper, IMediator mediator)
             {
                 _repository = repository;
                 _mapper = mapper;
+                _mediator = mediator;
             }
             [JwtAuthorize("Admin", "SuperAdmin")]
             [HttpGet]
-            public async Task<ActionResult<IEnumerable<PositionDto>>> GetAll()
+            public async Task<IActionResult> GetAll()
             {
-                var positions = await _repository.GetAllAsync();
+                var positions = await _mediator.Send(new GetAllPositionsQuery());
 
-                var positionDtos = _mapper.Map<IEnumerable<PositionDto>>(positions);
-
-                return Ok(positionDtos);
+                return Ok(positions);
             }
 
             [HttpGet("{id}")]
             public async Task<ActionResult<PositionDto>> GetById(Guid id)
             {
-                var position = await _repository.GetByIdAsync(id);
+                var query = new GetPositionByIdQuery { Id = id};
+                var positions = await _mediator.Send(query);
 
-                if (position == null)
+                if (positions == null || positions.Count() == 0)
                 {
                     return NotFound();
                 }
 
-                var positionDto = _mapper.Map<PositionDto>(position);
-
-                return Ok(positionDto);
+                return Ok(positions.First());
             }
 
             [HttpPost]
             public async Task<ActionResult<PositionDto>> Create(PositionAddorUpdateDto positionAddDto)
             {
-                var position = _mapper.Map<Position>(positionAddDto);
-
-                await _repository.CreateAsync(position);
-
-                var positionDto = _mapper.Map<PositionDto>(position);
-
+                var command = _mapper.Map<CreatePositionCommand>(positionAddDto);
+                var positionDto = await _mediator.Send(command);
                 return CreatedAtAction(nameof(GetById), new { id = positionDto.Id }, positionDto);
             }
 
             [HttpPut("{id}")]
-            public async Task<IActionResult> Update(Guid id, PositionAddorUpdateDto positionUpdateDto)
+            public async Task<IActionResult> Update(Guid id, [FromForm] PositionAddorUpdateDto positionUpdateDto)
             {
-                var position = await _repository.GetByIdAsync(id);
+                var updatePositionCommand = new UpdatePositionCommand(id, positionUpdateDto);
 
-                if (position == null)
+                try
+                {
+                    await _mediator.Send(updatePositionCommand);
+                }
+                catch (AppException ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+                return NoContent();
+            }
+
+            [HttpDelete("{id}")]
+            public async Task<IActionResult> Delete(Guid id)
+            {
+                var result = await _mediator.Send(new DeletePositionCommand { Id = id });
+
+                if (result)
+                {
+                    return NoContent();
+                }
+                else
                 {
                     return NotFound();
                 }
-
-                _mapper.Map(positionUpdateDto, position);
-
-                await _repository.UpdateAsync(position);
-
-                return NoContent();
             }
         }
     }

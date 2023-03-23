@@ -7,6 +7,9 @@ using UniversityManagementSystemPortal.ModelDto.StudentProgram;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
+using UniversityManagementSystemPortal.Application.Qurey.Program;
+using MediatR;
+using UniversityManagementSystemPortal.Application.Command.Program;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -18,9 +21,10 @@ namespace UniversityManagementSystemPortal.Controllers
         private readonly IIdentityServices _identityService;
         private readonly IMapper _mapper;
         private readonly IProgramRepository _repository;
-
-        public ProgramsController(IProgramRepository repository, IMapper mapper, IIdentityServices identityService)
+        private readonly IMediator _mediator;
+        public ProgramsController(IMediator mediator, IProgramRepository repository, IMapper mapper, IIdentityServices identityService)
         {
+            _mediator = mediator;
             _repository = repository;
             _mapper = mapper;
             _identityService = identityService;
@@ -29,49 +33,34 @@ namespace UniversityManagementSystemPortal.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProgramReadDto>>> GetAll()
         {
-            var programs = await _repository.GetAllAsync();
-            return Ok(_mapper.Map<IEnumerable<ProgramReadDto>>(programs));
+            var programs = await _mediator.Send(new GetAllProgramsQuery());
+            return Ok(programs);
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProgramReadDto>> GetById(Guid id)
         {
-            var program = await _repository.GetByIdAsync(id);
-            if (program == null)
-            {
-                return NotFound();
-            }
+            var query = new GetProgramByIdQuery { ProgramId = id };
+            var program = await _mediator.Send(query);
 
-            return Ok(_mapper.Map<ProgramReadDto>(program));
+            return Ok(program);
         }
         //[JwtAuthorize("Admin, SuperAdmin")]
         [HttpPost]
         public async Task<ActionResult<ProgramReadDto>> Create(ProgramCreateDto programCreateDto)
         {
-            var program = _mapper.Map<PorgramNamespace>(programCreateDto);
-            await _repository.AddAsync(program);
+            var command = _mapper.Map<CreateProgramCommand>(programCreateDto);
+            var program = await _mediator.Send(command);
 
-            var programReadDto = _mapper.Map<ProgramReadDto>(program);
-            return CreatedAtRoute(nameof(GetById), new { id = programReadDto.Id }, programReadDto);
+            return CreatedAtRoute(nameof(GetById), new { id = program.Id }, program);
         }
         [JwtAuthorize("Admin, SuperAdmin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(Guid id, ProgramUpdateDto programUpdateDto)
         {
-            var program = await _repository.GetByIdAsync(id);
-            if (program == null)
-            {
-                return NotFound("Program not found.");
-            }
-
-            var userId = _identityService.GetUserId();
-            if (userId != null)
-            {
-                program.UpdatedBy = userId.Value;
-            }
-
-            _mapper.Map(programUpdateDto, program);
-            await _repository.UpdateAsync(program);
+            var command = _mapper.Map<UpdateProgramCommand>(programUpdateDto);
+            command.Id = id;
+            await _mediator.Send(command);
 
             return NoContent();
         }
@@ -79,13 +68,7 @@ namespace UniversityManagementSystemPortal.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var program = await _repository.GetByIdAsync(id);
-            if (program == null)
-            {
-                return NotFound("Program not found.");
-            }
-
-            await _repository.DeleteAsync(id);
+            await _mediator.Send(new DeleteProgramCommand { Id = id });
             return Ok("Program deleted successfully.");
         }
 

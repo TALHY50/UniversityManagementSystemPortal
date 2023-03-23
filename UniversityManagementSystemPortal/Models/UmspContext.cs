@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using EntityFrameworkCore.Triggers;
 using Microsoft.EntityFrameworkCore;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class UmspContext : DbContext
+public partial class UmspContext : DbContextWithTriggers
 {
     public UmspContext()
     {

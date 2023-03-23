@@ -9,7 +9,7 @@ using UniversityManagementSystemPortal.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal
 {
-    public class ImportStudentsCommandHandler : IRequestHandler<ImportStudentsCommand>
+    public class ImportStudentsCommandHandler : IRequestHandler<ImportStudentsCommand, List<string>>
     {
         private readonly IUserInterface _userInterface;
         private readonly IStudentRepository _studentRepository;
@@ -34,10 +34,29 @@ namespace UniversityManagementSystemPortal
             _identityServices = identityServices;
         }
 
-        public async Task<Unit> Handle(ImportStudentsCommand request, CancellationToken cancellationToken)
+        public async Task<List<string>> Handle(ImportStudentsCommand request, CancellationToken cancellationToken)
         {
+            var i = 0;
+            var _skippedEntries = new List<string>();
             foreach (var data in request.StudentsData)
             {
+                // Check if any required value is null
+                if (string.IsNullOrEmpty(data.UserName) ||
+                    string.IsNullOrEmpty(data.ProgramName) ||
+                    string.IsNullOrEmpty(data.Password) ||
+                    string.IsNullOrEmpty(data.Gender.ToString()) ||
+                    data.DateOfBirth == null ||
+                    string.IsNullOrEmpty(data.FirstName) ||
+                    string.IsNullOrEmpty(data.AdmissionNo) ||
+                    string.IsNullOrEmpty(data.RoleNo) ||
+                    string.IsNullOrEmpty(data.Email))
+                {
+                    // Add skipped entry to the list
+                    _skippedEntries.Add($"Skipped Row {i + 1}  Reason: Required field(s) missing.");
+                    continue;
+                }
+                i++;
+
                 // Create user model from CSV data
                 var userModel = new User
                 {
@@ -53,7 +72,6 @@ namespace UniversityManagementSystemPortal
                     Username = data.UserName,
                     EmailConfirmed = data.EmailConfirm.Value,
                     Password = data.Password
-                    // Add other properties as needed
                 };
 
                 // Save user model to database
@@ -72,8 +90,9 @@ namespace UniversityManagementSystemPortal
                 var program = await _programRepository.GetProgramByName(data.ProgramName);
                 if (program == null)
                 {
-                    _logger.LogWarning("Invalid program name: {ProgramName}", data.ProgramName);
-                    throw new Exception("Invalid program name.");
+                    // Add skipped entry to the list
+                    _skippedEntries.Add($"Skipped Row {i + 1}  Reason: Invalid program name.");
+                    continue;
                 }
                 await _studentRepository.Add(studentModel);
                 await _studentProgramRepository.AddStudentProgramAsync(new StudentProgram
@@ -88,9 +107,13 @@ namespace UniversityManagementSystemPortal
                 });
             }
 
-            _logger.LogInformation("Processed {Count} student records from uploaded file.", request.StudentsData.Count);
+            // Log the processed records and skipped entries
+            _logger.LogInformation("Processed {Count} student records from uploaded file. Skipped {SkippedCount} entries.",
+                request.StudentsData.Count, _skippedEntries.Count);
 
-            return Unit.Value;
+            // Return skipped entries
+            return _skippedEntries;
         }
+
     }
 }

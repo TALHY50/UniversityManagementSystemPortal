@@ -10,7 +10,8 @@ namespace UniversityManagementSystemPortal
     {
         public PostitionProifler()
         {
-            CreateMap<Employee, EmployeeDto>();
+            CreateMap<Position, PositionDto>();
+            CreateMap<List<PositionDto>, IEnumerable<PositionDto>>();
             CreateMap<PositionAddorUpdateDto, Position>();
         }
     }

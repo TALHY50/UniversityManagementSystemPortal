@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.IdentityServices;
-using UniversityManagementSystemPortal.TrackableBaseEntity;
+using UniversityManagementSystemPortal.Models.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 

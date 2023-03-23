@@ -15,35 +15,36 @@ namespace UniversityManagementSystemPortal.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<Position> GetByIdAsync(Guid id)
+        public async Task<IEnumerable<Position>> GetByIdAsync(Guid id, Guid? instituteId = null)
         {
-            var position = await _dbContext.Positions
+            IQueryable<Position> query = _dbContext.Positions
                 .Include(p => p.Category)
                 .Include(p => p.Employees)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .Where(p => p.Id == id);
 
-            if (position == null)
+            if (instituteId.HasValue)
             {
-                
-                throw new AppException($"Position with id {id} not found.");
+                query = query.Where(p => p.Category.InstituteId == instituteId);
             }
 
-            return position;
-        }
+            var positions = await query.ToListAsync();
 
-        public async Task<IEnumerable<Position>> GetAllAsync()
-        {
-            var positions = await _dbContext.Positions
-                .Include(p => p.Category)
-                .Include(p => p.Employees)
-                .ToListAsync();
-
-            if (positions == null)
+            if (positions == null || positions.Count == 0)
             {
-                throw new AppException("No positions found.");
+                return null;
             }
 
             return positions;
+        }
+
+        public async Task<IEnumerable<Position>> GetAllAsync(Guid? instituteId = null)
+        {
+            IQueryable<Position> query = _dbContext.Positions;
+            if (instituteId.HasValue)
+            {
+                query = query.Where(p => p.Category.InstituteId == instituteId);
+            }
+            return await query.ToListAsync();
         }
 
         public async Task<IEnumerable<Position>> GetByCategoryIdAsync(Guid categoryId)
@@ -73,37 +74,67 @@ namespace UniversityManagementSystemPortal.Repository
             position.Id = Guid.NewGuid();
             position.IsActive = true;
             await _dbContext.Positions.AddAsync(position);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Position position)
+        public async Task UpdateAsync(Position position, Guid? instituteId = null)
         {
             if (position == null)
             {
                 throw new AppException("Position is null.");
             }
 
+            // Check if the position belongs to the active institute
+            if (instituteId.HasValue && position.Category.InstituteId != instituteId)
+            {
+                throw new AppException("You are not authorized to update this position.");
+            }
+
             _dbContext.Positions.Update(position);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var position = await GetByIdAsync(id);
+            var positions = await GetByIdAsync(id);
 
-            if (position == null)
+            if (positions == null)
             {
-                
                 throw new AppException($"Position with id {id} not found.");
             }
 
-            _dbContext.Positions.Remove(position);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.Positions.RemoveRange(positions.ToList());
+            await SaveChangesAsync();
         }
+
         public async Task<Position> GetPositionByName(string positionName)
         {
             var position =  _dbContext.Positions.FirstOrDefault(p => p.Name == positionName);
             return position;
+        }
+        public async Task<IEnumerable<Position>> GetByInstituteIdAsync(Guid? instituteId = null)
+        {
+            var query = _dbContext.Positions.AsQueryable();
+
+            if (instituteId.HasValue)
+            {
+                // Filter by institute ID
+                query = query.Where(p => p.Category.InstituteId == instituteId.Value);
+            }
+
+            // Retrieve all positions
+            var positions = await query.ToListAsync();
+
+            return positions;
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync() > 0;
+        }
+        public async Task DeleteAsync(Position position)
+        {
+            _dbContext.Positions.Remove(position);
+            await SaveChangesAsync();
         }
     }
 

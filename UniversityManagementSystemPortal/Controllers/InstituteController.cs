@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Application.Command.Institute;
+using UniversityManagementSystemPortal.Application.Qurey.Institute;
+using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.IdentityServices;
@@ -16,28 +19,30 @@ namespace UniversityManagementSystemPortal.Controllers
     [ApiController]
     public class InstitutesController : ControllerBase
     {
+        private readonly ILogger<InstitutesController> _logger;
+        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
         private readonly IInstituteRepository _repository;
         private readonly IIdentityServices _identityServices;
 
-        public InstitutesController(IMapper mapper, IInstituteRepository repository, IIdentityServices identityServices)
+        public InstitutesController(ILogger<InstitutesController> logger, IMediator mediator, IMapper mapper, IInstituteRepository repository, IIdentityServices identityServices)
         {
+            _mediator = mediator;
             _mapper = mapper;
             _repository = repository;
+            _logger = logger;
             _identityServices = identityServices;
         }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<InstituteDto>> GetById(Guid id)
         {
-            var institute = await _repository.GetByIdAsync(id);
+            var query = new GetInstituteByIdQuery { Id = id };
+            var instituteDto = await _mediator.Send(query);
 
-            if (institute == null)
+            if (instituteDto == null)
             {
                 return NotFound();
             }
-
-            var instituteDto = _mapper.Map<InstituteDto>(institute);
 
             return instituteDto;
         }
@@ -45,15 +50,14 @@ namespace UniversityManagementSystemPortal.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<InstituteDto>>> GetAll()
         {
-            var institutes = await _repository.GetAllAsync();
+            var query = new GetAllInstitutesQuery();
+            var result = await _mediator.Send(query);
 
-            var institutesDto = _mapper.Map<IEnumerable<InstituteDto>>(institutes);
-
-            return Ok(institutesDto);
+            return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromForm] InstituteCreateDto instituteCreateDto, InstituteType institutetype)
+        public async Task<ActionResult> Create([FromForm] InstituteCreateDto instituteCreateDto)
         {
             if (instituteCreateDto == null)
             {
@@ -61,36 +65,26 @@ namespace UniversityManagementSystemPortal.Controllers
             }
 
             var institute = _mapper.Map<Institute>(instituteCreateDto);
-            institute.IsAutoIncrementAdmissionNo = instituteCreateDto.IsAutoIncrementAdmissionNo; 
+            institute.IsAutoIncrementAdmissionNo = instituteCreateDto.IsAutoIncrementAdmissionNo;
 
-            institute.CreatedBy = _identityServices.GetUserId(); 
+            institute.CreatedBy = _identityServices.GetUserId();
             institute.UpdatedBy = _identityServices.GetUserId();
             await _repository.AddAsync(institute);
 
             return CreatedAtAction(nameof(GetById), new { id = institute.Id }, new { message = "Institute created successfully" });
         }
-
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update([FromForm] Guid id, InstituteUpdateDto instituteUpdateDto)
+        public async Task<IActionResult> Update(Guid id, [FromForm] InstituteUpdateDto instituteUpdateDto)
         {
             if (instituteUpdateDto == null || id != instituteUpdateDto.Id)
             {
                 return BadRequest();
             }
 
-            var institute = await _repository.GetByIdAsync(id);
+            var command = _mapper.Map<InstituteUpdateCommand>(instituteUpdateDto);
+            command.Id = id;
 
-            if (institute == null)
-            {
-                return NotFound();
-            }
-
-            _mapper.Map(instituteUpdateDto, institute);
-            institute.IsAutoIncrementAdmissionNo = instituteUpdateDto.IsAutoIncrementAdmissionNo;
-
-            institute.UpdatedBy = _identityServices.GetUserId(); 
-
-            await _repository.UpdateAsync(institute);
+            var result = await _mediator.Send(command);
 
             return Ok(new { message = "Institute updated successfully" });
         }
@@ -98,15 +92,22 @@ namespace UniversityManagementSystemPortal.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var institute = await _repository.GetByIdAsync(id);
-
-            if (institute == null)
+            try
             {
+                await _mediator.Send(new DeleteInstituteCommand { Id = id });
+
+                return Ok("Institute deleted successfully.");
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning("Failed to delete institute: {ErrorMessage}", ex.Message);
                 return NotFound();
             }
-            await _repository.DeleteAsync(id);
-
-            return Ok("Institute deleted successfully.");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting institute");
+                return StatusCode(500, "An error occurred while deleting institute");
+            }
         }
 
     }

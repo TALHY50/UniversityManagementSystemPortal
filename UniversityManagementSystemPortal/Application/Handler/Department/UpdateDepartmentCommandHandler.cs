@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Serilog;
 using UniversityManagementSystemPortal.Application.Command.Department;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
@@ -37,8 +38,11 @@ namespace UniversityManagementSystemPortal.Application.Handler.Department
 
             var departmentDto = _mapper.Map<DepartmentUpdateDto>(department);
 
+            Log.Information("Department updated successfully. Id: {DepartmentId}", department.Id);
+
             return departmentDto;
         }
     }
 
 }
+

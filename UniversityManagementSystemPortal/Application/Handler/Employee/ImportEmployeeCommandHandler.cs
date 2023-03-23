@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Employee;
 using UniversityManagementSystemPortal.IdentityServices;
@@ -54,7 +56,7 @@ namespace UniversityManagementSystemPortal
                     Username = data.Username,
                     Password = data.Password,
                     IsActive = data.IsActive,
-                   
+
                     CreatedBy = _identityServices.GetUserId().Value,
                     UpdatedBy = _identityServices.GetUserId().Value
                     // Add other properties as needed
@@ -71,6 +73,7 @@ namespace UniversityManagementSystemPortal
                 // Create employee model from CSV data
                 var employeeModel = new Employee
                 {
+                    Id = Guid.NewGuid(),
                     EmployeeNo = data.EmployeeNo,
                     EmployeeType = data.EmployeeType,
                     Address = data.EmployeAddress,

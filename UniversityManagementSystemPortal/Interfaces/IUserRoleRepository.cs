@@ -9,6 +9,7 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task AddAsync(UserRole userRole);
         Task UpdateAsync(UserRole userRole);
         Task DeleteAsync(UserRole userRole);
+        Task<bool> SaveChangesAsync();
     }
 
 }

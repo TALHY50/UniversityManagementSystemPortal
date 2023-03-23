@@ -22,12 +22,11 @@ namespace UniversityManagementSystemPortal.Repository
         {
             if (user == null)
             {
-                throw new ArgumentNullException(nameof(user), "User object is null.");
+                return null;
             }
 
             user.EmailConfirmed = false;
             user.IsActive = true;
-            //user.CreatedAt = DateTime.UtcNow;
             user.Id = Guid.NewGuid();
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
