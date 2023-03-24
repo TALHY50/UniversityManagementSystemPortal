@@ -11,13 +11,13 @@ using UniversityManagementSystemPortal;
 using UniversityManagementSystemPortal.PictureManager;
 using Microsoft.AspNetCore.Http.Features;
 using UniversityManagementSystemPortal.IdentityServices;
-using UniversityManagementSystemPortal.CsvImport;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -33,7 +33,7 @@ var builder = WebApplication.CreateBuilder(args);
     // configure strongly typed settings object
     builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
     builder.Services.AddAutoMapper(typeof(Program).Assembly);
-    //builder.Host.UseSerilog(SerilogConfig.CreateLogger()); 
+    builder.Host.UseSerilog(SerilogConfig.CreateLogger()); 
     builder.Services.AddLogging();
     builder.Services.AddCors();
     builder.Services.AddControllers().AddJsonOptions(x =>
@@ -56,7 +56,6 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IPositionRepository, PositionRepository>();
     builder.Services.AddScoped<IStudentRepository, StudentRepository>();
     services.AddMediatR(typeof(AddStudentCommandHandler).Assembly);
-    services.AddScoped(typeof(ImportExportService<>));
     builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
     builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
     builder.Services.AddScoped(typeof(IIdentityServices), typeof(IdentityServices));
@@ -123,6 +122,8 @@ app.UseHttpsRedirection();
 //app.UseMiddleware<ErrorHandlerMiddleware>();
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

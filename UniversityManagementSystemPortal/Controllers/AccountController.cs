@@ -1,18 +1,13 @@
-﻿using AutoMapper;
-using ExcelDataReader.Log;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Application.Command.Account;
+using UniversityManagementSystemPortal.Application.Qurey.Account;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.IdentityServices;
-using UniversityManagementSystemPortal.Interfce;
-using Serilog;
+using UniversityManagementSystemPortal.ModelDto.NewFolder;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
 using AllowAnonymous = UniversityManagementSystemPortal.Authorization.AllowAnonymousAttribute;
-using UniversityManagementSystemPortal.ModelDto.NewFolder;
-using MediatR;
-using UniversityManagementSystemPortal.Application.Command.Account;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -22,25 +17,14 @@ namespace UniversityManagementSystemPortal.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IUserInterface _userRepository;
-        private readonly IIdentityServices _identityServices;
-        private readonly IMapper _mapper;
-        private readonly IJwtTokenService _jwtTokenService;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(IUserInterface userRepository,
+        public AccountController(
             IMediator mediator,
-            IMapper mapper,
-            IJwtTokenService jwtTokenService,
-            IIdentityServices identityServices,
             ILogger<AccountController> logger)
         {
-            _userRepository = userRepository;
-            _mapper = mapper;
-            _jwtTokenService = jwtTokenService;
-            _identityServices = identityServices;
             _logger = logger;
-            _mediator = mediator; 
+            _mediator = mediator;
         }
 
         [JwtAuthorize("Admin", "SuperAdmin")]
@@ -49,8 +33,7 @@ namespace UniversityManagementSystemPortal.Controllers
         {
             try
             {
-                var getUsers = await _userRepository.GetAllAsync();
-                var userViewModels = _mapper.Map<IEnumerable<UserViewModel>>(getUsers);
+                var userViewModels = await _mediator.Send(new GetAllUsersQuery());
                 return Ok(new { message = "Successfully retrieved all users.", data = userViewModels });
             }
             catch (Exception ex)
@@ -66,15 +49,13 @@ namespace UniversityManagementSystemPortal.Controllers
         {
             try
             {
-                var getUser = await _userRepository.GetByIdAsync(id);
-
-                if (getUser == null)
-                {
-                    return NotFound(new { message = $"User with ID {id} not found." });
-                }
-
-                var userViewModel = _mapper.Map<UserViewModel>(getUser);
+                var userViewModel = await _mediator.Send(new GetUserByIdQuery { UserId = id });
                 return Ok(new { message = "Successfully retrieved user.", data = userViewModel });
+            }
+            catch (AppException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return NotFound(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -82,71 +63,30 @@ namespace UniversityManagementSystemPortal.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Error occurred while getting user with ID {id}" });
             }
         }
-
         [AllowAnonymous]
         [HttpPost("post")]
-        public async Task<ActionResult<RegistorUserDto>> Post([FromForm] RegistorUserDto userViewModel)
+        public async Task<IActionResult> Register(RegistorUserDto registerUserDto)
         {
             try
             {
-                if (userViewModel == null)
-                {
-                    return BadRequest(new { message = "User data is required." });
-                }
-                var user = _mapper.Map<User>(userViewModel);
-                user.CreatedBy = _identityServices.GetUserId();
-                user.LastLoggedIn = DateTime.Now;
-                user.UpdatedBy = _identityServices.GetUserId();
-                var registeredUser = await _userRepository.RegisterAsUser(user);
-
-                if (registeredUser == null)
-                {
-                    return BadRequest(new { message = "Failed to register user." });
-                }
-
-                var mappedUserViewModel = _mapper.Map<RegistorUserDto>(registeredUser);
-                return Ok(new { message = "Successfully registered user.", data = mappedUserViewModel });
+                var command = new RegisterUserCommand { RegisterUserDto = registerUserDto };
+                var result = await _mediator.Send(command);
+                return Ok(result);
             }
-            catch (Exception ex)
+            catch (AppException ex)
             {
-                _logger.LogError(ex, "Error occurred while registering user");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error occurred while registering user" });
+                return BadRequest(ex.Message);
             }
         }
+
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<RegistorUserDto>> Put([FromForm] Guid id, User user)
-
+        public async Task<ActionResult<UserViewModel>> UpdateUser(Guid id, UpdateUserDto updateUserDto)
         {
-            try
-            {
-                if (id != user.Id)
-                {
-                    return BadRequest(new { message = $"User ID in request body ({user.Id}) does not match ID in URL ({id})." });
-                }
+            var command = new UpdateUserCommand { Id = id, UpdateUserDto = updateUserDto };
+            var user = await _mediator.Send(command);
 
-                var userId = _identityServices.GetUserId();
-                if (userId == null)
-                {
-                    return BadRequest(new { message = "User ID could not be retrieved." });
-                }
-
-                user.UpdatedBy = userId;
-                var updatedUser =  _userRepository.UpdateAsync(user);
-
-                if (updatedUser == null)
-                {
-                    return BadRequest(new { message = "Failed to update user." });
-                }
-
-                var updatedUserViewModel = _mapper.Map<RegistorUserDto>(updatedUser);
-                return Ok(new { message = "Successfully updated user.", data = updatedUserViewModel });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating user: {ex.Message}");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to update user." });
-            }
+            return Ok(user);
         }
         [JwtAuthorize("SuperAdmin")]
         [HttpDelete("{id}")]

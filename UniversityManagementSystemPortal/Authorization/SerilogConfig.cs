@@ -1,13 +1,15 @@
 ﻿using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
-
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace UniversityManagementSystemPortal.Authorization
 {
     public static class SerilogConfig
     {
-        public static Serilog.Core.Logger CreateLogger( )
+        private static readonly string LogDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
+
+        public static Serilog.Core.Logger CreateLogger()
         {
             var logLevel = LogEventLevel.Information;
             var outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}";
@@ -16,17 +18,17 @@ namespace UniversityManagementSystemPortal.Authorization
                 .MinimumLevel.Is(logLevel)
                 .Enrich.FromLogContext()
                 .Enrich.WithExceptionDetails()
-                .WriteTo.Console(outputTemplate: outputTemplate)
-                .WriteTo.File("log.txt", outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day)
+                .WriteTo.Console(outputTemplate: outputTemplate, theme: AnsiConsoleTheme.Literate)
+                .WriteTo.File(Path.Combine(LogDirectory, "log.txt"), outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day)
                 .WriteTo.Logger(lc => lc
                     .MinimumLevel.Is(LogEventLevel.Warning)
-                    .WriteTo.File("warnings.txt", outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day))
+                    .WriteTo.File(Path.Combine(LogDirectory, "warning", "warning.txt"), outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day))
                 .WriteTo.Logger(lc => lc
                     .Filter.ByIncludingOnly(e => e.Level >= LogEventLevel.Error)
-                    .WriteTo.File("errors.txt", outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day))
+                    .WriteTo.File(Path.Combine(LogDirectory, "error", "errors.txt"), outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day))
                 .WriteTo.Logger(lc => lc
                     .Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Fatal)
-                    .WriteTo.File("fatal.txt", outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day));
+                    .WriteTo.File(Path.Combine(LogDirectory, "fatal", "fatal.txt"), outputTemplate: outputTemplate, rollingInterval: RollingInterval.Day));
 
             return loggerConfiguration.CreateLogger();
         }

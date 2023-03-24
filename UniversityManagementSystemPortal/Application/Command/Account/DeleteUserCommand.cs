@@ -1,6 +1,9 @@
-﻿namespace UniversityManagementSystemPortal.Application.Command.Account
+﻿using MediatR;
+
+namespace UniversityManagementSystemPortal.Application.Command.Account
 {
-    public class DeleteUserCommand
+    public class DeleteUserCommand : IRequest
     {
+        public Guid UserId { get; set; }
     }
 }

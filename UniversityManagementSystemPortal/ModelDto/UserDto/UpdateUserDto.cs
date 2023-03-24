@@ -3,18 +3,17 @@ using UniversityManagementSystemPortal.Enum;
 
 namespace UniversityManagementSystemPortal.ModelDto.UserDto
 {
-    public class RegistorUserDto
+    public class UpdateUserDto
     {
-       
         public string FirstName { get; set; } = null!;
 
-        
+
         public string? MiddleName { get; set; }
 
-       
+
         public string? LastName { get; set; }
 
-     
+
         public string? MobileNo { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
@@ -32,7 +31,5 @@ namespace UniversityManagementSystemPortal.ModelDto.UserDto
         public string Username { get; set; } = null!;
 
         public string Password { get; set; } = null!;
-
     }
-
 }

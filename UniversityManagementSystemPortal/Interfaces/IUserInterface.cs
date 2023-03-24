@@ -18,6 +18,8 @@ namespace UniversityManagementSystemPortal.Interfce
         Task DeleteAsync(User user);
         Task<User> RegisterAsUser(User model);
         Task<User> GetByEmailAsync(string email);
+        Task<int> GetUniqueUsernameNumberAsync(string username);
+        Task<User> GetByUsernameAsync(string username);
 
     }
 }
