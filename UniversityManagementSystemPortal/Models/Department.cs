@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UniversityManagementSystemPortal.Models.TrackableBaseEntity;
+﻿using UniversityManagementSystemPortal.Models.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
@@ -20,11 +18,8 @@ public partial class Department : TrackableBaseEntity
 
     public bool IsAdministrative { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
 
     public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
 
     public Guid? UpdatedBy { get; set; }
 

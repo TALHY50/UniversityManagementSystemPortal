@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using UniversityManagementSystemPortal;
-using UniversityManagementSystemPortal.Models.TrackableBaseEntity;
+﻿using UniversityManagementSystemPortal.Models.TrackableBaseEntity;
 
 namespace UniversityManagementsystem.Models;
 
-public partial class StudentProgram:TrackableBaseEntity
+public partial class StudentProgram : TrackableBaseEntity
 {
     public Guid Id { get; set; }
 
@@ -17,7 +14,7 @@ public partial class StudentProgram:TrackableBaseEntity
 
     public bool? IsActive { get; set; }
 
-        public Guid? CreatedBy { get; set; }
+    public Guid? CreatedBy { get; set; }
 
     public Guid? UpdatedBy { get; set; }
 

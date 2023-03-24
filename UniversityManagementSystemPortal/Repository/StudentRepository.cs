@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.Web.CodeGeneration.Design;
 using NuGet.Versioning;
 using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Enum;
+using UniversityManagementSystemPortal.FilterandSorting;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Student;
@@ -25,7 +27,7 @@ namespace UniversityManagementSystemPortal.Repository
             _identityService = identityService;
         }
 
-        public async Task<List<Student>> Get()
+        public async Task<PaginatedList<Student>> Get(PaginatedViewModel paginatedViewModel)
         {
             var students = await _dbContext.Students
                 .Include(s => s.User)
@@ -35,8 +37,15 @@ namespace UniversityManagementSystemPortal.Repository
                         .ThenInclude(p => p.Department)
                 .ToListAsync();
 
-            return students;
+            var filteredStudents = Filtering.Filter<Student, User>(paginatedViewModel.columnName, paginatedViewModel.search, students.AsQueryable(), s => s.Institute);
+            var sortedStudents = Sorting<Student>.Sort(paginatedViewModel.SortBy, paginatedViewModel.columnName, filteredStudents);
+            var paginatedStudents = PaginationHelper.Create(sortedStudents.AsQueryable(), paginatedViewModel);
+
+            return paginatedStudents;
         }
+
+
+
 
         public async Task<Student> GetById(Guid id)
         {

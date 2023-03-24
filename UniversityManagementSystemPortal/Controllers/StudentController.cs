@@ -6,7 +6,6 @@ using UniversityManagementSystemPortal.Application.Command.Student;
 using UniversityManagementSystemPortal.Application.Qurey.Student;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.CsvImport;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.Interfce;

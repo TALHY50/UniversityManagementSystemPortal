@@ -12,7 +12,6 @@ public partial class InstituteAdmin :TrackableBaseEntity
 
     public Guid InstituteId { get; set; }
 
-
     public Guid? CreatedBy { get; set; }
 
     public Guid? UpdatedBy { get; set; }
