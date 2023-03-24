@@ -37,7 +37,7 @@ namespace UniversityManagementSystemPortal.Repository
                         .ThenInclude(p => p.Department)
                 .ToListAsync();
 
-            var filteredStudents = Filtering.Filter<Student, User>(paginatedViewModel.columnName, paginatedViewModel.search, students.AsQueryable(), s => s.Institute);
+            var filteredStudents = Filtering.Filter<Student, User>(paginatedViewModel.columnName, paginatedViewModel.search, students.AsQueryable(), s => s.User);
             var sortedStudents = Sorting<Student>.Sort(paginatedViewModel.SortBy, paginatedViewModel.columnName, filteredStudents);
             var paginatedStudents = PaginationHelper.Create(sortedStudents.AsQueryable(), paginatedViewModel);
 
