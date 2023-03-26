@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using UniversityManagementsystem.Models;
 
 namespace UniversityManagementSystemPortal.Interfaces
 {
@@ -12,5 +11,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<Category> UpdateAsync(Category category);
         Task DeleteAsync(Category category);
         Task<Category> GetCategoryByName(string categoryName);
+        Task<bool> SaveChangesAsync();
     }
 }

@@ -4,15 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.UserRoles;
 using UniversityManagementSystemPortal.Application.Qurey.UserRoles;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto.UserRoleDto;
+using UniversityManagementSystemPortal.Models.ModelDto;
 
 namespace UniversityManagementSystemPortal.Controllers
 {

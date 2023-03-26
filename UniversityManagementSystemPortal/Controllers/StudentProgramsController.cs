@@ -4,6 +4,7 @@ using UniversityManagementSystemPortal.Application.Command.StudentProgram;
 using UniversityManagementSystemPortal.Application.Qurey.StudentProgram;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.ModelDto.StudentProgram;
+using UniversityManagementSystemPortal.Models.ModelDto.StudentProgram;
 
 namespace UniversityManagementSystemPortal.Controllers
 {

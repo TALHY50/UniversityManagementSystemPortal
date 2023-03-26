@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -52,7 +52,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
             institute.Id = Guid.NewGuid();
             await _context.Institutes.AddAsync(institute);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Institute institute)
@@ -63,7 +63,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
             
             _context.Institutes.Update(institute);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
@@ -76,10 +76,13 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Institutes.Remove(institute);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
-
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 
 }

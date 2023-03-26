@@ -1,15 +1,8 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using LINQtoCSV;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGeneration.Design;
-using NuGet.Versioning;
-using UniversityManagementsystem.Models;
-using UniversityManagementSystemPortal.Enum;
-using UniversityManagementSystemPortal.FilterandSorting;
-using UniversityManagementSystemPortal.Helpers.Paging;
+﻿using Microsoft.EntityFrameworkCore;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.ModelDto.Student;
+using UniversityManagementSystemPortal.Models.DbContext;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 using UniversityManagementSystemPortal.PictureManager;
 
 namespace UniversityManagementSystemPortal.Repository
@@ -26,26 +19,15 @@ namespace UniversityManagementSystemPortal.Repository
             _pictureManager = pictureManager;
             _identityService = identityService;
         }
-
-        public async Task<PaginatedList<Student>> Get(PaginatedViewModel paginatedViewModel)
+        public IQueryable<Student> Get()
         {
-            var students = await _dbContext.Students
-                .Include(s => s.User)
+            return _dbContext.Students.AsQueryable().Include(s => s.User)
                 .Include(s => s.Institute)
                 .Include(s => s.StudentPrograms)
                     .ThenInclude(sp => sp.Program)
-                        .ThenInclude(p => p.Department)
-                .ToListAsync();
+                        .ThenInclude(p => p.Department).AsNoTracking();
 
-            var filteredStudents = Filtering.Filter<Student, User>(paginatedViewModel.columnName, paginatedViewModel.search, students.AsQueryable(), s => s.User);
-            var sortedStudents = Sorting<Student>.Sort(paginatedViewModel.SortBy, paginatedViewModel.columnName, filteredStudents);
-            var paginatedStudents = PaginationHelper.Create(sortedStudents.AsQueryable(), paginatedViewModel);
-
-            return paginatedStudents;
         }
-
-
-
 
         public async Task<Student> GetById(Guid id)
         {
@@ -67,7 +49,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             student.Id = Guid.NewGuid();
             _dbContext.Students.Add(student);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
             return student;
         }
 
@@ -129,16 +111,16 @@ namespace UniversityManagementSystemPortal.Repository
                 CreatedBy = _identityService.GetUserId().Value
             };
             _dbContext.Students.AddRange(students);
-             _dbContext.SaveChanges(); // Add this line to save the changes to the database
+            await SaveChangesAsync();// Add this line to save the changes to the database
             return student;
         }
 
         public async Task<Student> Update(Student student)
         {
-           
+
             student.Id = Guid.NewGuid();
             _dbContext.Students.Update(student);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
 
             student.ProfilePath = GetProfilePicturePath(student.ProfilePath);
 
@@ -155,7 +137,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _dbContext.Students.Remove(student);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         private string GetProfilePicturePath(string filePath)
@@ -301,7 +283,7 @@ namespace UniversityManagementSystemPortal.Repository
 
         public Student AddBulk(Student student, User user, StudentReadModel dto)
         {
-          
+
             user.CreatedBy = _identityService.GetUserId().Value;
             user.UpdatedBy = _identityService.GetUserId().Value;
 
@@ -337,8 +319,12 @@ namespace UniversityManagementSystemPortal.Repository
 
             _dbContext.StudentPrograms.Add(studentProgram);
 
-            _dbContext.SaveChanges();
+            SaveChangesAsync();
             return student;
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 }

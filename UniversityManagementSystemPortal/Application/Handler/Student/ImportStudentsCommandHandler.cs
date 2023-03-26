@@ -1,10 +1,8 @@
 ﻿using LINQtoCSV;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Student;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal

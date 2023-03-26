@@ -1,25 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
+using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using UniversityManagementSystemPortal.Application.Command.Position;
+using UniversityManagementSystemPortal.Application.Qurey.Position;
+using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.ModelDto.Position;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using global::AutoMapper;
-    using MediatR;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using UniversityManagementsystem.Models;
-    using UniversityManagementSystemPortal.Application.Command.Position;
-    using UniversityManagementSystemPortal.Application.Qurey.Position;
-    using UniversityManagementSystemPortal.Authorization;
-    using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
-    using UniversityManagementSystemPortal.Interfaces;
-    using UniversityManagementSystemPortal.ModelDto.Position;
-  
+
 
     namespace YourApplicationName.Controllers
     {

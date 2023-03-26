@@ -3,45 +3,65 @@ using System.Text.Json;
 
 namespace UniversityManagementSystemPortal.Authorization
 {
-    public class ErrorHandlerMiddleware
+
+
+    public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-        public ErrorHandlerMiddleware(RequestDelegate next)
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             try
             {
-                await _next(context);
+                await _next(httpContext);
             }
-            catch (Exception error)
+            catch (Exception ex)
             {
-                var response = context.Response;
-                response.ContentType = "application/json";
-
-                switch (error)
-                {
-                    case AppException e:
-                        // custom application error
-                        response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        break;
-                    case KeyNotFoundException e:
-                        // not found error
-                        response.StatusCode = (int)HttpStatusCode.NotFound;
-                        break;
-                    default:
-                        // unhandled error
-                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
-                }
-
-                var result = JsonSerializer.Serialize(new { message = error?.Message });
-                await response.WriteAsync(result);
+                await HandleExceptionAsync(httpContext, ex);
             }
         }
+
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            context.Response.ContentType = "application/json";
+            var response = context.Response;
+
+            var errorResponse = new ErrorResponse
+            {
+                Success = false
+            };
+
+            switch (exception)
+            {
+                case ApplicationException ex:
+                    if (ex.Message.Contains("Invalid Token"))
+                    {
+                        response.StatusCode = (int)HttpStatusCode.Forbidden;
+                        errorResponse.Message = ex.Message;
+                        break;
+                    }
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse.Message = ex.Message;
+                    break;
+                default:
+                    response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    errorResponse.Message = "Internal server error!";
+                    break;
+            }
+
+            _logger.LogError(exception, "An exception occurred while processing the request.");
+
+            var result = JsonSerializer.Serialize(errorResponse);
+
+            await context.Response.WriteAsync(result);
+        }
     }
+
 }

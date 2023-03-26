@@ -2,8 +2,8 @@
 using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Account;
 using UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.Interfce;
-using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Account
 {

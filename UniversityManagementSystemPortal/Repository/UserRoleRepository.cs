@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {

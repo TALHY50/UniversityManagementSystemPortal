@@ -1,7 +1,6 @@
-﻿using UniversityManagementsystem.Models;
-using PorgramNamespace = UniversityManagementsystem.Models.Program;
-
-namespace UniversityManagementSystemPortal
+﻿
+using PorgramNamespace = UniversityManagementSystemPortal.Program;
+namespace UniversityManagementSystemPortal.Interfaces
 {
     public interface IProgramRepository
     {
@@ -12,5 +11,6 @@ namespace UniversityManagementSystemPortal
         Task DeleteAsync(Guid id);
         Task<IEnumerable<StudentProgram>> GetStudentProgramsAsync(Guid programId);
         Task<PorgramNamespace> GetProgramByName(string programName);
+        Task<bool> SaveChangesAsync();
     }
 }

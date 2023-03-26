@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Institute;
 using UniversityManagementSystemPortal.Application.Qurey.Institute;
 using UniversityManagementSystemPortal.Authorization;
@@ -11,6 +10,7 @@ using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Institute;
 using UniversityManagementSystemPortal.ModelDto.InstituteDto;
+using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.Controllers
 {

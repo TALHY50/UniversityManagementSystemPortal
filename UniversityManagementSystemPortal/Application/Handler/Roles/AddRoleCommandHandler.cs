@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
+using UniversityManagementSystemPortal.Application.Command.Roles;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Role;
+using UniversityManagementSystemPortal.Models.ModelDto.Role;
 
-namespace UniversityManagementSystemPortal
+namespace UniversityManagementSystemPortal.Application.Handler.Roles
 {
     public class AddRoleCommandHandler : IRequestHandler<AddRoleCommand, AddRoleDto>
     {

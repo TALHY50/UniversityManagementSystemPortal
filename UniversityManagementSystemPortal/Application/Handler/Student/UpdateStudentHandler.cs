@@ -4,6 +4,7 @@ using Serilog;
 using UniversityManagementSystemPortal.Application.Command.Student;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 using UniversityManagementSystemPortal.PictureManager;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Student

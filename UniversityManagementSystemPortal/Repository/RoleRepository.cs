@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -49,7 +49,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             role.Id = Guid.NewGuid();
             _context.Roles.Add(role);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
             return role;
         }
 
@@ -61,7 +61,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Roles.Update(role);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Role role)
@@ -72,7 +72,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Roles.Remove(role);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task<Role> GetByRoleTypeAsync(RoleType roleType)
@@ -83,6 +83,10 @@ namespace UniversityManagementSystemPortal.Repository
                 .FirstOrDefaultAsync(r => (int)r.RoleType == Convert.ToInt32(roleType));
 
             return role;
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 

@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
+
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -82,7 +83,7 @@ namespace UniversityManagementSystemPortal.Repository
             department.IsAdministrative = true;
 
             _context.Departments.Add(department);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
 
             return department;
         }
@@ -97,7 +98,7 @@ namespace UniversityManagementSystemPortal.Repository
             department.UpdatedAt = DateTime.UtcNow;
 
             _context.Departments.Update(department);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
 
             return department;
         }
@@ -117,13 +118,17 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Departments.Remove(department);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
         public async Task<Department> GetDepartmentByNameAsync(string departmentName)
         {
             // Retrieve the department with the specified name
             var department = await _context.Departments.FirstOrDefaultAsync(d => d.Name == departmentName);
             return department;
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 

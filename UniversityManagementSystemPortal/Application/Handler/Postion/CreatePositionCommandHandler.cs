@@ -6,7 +6,7 @@ using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Position;
 
-namespace UniversityManagementSystemPortal
+namespace UniversityManagementSystemPortal.Application.Handler.Postion
 {
     public class CreatePositionCommandHandler : IRequestHandler<CreatePositionCommand, PositionDto>
     {
@@ -36,7 +36,7 @@ namespace UniversityManagementSystemPortal
                 throw new AppException("Active user is not associated with any institute.");
             }
 
-            var position = _mapper.Map<UniversityManagementsystem.Models.Position>(request);
+            var position = _mapper.Map<Position>(request);
             position.Id = Guid.NewGuid();
             position.IsActive = true;
             await _positionRepository.CreateAsync(position);

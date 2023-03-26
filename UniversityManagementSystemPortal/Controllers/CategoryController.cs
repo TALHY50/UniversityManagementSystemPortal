@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Category;
 using UniversityManagementSystemPortal.Application.Qurey.Category;
 using UniversityManagementSystemPortal.Interfaces;

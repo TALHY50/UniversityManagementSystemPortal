@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using UniversityManagementSystemPortal.Application.Command.Employee;
 using UniversityManagementSystemPortal.Application.Qurey.Employee;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.ModelDto.Employee;
 
 namespace UniversityManagementSystemPortal.Controllers
@@ -22,9 +23,9 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetAll()
+        public async Task<ActionResult<PaginatedList<EmployeeDto>>> Get([FromQuery] PaginatedViewModel PaginatedViewModel)
         {
-            var employees = await _mediator.Send(new GetAllEmployeesQuery());
+            var employees = await _mediator.Send(new GetAllEmployeesQuery { paginatedViewModel = PaginatedViewModel });
 
             return Ok(employees);
         }

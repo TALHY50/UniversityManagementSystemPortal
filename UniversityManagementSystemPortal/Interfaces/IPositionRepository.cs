@@ -1,4 +1,4 @@
-﻿using UniversityManagementsystem.Models;
+﻿
 
 namespace UniversityManagementSystemPortal.Interfaces
 {

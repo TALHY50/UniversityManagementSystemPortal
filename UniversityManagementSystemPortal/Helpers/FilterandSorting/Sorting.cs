@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
 
-namespace UniversityManagementSystemPortal.FilterandSorting
+namespace UniversityManagementSystemPortal.Helpers.FilterandSorting
 {
     public static class Sorting<T>
     {

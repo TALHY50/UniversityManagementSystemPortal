@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
 namespace UniversityManagementSystemPortal.Application.Command.Account
 {

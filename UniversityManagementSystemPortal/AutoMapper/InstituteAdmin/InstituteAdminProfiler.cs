@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.InstituteAdmin;
+using UniversityManagementSystemPortal.Models.ModelDto.InstituteAdmin;
 
-namespace UniversityManagementSystemPortal.AutoMapper
+namespace UniversityManagementSystemPortal
 {
-    public class InstituteAdminProfiler :Profile
+    public class InstituteAdminProfiler : Profile
     {
         public InstituteAdminProfiler()
         {

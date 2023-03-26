@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using System.ComponentModel.DataAnnotations;
 using UniversityManagementSystemPortal.Enum;
+using UniversityManagementSystemPortal.Models.ModelDto.Program;
 
 namespace UniversityManagementSystemPortal.Application.Command.Program
 {

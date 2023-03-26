@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -17,7 +17,7 @@ namespace UniversityManagementSystemPortal.Repository
         {
             studentProgram.Id = Guid.NewGuid();
             await _dbContext.StudentPrograms.AddAsync(studentProgram);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task<IEnumerable<StudentProgram>> GetAllStudentProgramsAsync()
@@ -39,7 +39,7 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task UpdateStudentProgramAsync(StudentProgram studentProgram)
         {
             _dbContext.StudentPrograms.Update(studentProgram);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteStudentProgramAsync(Guid id)
@@ -48,8 +48,12 @@ namespace UniversityManagementSystemPortal.Repository
             if (studentProgram != null)
             {
                 _dbContext.StudentPrograms.Remove(studentProgram);
-                await _dbContext.SaveChangesAsync();
+                await SaveChangesAsync();
             }
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 

@@ -1,9 +1,8 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
+﻿using Microsoft.EntityFrameworkCore;
 using UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.Interfce;
+using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -28,7 +27,7 @@ namespace UniversityManagementSystemPortal.Repository
             user.IsActive = true;
             user.Id = Guid.NewGuid();
             await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
 
             return user;
         }
@@ -62,7 +61,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(User user)
@@ -73,7 +72,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Users.RemoveRange(user);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task<User> Authenticate(Login model)
@@ -110,6 +109,10 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task<User> GetByUsernameAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 

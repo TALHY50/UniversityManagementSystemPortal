@@ -20,7 +20,7 @@ namespace UniversityManagementSystemPortal.Application.Handler.Employee
 
         public async Task<byte[]> Handle(ExportEmployeeListQuery request, CancellationToken cancellationToken)
         {
-            var employees = await _employeeRepository.GetAllAsync();
+            var employees =  _employeeRepository.GetAllAsync();
             var employeeDtos = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
 
             var csvContent = new StringBuilder();

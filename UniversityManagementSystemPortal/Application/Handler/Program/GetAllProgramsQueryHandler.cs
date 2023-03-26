@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Program;
+using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.Program;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Program
 {

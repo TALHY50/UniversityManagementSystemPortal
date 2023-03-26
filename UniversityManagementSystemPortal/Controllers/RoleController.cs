@@ -5,6 +5,7 @@ using UniversityManagementSystemPortal.Application.Qurey.Roles;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.ModelDto.Role;
+using UniversityManagementSystemPortal.Models.ModelDto.Role;
 
 namespace UniversityManagementSystemPortal.Controllers
 {

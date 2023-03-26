@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.Department;
-using UniversityManagementSystemPortal.ModelDto.Program;
-using PorgramNamespace = UniversityManagementsystem.Models.Program;
+using PorgramNamespace = UniversityManagementSystemPortal.Program;
 using UniversityManagementSystemPortal.ModelDto.StudentProgram;
+using UniversityManagementSystemPortal.Models.ModelDto.Program;
+using UniversityManagementSystemPortal.ModelDto.Program;
 
 namespace UniversityManagementSystemPortal.AutoMapper.Program
 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PorgramNamespace = UniversityManagementsystem.Models.Program;
-using UniversityManagementsystem.Models;
-using Microsoft.AspNetCore.OutputCaching;
+using PorgramNamespace = UniversityManagementSystemPortal.Program;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Models.DbContext;
+using UniversityManagementSystemPortal.Interfaces;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -54,7 +54,7 @@ namespace UniversityManagementSystemPortal.Repository
             program.Id = Guid.NewGuid();
             program.IsActive = false;
             _context.Programs.Add(program);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task UpdateAsync(PorgramNamespace program)
@@ -65,7 +65,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Entry(program).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
@@ -78,7 +78,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Programs.Remove(programToDelete);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task<IEnumerable<StudentProgram>> GetStudentProgramsAsync(Guid programId)
@@ -90,6 +90,10 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task<PorgramNamespace> GetProgramByName(string programName)
         {
             return  _context.Programs.FirstOrDefault(p => p.Name == programName);
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 

@@ -1,5 +1,4 @@
-﻿using UniversityManagementsystem.Models;
-
+﻿
 namespace UniversityManagementSystemPortal.Interfaces
 {
     public interface IUserRoleRepository
@@ -10,6 +9,7 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task UpdateAsync(UserRole userRole);
         Task DeleteAsync(UserRole userRole);
         Task<bool> SaveChangesAsync();
+
     }
 
 }

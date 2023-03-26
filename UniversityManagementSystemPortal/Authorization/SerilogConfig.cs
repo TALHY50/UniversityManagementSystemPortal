@@ -7,7 +7,7 @@ namespace UniversityManagementSystemPortal.Authorization
 {
     public static class SerilogConfig
     {
-        private static readonly string LogDirectory = Path.Combine("wwwroot", "log");
+         private static readonly string LogDirectory = Path.Combine("wwwroot", "log");
 
         public static Serilog.Core.Logger CreateLogger()
         {

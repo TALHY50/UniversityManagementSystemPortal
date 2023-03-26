@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -40,19 +40,19 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task AddAsync(InstituteAdmin instituteAdmin)
         {
             await _context.InstituteAdmins.AddAsync(instituteAdmin);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task UpdateAsync(InstituteAdmin instituteAdmin)
         {
             _context.InstituteAdmins.Update(instituteAdmin);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task DeleteAsync(InstituteAdmin instituteAdmin)
         {
             _context.InstituteAdmins.Remove(instituteAdmin);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
 
         public async Task<IEnumerable<InstituteAdmin>> GetInstituteAdminsAsync(Guid instituteId)
@@ -67,6 +67,10 @@ namespace UniversityManagementSystemPortal.Repository
             var instituteAdmin = await _context.InstituteAdmins
                 .FirstOrDefaultAsync(i => i.UserId == activeUserId);
             return instituteAdmin?.InstituteId;
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
 
     }

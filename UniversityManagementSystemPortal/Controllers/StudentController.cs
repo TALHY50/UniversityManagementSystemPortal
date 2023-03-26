@@ -6,10 +6,10 @@ using UniversityManagementSystemPortal.Application.Command.Student;
 using UniversityManagementSystemPortal.Application.Qurey.Student;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.Interfce;
-using UniversityManagementSystemPortal.ModelDto.Student;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 using UniversityManagementSystemPortal.PictureManager;
 
 namespace UniversityManagementSystemPortal.Controllers
@@ -28,9 +28,9 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [JwtAuthorize("Students", "Admin", "SuperAdmin", "Teacher")]
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<ActionResult<PaginatedList<StudentDto>>> Get([FromQuery] PaginatedViewModel PaginatedViewModel)
         {
-            var query = new GetStudentListQurey();
+            var query = new GetStudentListQuery{ paginatedViewModel = PaginatedViewModel };
             var result = await _mediator.Send(query);
             return Ok(result);
         }

@@ -1,12 +1,11 @@
-﻿using UniversityManagementsystem.Models;
-using UniversityManagementSystemPortal.Helpers.Paging;
-using UniversityManagementSystemPortal.ModelDto.Student;
+﻿using UniversityManagementSystemPortal.Helpers.Paging;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal.Interfaces
 {
     public interface IStudentRepository
     {
-        Task<PaginatedList<Student>> Get(PaginatedViewModel paginatedViewModel);
+        IQueryable<Student> Get();
         Task<Student> GetById(Guid id);
         Task<Student> Add(Student student);
         Student AddBulk(Student student, User user, StudentReadModel dto);

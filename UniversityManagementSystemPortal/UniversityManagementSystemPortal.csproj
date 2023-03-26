@@ -48,7 +48,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <None Include="wwwroot\uploads\image_2023_03_14T18_01_36_799Z_638146490998900545.png" />
+    <None Include="wwwroot\uploads\Talha Asif_638146497165467128.jpg" />
+    <None Include="wwwroot\uploads\uploads\bc50f1d1-9043-474d-87cf-8eddaf9a49d0.png" />
+    <None Include="wwwroot\uploads\uploads\WhatsApp Image 2023-03-03 at 3.15.47 AM_638136561149355419.jpeg" />
   </ItemGroup>
 
 

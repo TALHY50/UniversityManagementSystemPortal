@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.UserRoles;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.UserRoleDto;

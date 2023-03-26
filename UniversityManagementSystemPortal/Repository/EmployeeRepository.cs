@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
+﻿using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -28,16 +30,14 @@ namespace UniversityManagementSystemPortal.Repository
 
         }
 
-        public async Task<IEnumerable<Employee>> GetAllAsync()
+        public  IQueryable<Employee> GetAllAsync()
         {
-            var employees = await _dbContext.Employees
+            var employees = _dbContext.Employees.AsQueryable()
                 .Include(e => e.Department)
                 .Include(e => e.Institute)
                 .Include(e => e.Position)
-                .Include(e => e.User)
-                .ToListAsync();
-
-            return employees ?? Enumerable.Empty<Employee>();
+                .Include(e => e.User).AsNoTracking();
+            return employees;
         }
 
         public async Task<IEnumerable<Employee>> GetByDepartmentIdAsync(Guid departmentId)
@@ -74,7 +74,7 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             await _dbContext.Employees.AddAsync(employee);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
             return employee;
         }
 
@@ -86,7 +86,7 @@ namespace UniversityManagementSystemPortal.Repository
                 return null;
             }
             _dbContext.Employees.Update(employee);
-            await _dbContext.SaveChangesAsync();
+            await SaveChangesAsync();
             return employee;
         }
 
@@ -98,7 +98,7 @@ namespace UniversityManagementSystemPortal.Repository
             if (employee != null)
             {
                 _dbContext.Employees.Remove(employee);
-                await _dbContext.SaveChangesAsync();
+                await SaveChangesAsync();
             }
         }
         public async Task<bool> EmployeeNoExistsAsync(string employeeNo)
@@ -113,6 +113,10 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             return null;
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 

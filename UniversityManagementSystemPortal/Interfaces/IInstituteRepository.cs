@@ -1,4 +1,4 @@
-﻿using UniversityManagementsystem.Models;
+﻿
 
 namespace UniversityManagementSystemPortal.Interfaces
 {
@@ -10,6 +10,7 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task UpdateAsync(Institute institute);
 
         Task DeleteAsync(Guid id);
-    
+        Task<bool> SaveChangesAsync();
+
     }
 }

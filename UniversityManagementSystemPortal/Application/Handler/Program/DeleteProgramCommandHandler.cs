@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using UniversityManagementSystemPortal.Application.Command.Program;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Interfaces;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Program
 {

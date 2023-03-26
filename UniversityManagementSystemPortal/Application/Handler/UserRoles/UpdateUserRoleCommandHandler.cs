@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.UserRoles;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
-
 namespace UniversityManagementSystemPortal.Application.Handler.UserRoles
 {
     public class UpdateUserRoleCommandHandler : IRequestHandler<UpdateUserRoleCommand>

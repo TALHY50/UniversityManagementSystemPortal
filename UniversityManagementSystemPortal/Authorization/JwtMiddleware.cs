@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using UniversityManagementSystemPortal.Interfce;
+using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto;
-using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal.Authorization
-{ 
+{
 
     public class JwtMiddleware
     { 

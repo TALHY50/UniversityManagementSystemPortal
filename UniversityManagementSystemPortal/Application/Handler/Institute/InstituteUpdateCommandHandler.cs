@@ -4,7 +4,7 @@ using UniversityManagementSystemPortal.Application.Command.Institute;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.ModelDto.Institute;
+using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Institute
 {

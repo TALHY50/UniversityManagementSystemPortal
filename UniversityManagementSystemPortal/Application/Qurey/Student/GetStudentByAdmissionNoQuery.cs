@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal.Application.Qurey.Student
 {

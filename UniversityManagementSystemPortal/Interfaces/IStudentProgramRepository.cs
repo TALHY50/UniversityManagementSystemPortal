@@ -1,5 +1,4 @@
-﻿using UniversityManagementsystem.Models;
-
+﻿
 namespace UniversityManagementSystemPortal.Interfaces
 {
     public interface IStudentProgramRepository
@@ -13,5 +12,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task UpdateStudentProgramAsync(StudentProgram studentProgram);
 
         Task DeleteStudentProgramAsync(Guid id);
+        Task<bool> SaveChangesAsync();
     }
 }

@@ -2,6 +2,8 @@
 using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Program;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.Program;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Program
 {

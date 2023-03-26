@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using System.Diagnostics;
-using System.Security.Principal;
+﻿using Serilog;
 using UniversityManagementSystemPortal.Authorization;
 
 namespace UniversityManagementSystemPortal.PictureManager
@@ -17,31 +15,20 @@ namespace UniversityManagementSystemPortal.PictureManager
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
         }
-
         public async Task<byte[]> GetPicture(string fileName)
         {
-            try
-            {
-                var uploadsFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "uploads");
-                var filePath = Path.Combine(uploadsFolderPath, fileName.Trim());
+            var uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+            var filePath = Path.Combine(uploadsFolderPath, fileName.Trim());
 
-                if (!File.Exists(filePath))
-                {
-                    _logger.LogError($"File {fileName} does not exist at path: {uploadsFolderPath}");
-                    throw new FileNotFoundException($"File {fileName} does not exist.");
-                }
-
-                var pictureBytes = await File.ReadAllBytesAsync(filePath);
-                return pictureBytes;
-            }
-            catch (Exception ex)
+            if (!File.Exists(filePath))
             {
-                _logger.LogError(ex, $"Error getting picture with filename {fileName}");
-                throw;
+                _logger.LogError("File {FileName} does not exist at path: {FilePath}", fileName, filePath);
+                throw new FileNotFoundException($"File {fileName} does not exist.");
             }
+
+            var pictureBytes = await File.ReadAllBytesAsync(filePath);
+            return pictureBytes;
         }
-
-
 
         public async Task<string> Upload(IFormFile formFile)
         {
@@ -55,7 +42,7 @@ namespace UniversityManagementSystemPortal.PictureManager
                 throw new AppException($"File size exceeds the maximum allowed size of {MaxFileSizeMB} MB.");
             }
 
-            var uploadsFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "uploads");
+            var uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
 
             if (!Directory.Exists(uploadsFolderPath))
             {
@@ -71,9 +58,10 @@ namespace UniversityManagementSystemPortal.PictureManager
                 await formFile.CopyToAsync(stream);
             }
 
+            _logger.LogInformation("Uploaded file {FileName} to path: {FilePath}", fileName, filePath);
+
             return fileName;
         }
-
 
         public async Task<string> Update(Guid id, IFormFile formFile, string currentFilePath = null)
         {
@@ -87,17 +75,18 @@ namespace UniversityManagementSystemPortal.PictureManager
                 throw new AppException($"File size exceeds the maximum allowed size of {MaxFileSizeMB} MB.");
             }
 
-            var uploadsFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "uploads");
+            var uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(formFile.FileName)}";
             var filePath = Path.Combine(uploadsFolderPath, fileName);
 
             if (!string.IsNullOrEmpty(currentFilePath))
             {
-                var currentFilePathFull = Path.Combine(_webHostEnvironment.ContentRootPath, currentFilePath);
+                var currentFilePathFull = Path.Combine(_webHostEnvironment.WebRootPath, currentFilePath);
 
                 if (File.Exists(currentFilePathFull))
                 {
                     File.Delete(currentFilePathFull);
+                    _logger.LogInformation("Deleted file {CurrentFilePath}", currentFilePathFull);
                 }
             }
 
@@ -106,22 +95,25 @@ namespace UniversityManagementSystemPortal.PictureManager
                 await formFile.CopyToAsync(stream);
             }
 
+            _logger.LogInformation("Updated file {FileName} to path: {FilePath}", fileName, filePath);
+
             return fileName;
         }
 
         public void Delete(string fileName)
         {
-            var uploadsFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "uploads");
+            var uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
             var filePath = Path.Combine(uploadsFolderPath, fileName);
 
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
+                _logger.LogInformation("Deleted file {FilePath}", filePath);
             }
         }
         public void ClearCache(string fileName)
         {
-            var cacheFolderPath = Path.Combine(_webHostEnvironment.ContentRootPath, "cache");
+            var cacheFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "cache");
             var cacheFilePath = Path.Combine(cacheFolderPath, fileName);
 
             if (File.Exists(cacheFilePath))
@@ -129,6 +121,8 @@ namespace UniversityManagementSystemPortal.PictureManager
                 File.Delete(cacheFilePath);
             }
         }
-}   }  
+    }
+
+}
 
 

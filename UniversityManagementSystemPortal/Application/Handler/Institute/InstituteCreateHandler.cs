@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Institute;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Institute;
-
 namespace UniversityManagementSystemPortal
 {
     public class InstituteCreateHandler : IRequestHandler<InstituteCreateCommand, InstituteCreateDto>

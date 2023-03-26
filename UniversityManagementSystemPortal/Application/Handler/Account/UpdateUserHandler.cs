@@ -3,10 +3,10 @@ using MediatR;
 using UniversityManagementSystemPortal.Application.Command.Account;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
-using UniversityManagementSystemPortal.Interfce;
-using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
-namespace MyApp.Application.Users.Commands.UpdateUser
+namespace UniversityManagementSystemPortal.Application.Handler.Account
 {
     public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, UserViewModel>
     {

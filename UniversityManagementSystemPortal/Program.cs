@@ -1,23 +1,21 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using UniversityManagementsystem.Models;
-using UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.Interfce;
-using UniversityManagementSystemPortal.ModelDto;
-using UniversityManagementSystemPortal.Repository;
-using System.Text.Json.Serialization;
-using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal;
-using UniversityManagementSystemPortal.PictureManager;
-using Microsoft.AspNetCore.Http.Features;
-using UniversityManagementSystemPortal.IdentityServices;
-using Microsoft.AspNetCore.StaticFiles;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using UniversityManagementSystemPortal;
+using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.IdentityServices;
+using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.ModelDto;
+using UniversityManagementSystemPortal.Models.DbContext;
+using UniversityManagementSystemPortal.PictureManager;
+using UniversityManagementSystemPortal.Repository;
+using UniversityManagementSystemPortal.SwaggerFileUploadFilter;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -119,7 +117,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 // global error handler
-//app.UseMiddleware<ErrorHandlerMiddleware>();
+//app.UseMiddleware<ExceptionHandlingMiddleware>();
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddleware>();
 app.UseStaticFiles();

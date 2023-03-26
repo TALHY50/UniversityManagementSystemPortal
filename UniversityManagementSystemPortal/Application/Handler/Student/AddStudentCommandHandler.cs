@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Student;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 using UniversityManagementSystemPortal.PictureManager;
 
 namespace UniversityManagementSystemPortal
@@ -18,7 +18,7 @@ namespace UniversityManagementSystemPortal
 
         public AddStudentCommandHandler(IStudentRepository studentRepository,
             IMapper mapper,
-            IPictureManager pictureManager, 
+            IPictureManager pictureManager,
             ILogger<AddStudentCommandHandler> logger,
             IIdentityServices identityService)
         {

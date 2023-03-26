@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Qurey.Roles;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Role;
+using UniversityManagementSystemPortal.Models.ModelDto.Role;
 using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Roles

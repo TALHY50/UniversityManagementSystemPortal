@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Qurey.UserRoles;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.UserRoleDto;
 
-namespace UniversityManagementSystemPortal
+namespace UniversityManagementSystemPortal.Application.Handler.UserRoles
 {
     public class GetUserRoleByIdQueryHandler : IRequestHandler<GetUserRoleByIdQuery, UserRoleDto>
     {

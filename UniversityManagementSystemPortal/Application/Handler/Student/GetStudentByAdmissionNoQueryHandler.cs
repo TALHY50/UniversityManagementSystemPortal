@@ -3,6 +3,7 @@ using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Student;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Student
 {

@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Employee;
+using UniversityManagementSystemPortal.Helpers.FilterandSorting;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Employee;
 
-namespace UniversityManagementSystemPortal.Application.Handler.Employee
+namespace UniversityManagementSystemPortal
 {
-    public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery, IEnumerable<EmployeeDto>>
+    public class GetAllEmployeesQueryHandler : IRequestHandler<GetAllEmployeesQuery, PaginatedList<EmployeeDto>>
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
@@ -17,12 +19,16 @@ namespace UniversityManagementSystemPortal.Application.Handler.Employee
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<EmployeeDto>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedList<EmployeeDto>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
         {
-            var employees = await _employeeRepository.GetAllAsync();
-            var employeeDtos = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
-
-            return employeeDtos;
+            var paginatedViewModel = request.paginatedViewModel;
+            var employees = _employeeRepository.GetAllAsync();
+            var propertyNames = new[] { paginatedViewModel?.columnName }; // assuming only one property for filtering
+            var filteredemployees = Filtering.Filter(employees, paginatedViewModel.search, propertyNames);
+            var sortedemployees = Sorting<Employee>.Sort(paginatedViewModel.SortBy, paginatedViewModel.columnName, filteredemployees);
+            var paginatedemployees = PaginationHelper.Create(sortedemployees, paginatedViewModel);
+            var studentDtos = _mapper.Map<PaginatedList<EmployeeDto>>(paginatedemployees);
+            return await Task.FromResult(studentDtos);
         }
     }
 }

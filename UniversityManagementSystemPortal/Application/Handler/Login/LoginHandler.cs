@@ -1,11 +1,11 @@
 ﻿using MediatR;
-using UniversityManagementSystemPortal.Application.Command.Account;
 using UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.Interfce;
+using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 using UniversityManagementSystemPortal.Repository;
 
-namespace UniversityManagementSystemPortal.Application.Handler.Account
+namespace UniversityManagementSystemPortal.Application.Handler.Login
 {
     public class LoginHandler : IRequestHandler<LoginCommand, LoginView>
     {

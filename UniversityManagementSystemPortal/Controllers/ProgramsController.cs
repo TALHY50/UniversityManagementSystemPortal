@@ -1,15 +1,16 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using PorgramNamespace = UniversityManagementsystem.Models.Program;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementSystemPortal.ModelDto.Program;
-using UniversityManagementSystemPortal.ModelDto.StudentProgram;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Application.Qurey.Program;
 using MediatR;
 using UniversityManagementSystemPortal.Application.Command.Program;
+using UniversityManagementSystemPortal.Models.ModelDto.Program;
+using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.StudentProgram;
+using UniversityManagementSystemPortal.ModelDto.StudentProgram;
+using UniversityManagementSystemPortal.ModelDto.Program;
 
 namespace UniversityManagementSystemPortal.Controllers
 {

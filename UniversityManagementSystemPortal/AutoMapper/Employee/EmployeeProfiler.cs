@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.ModelDto.Employee;
 using UniversityManagementSystemPortal.ModelDto.Student;
+
 
 namespace UniversityManagementSystemPortal
 {
     public class EmployeeProfiler : Profile
     {
-        public EmployeeProfiler() {
+        public EmployeeProfiler()
+        {
             CreateMap<Employee, EmployeeDto>()
            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
            .ForMember(dest => dest.MiddleName, opt => opt.MapFrom(src => src.User.MiddleName))

@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
-namespace UniversityManagementSystemPortal.Application.Command.Account
+namespace UniversityManagementSystemPortal
 {
     public class LoginCommand : IRequest<LoginView>
     {

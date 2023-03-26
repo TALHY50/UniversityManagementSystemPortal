@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
-namespace UniversityManagementSystemPortal.Interfce
+namespace UniversityManagementSystemPortal.Interfaces
 {
 
     public interface IUserInterface
@@ -20,6 +20,6 @@ namespace UniversityManagementSystemPortal.Interfce
         Task<User> GetByEmailAsync(string email);
         Task<int> GetUniqueUsernameNumberAsync(string username);
         Task<User> GetByUsernameAsync(string username);
-
+        Task<bool> SaveChangesAsync();
     }
 }

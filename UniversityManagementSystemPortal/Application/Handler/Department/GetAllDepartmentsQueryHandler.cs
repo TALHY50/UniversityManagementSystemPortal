@@ -2,7 +2,7 @@
 using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Department;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.ModelDto.Department;
+using UniversityManagementSystemPortal.Models.ModelDto.Department;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Department
 {

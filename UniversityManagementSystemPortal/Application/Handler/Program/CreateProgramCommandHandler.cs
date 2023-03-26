@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
-using PorgramNamespace = UniversityManagementsystem.Models.Program;
+using PorgramNamespace = UniversityManagementSystemPortal.Program;
 
 using UniversityManagementSystemPortal.Application.Command.Program;
+using UniversityManagementSystemPortal.Models.ModelDto.Program;
+using UniversityManagementSystemPortal.Interfaces;
 
-namespace UniversityManagementSystemPortal
+namespace UniversityManagementSystemPortal.Application.Handler.Program
 {
     public class CreateProgramCommandHandler : IRequestHandler<CreateProgramCommand, ProgramReadDto>
     {

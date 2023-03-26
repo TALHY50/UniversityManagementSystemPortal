@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.Department;
+using UniversityManagementSystemPortal.Models.ModelDto.Department;
 
-namespace UniversityManagementSystemPortal.AutoMapper
+namespace UniversityManagementSystemPortal
 {
     public class DepartmentProfiler : Profile
     {
-        public DepartmentProfiler() 
+        public DepartmentProfiler()
         {
             CreateMap<Department, DepartmentDto>();
             CreateMap<DepartmentCreateDto, Department>();

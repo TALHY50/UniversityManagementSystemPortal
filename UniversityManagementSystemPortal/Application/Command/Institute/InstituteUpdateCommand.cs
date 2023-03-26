@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using System.ComponentModel.DataAnnotations;
 using UniversityManagementSystemPortal.Enum;
-using UniversityManagementSystemPortal.ModelDto.Institute;
+using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.Application.Command.Institute
 {

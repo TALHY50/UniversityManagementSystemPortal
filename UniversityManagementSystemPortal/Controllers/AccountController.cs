@@ -7,6 +7,7 @@ using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 using AllowAnonymous = UniversityManagementSystemPortal.Authorization.AllowAnonymousAttribute;
 
 namespace UniversityManagementSystemPortal.Controllers

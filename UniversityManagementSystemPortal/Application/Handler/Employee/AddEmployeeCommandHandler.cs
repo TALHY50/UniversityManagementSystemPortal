@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Employee;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
@@ -17,7 +16,7 @@ namespace UniversityManagementSystemPortal
         private readonly IMapper _mapper;
         private readonly IPictureManager _pictureManager;
         private readonly IIdentityServices _identityServices;
-        private readonly ILogger<AddEmployeeCommandHandler>_logger;
+        private readonly ILogger<AddEmployeeCommandHandler> _logger;
         public AddEmployeeCommandHandler(
             IEmployeeRepository employeeRepository,
             IMapper mapper,

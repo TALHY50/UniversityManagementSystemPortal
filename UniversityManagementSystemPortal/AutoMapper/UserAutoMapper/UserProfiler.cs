@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
-namespace UniversityManagementSystemPortal.AutoMapper.UserAutoMapper
+namespace UniversityManagementSystemPortal
 {
     public class UserProfiler : Profile
     {

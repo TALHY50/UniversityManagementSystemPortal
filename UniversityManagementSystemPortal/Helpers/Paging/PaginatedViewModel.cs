@@ -4,7 +4,6 @@ namespace UniversityManagementSystemPortal.Helpers.Paging
 {
     public class PaginatedViewModel
     {
-
         //const int maxPageSize = 50;
         private string _search = string.Empty;
         private string _sortBy = string.Empty;

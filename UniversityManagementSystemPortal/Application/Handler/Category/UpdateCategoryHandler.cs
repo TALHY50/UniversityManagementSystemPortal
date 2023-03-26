@@ -27,7 +27,6 @@ namespace UniversityManagementSystemPortal.Application.Handler.Category
             }
 
             _mapper.Map(command.UpdateCategoryDto, category);
-            category.UpdatedAt = DateTime.UtcNow;
             category = await _repository.UpdateAsync(category);
             var categoryDto = _mapper.Map<CategoryDto>(category);
             return categoryDto;

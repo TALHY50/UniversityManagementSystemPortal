@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using UniversityManagementSystemPortal.ModelDto.UserRoleDto;
+using UniversityManagementSystemPortal.Models.ModelDto;
 
 namespace UniversityManagementSystemPortal.Application.Command.UserRoles
 {

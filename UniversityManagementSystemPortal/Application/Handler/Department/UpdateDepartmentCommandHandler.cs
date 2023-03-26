@@ -5,7 +5,7 @@ using UniversityManagementSystemPortal.Application.Command.Department;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.ModelDto.Department;
+using UniversityManagementSystemPortal.Models.ModelDto.Department;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Department
 {

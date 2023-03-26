@@ -3,6 +3,7 @@ using MediatR;
 using System.Text;
 using UniversityManagementSystemPortal.Application.Qurey.Student;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Student
 {
@@ -19,7 +20,7 @@ namespace UniversityManagementSystemPortal.Application.Handler.Student
 
         public async Task<byte[]> Handle(ExportStudentListQuery request, CancellationToken cancellationToken)
         {
-            var students = await _studentRepository.Get();
+            var students =  _studentRepository.Get();
             var studentDtos = _mapper.Map<List<StudentDto>>(students);
 
             var csvContent = new StringBuilder();

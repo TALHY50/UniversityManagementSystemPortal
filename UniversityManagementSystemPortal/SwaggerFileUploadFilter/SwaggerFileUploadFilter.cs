@@ -2,7 +2,7 @@
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
-namespace UniversityManagementSystemPortal
+namespace UniversityManagementSystemPortal.SwaggerFileUploadFilter
 {
     public class FileUploadOperationFilter : IOperationFilter
     {

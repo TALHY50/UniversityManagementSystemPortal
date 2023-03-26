@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using UniversityManagementsystem.Models;
+
 using UniversityManagementSystemPortal.Application.Command.Department;
 using UniversityManagementSystemPortal.Application.Qurey.Department;
 using UniversityManagementSystemPortal.Authorization;
-using UniversityManagementSystemPortal.IdentityServices;
-using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Department;
+using UniversityManagementSystemPortal.Models.ModelDto.Department;
 
 namespace UniversityManagementSystemPortal.Controllers
 {

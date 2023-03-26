@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using UniversityManagementSystemPortal.ModelDto.Student;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
 
 namespace UniversityManagementSystemPortal.Application.Command.Student
 {

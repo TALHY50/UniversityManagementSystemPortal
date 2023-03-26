@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.UserRoleDto;
+using UniversityManagementSystemPortal.Models.ModelDto;
 
 namespace UniversityManagementSystemPortal.AutoMapper
 {

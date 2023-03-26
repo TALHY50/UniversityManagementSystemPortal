@@ -5,7 +5,7 @@ using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Position;
 
-namespace UniversityManagementSystemPortal
+namespace UniversityManagementSystemPortal.Application.Handler.Postion
 {
     public class GetAllPositionsQueryHandler : IRequestHandler<GetAllPositionsQuery, List<PositionDto>>
     {

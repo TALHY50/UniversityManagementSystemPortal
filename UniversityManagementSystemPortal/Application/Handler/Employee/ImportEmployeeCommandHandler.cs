@@ -1,11 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Employee;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
-using UniversityManagementSystemPortal.Interfce;
 using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal
@@ -14,15 +12,15 @@ namespace UniversityManagementSystemPortal
     {
         private readonly IUserInterface _userInterface;
         private readonly IDepartmentRepository _departmentRepository;
-        private readonly IEmployeeRepository _employeeRepository ;
-        private readonly ICategoryRepository _categoryRepository  ;
+        private readonly IEmployeeRepository _employeeRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IIdentityServices _identityServices;
-        private readonly IInstituteAdminRepository  _instituteAdminRepository;
+        private readonly IInstituteAdminRepository _instituteAdminRepository;
 
 
-        private readonly IPositionRepository _positionRepository ;
+        private readonly IPositionRepository _positionRepository;
         public ImportEmployeeCommandHandler(IUserInterface userInterface, IDepartmentRepository departmentRepository,
-            IEmployeeRepository employeeRepository, IPositionRepository positionRepository, 
+            IEmployeeRepository employeeRepository, IPositionRepository positionRepository,
             ICategoryRepository categoryRepository, IIdentityServices identityServices,
  IInstituteAdminRepository instituteAdminRepository
 

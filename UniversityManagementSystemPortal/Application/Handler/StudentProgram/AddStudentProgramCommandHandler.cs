@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.StudentProgram;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.StudentProgram;
+using UniversityManagementSystemPortal.Models.ModelDto.StudentProgram;
 
 namespace UniversityManagementSystemPortal
 {

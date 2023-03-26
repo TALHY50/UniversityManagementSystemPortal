@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.Institute;
 using UniversityManagementSystemPortal.ModelDto.InstituteDto;
+using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.AutoMapper
 {

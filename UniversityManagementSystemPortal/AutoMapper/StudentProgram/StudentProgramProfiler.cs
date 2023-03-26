@@ -1,8 +1,8 @@
 ﻿
 using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.ModelDto.Student;
 using UniversityManagementSystemPortal.ModelDto.StudentProgram;
+using UniversityManagementSystemPortal.Models.ModelDto.StudentProgram;
 
 namespace UniversityManagementSystemPortal
 {

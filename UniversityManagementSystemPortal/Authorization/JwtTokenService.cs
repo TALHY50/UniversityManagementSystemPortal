@@ -5,14 +5,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Enum;
 using UniversityManagementSystemPortal.ModelDto;
+using UniversityManagementSystemPortal.Models.DbContext;
+
+using UniversityManagementSystemPortal.Models.ModelDto;
 
 namespace UniversityManagementSystemPortal.Authorization
 {
 
-  public interface IJwtTokenService
+    public interface IJwtTokenService
     {
         string GenerateJwtToken(User user);
         Guid? ValidateJwtToken(string token);

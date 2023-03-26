@@ -1,4 +1,4 @@
-﻿using UniversityManagementsystem.Models;
+﻿
 
 namespace UniversityManagementSystemPortal.Interfaces
 {
@@ -11,6 +11,7 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task DeleteAsync(InstituteAdmin instituteAdmin);
         Task<IEnumerable<InstituteAdmin>> GetInstituteAdminsAsync(Guid instituteId);
         Task<Guid?> GetInstituteIdByActiveUserId(Guid activeUserId);
+        Task<bool> SaveChangesAsync();
     }
 
 }

@@ -1,5 +1,4 @@
-﻿using UniversityManagementsystem.Models;
-
+﻿
 namespace UniversityManagementSystemPortal.Interfaces
 {
     public interface IDepartmentRepository
@@ -11,5 +10,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task<Department> UpdateDepartmentAsync(Department department);
         Task DeleteDepartmentAsync(Guid departmentId);
         Task<Department> GetDepartmentByNameAsync(string name);
+        Task<bool> SaveChangesAsync();
     }
 }

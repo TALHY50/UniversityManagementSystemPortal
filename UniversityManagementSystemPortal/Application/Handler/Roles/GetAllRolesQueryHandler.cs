@@ -3,6 +3,7 @@ using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Roles;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Role;
+using UniversityManagementSystemPortal.Models.ModelDto.Role;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Roles
 {

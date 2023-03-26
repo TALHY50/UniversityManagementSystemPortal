@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Student;
-using UniversityManagementSystemPortal.ModelDto.Student;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.ModelDto.StudentProgram;
-using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Models.ModelDto.Student;
+using UniversityManagementSystemPortal.Models.ModelDto.StudentProgram;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
 namespace UniversityManagementSystemPortal
 {
@@ -42,9 +43,9 @@ namespace UniversityManagementSystemPortal
             CreateMap<UpdateStudentDto, Student>();
             CreateMap<UpdateStudentCommand, Student>()
            .ForMember(dest => dest.Id, opt => opt.Ignore())
-           .ForMember(dest => dest.Institute, opt => opt.Ignore()) 
+           .ForMember(dest => dest.Institute, opt => opt.Ignore())
            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-           .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore()); 
+           .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
             CreateMap<StudentReadModel, Student>()
            .ForMember(dest => dest.AdmissionNo, opt => opt.MapFrom(src => src.AdmissionNo))
            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
@@ -66,6 +67,9 @@ namespace UniversityManagementSystemPortal
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
                 .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmed))
              .ForMember(dest => dest.BloodGroup, opt => opt.MapFrom(src => src.BloodGroup));
+
+
+            CreateMap<PaginatedList<Student>, PaginatedList<StudentDto>>();
         }
     }
 }

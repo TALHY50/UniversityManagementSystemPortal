@@ -1,8 +1,8 @@
 ﻿using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -136,6 +136,7 @@ namespace UniversityManagementSystemPortal.Repository
             _dbContext.Positions.Remove(position);
             await SaveChangesAsync();
         }
+
     }
 
 

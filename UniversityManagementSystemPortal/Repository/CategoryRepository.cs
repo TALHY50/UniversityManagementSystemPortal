@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
+using UniversityManagementSystemPortal.Models.DbContext;
 
 namespace UniversityManagementSystemPortal.Repository
 {
@@ -59,7 +59,7 @@ namespace UniversityManagementSystemPortal.Repository
             category.IsFaculty = false;
 
             await _context.Categories.AddAsync(category);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
 
             return category;
         }
@@ -84,7 +84,7 @@ namespace UniversityManagementSystemPortal.Repository
             existingCategory.IsFaculty = category.IsFaculty;
 
             _context.Categories.Update(existingCategory);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
 
             return existingCategory;
         }
@@ -97,11 +97,15 @@ namespace UniversityManagementSystemPortal.Repository
             }
 
             _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            await SaveChangesAsync();
         }
         public async Task<Category> GetCategoryByName(string categoryName)
         {
             return  _context.Categories.FirstOrDefault(c => c.Name == categoryName);
+        }
+        public async Task<bool> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 

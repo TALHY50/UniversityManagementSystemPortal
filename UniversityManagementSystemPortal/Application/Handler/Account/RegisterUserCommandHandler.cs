@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using MediatR;
-using UniversityManagementsystem.Models;
 using UniversityManagementSystemPortal.Application.Command.Account;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.IdentityServices;
-using UniversityManagementSystemPortal.Interfce;
+using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
+using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Account
 {

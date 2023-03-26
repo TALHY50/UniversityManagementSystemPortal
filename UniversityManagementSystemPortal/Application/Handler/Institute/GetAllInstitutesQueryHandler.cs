@@ -3,6 +3,7 @@ using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Institute;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.InstituteDto;
+using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Institute
 {
