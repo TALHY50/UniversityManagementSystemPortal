@@ -6,8 +6,10 @@ using UniversityManagementSystemPortal.Application.Command.Position;
 using UniversityManagementSystemPortal.Application.Qurey.Position;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Position;
+using UniversityManagementSystemPortal.Models.ModelDto.Program;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -31,9 +33,9 @@ namespace UniversityManagementSystemPortal.Controllers
             }
             [JwtAuthorize("Admin", "SuperAdmin")]
             [HttpGet]
-            public async Task<IActionResult> GetAll()
+            public async Task<ActionResult<PaginatedList<PositionDto>>> GetAll(PaginatedViewModel paginatedViewModel)
             {
-                var positions = await _mediator.Send(new GetAllPositionsQuery());
+                var positions = await _mediator.Send(new GetAllPositionsQuery {paginatedViewModel = paginatedViewModel });
 
                 return Ok(positions);
             }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementSystemPortal.Application.Command.Category;
 using UniversityManagementSystemPortal.Application.Qurey.Category;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Category;
 
@@ -29,9 +30,9 @@ namespace UniversityManagementSystemPortal.Controllers
             return Ok(categoryDto);
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetAll()
+        public async Task<ActionResult<PaginatedList<CategoryDto>>> GetAll(PaginatedViewModel paginatedViewModel)
         {
-            var categoryDtos = await _mediator.Send(new GetAllCategoriesQuery());
+            var categoryDtos = await _mediator.Send(new GetAllCategoriesQuery {paginatedViewModel = paginatedViewModel });
             return Ok(categoryDtos);
         }
 

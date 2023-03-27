@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using UniversityManagementSystemPortal.Application.Command.Department;
 using UniversityManagementSystemPortal.Application.Qurey.Department;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.ModelDto.Department;
 using UniversityManagementSystemPortal.Models.ModelDto.Department;
 
@@ -21,9 +22,9 @@ namespace UniversityManagementSystemPortal.Controllers
             _mediator = mediator;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DepartmentDto>>> GetAll()
+        public async Task<ActionResult<PaginatedList<DepartmentDto>>> GetAll(PaginatedViewModel paginatedViewModel)
         {
-            var query = new GetAllDepartmentsQuery();
+            var query = new GetAllDepartmentsQuery{paginatedViewModel = paginatedViewModel};
             var departmentDtos = await _mediator.Send(query);
             return Ok(departmentDtos);
         }

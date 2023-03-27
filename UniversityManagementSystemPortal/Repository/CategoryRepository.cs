@@ -27,16 +27,15 @@ namespace UniversityManagementSystemPortal.Repository
             return category;
         }
 
-        public async Task<IEnumerable<Category>> GetAllAsync()
+        public async Task<IQueryable<Category>> GetAllAsync()
         {
-            var categories = await _context.Categories
+            var categories = _context.Categories.AsQueryable()
             .Include(c => c.Institute)
             .Include(c => c.Positions)
-            .ToListAsync();
+            .AsTracking();
 
-            return categories ?? Enumerable.Empty<Category>();
+            return categories;
         }
-
         public async Task<IEnumerable<Category>> GetByInstituteIdAsync(Guid instituteId)
         {
             var categories = await _context.Categories

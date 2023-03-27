@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
 using MediatR;
 using UniversityManagementSystemPortal.Application.Qurey.Position;
+using UniversityManagementSystemPortal.Helpers.FilterandSorting;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Position;
 
-namespace UniversityManagementSystemPortal.Application.Handler.Postion
-{
-    public class GetAllPositionsQueryHandler : IRequestHandler<GetAllPositionsQuery, List<PositionDto>>
+namespace UniversityManagementSystemPortal
+{ 
+    public class GetAllPositionsQueryHandler : IRequestHandler<GetAllPositionsQuery, PaginatedList<PositionDto>>
     {
         private readonly IInstituteAdminRepository _repository;
         private readonly IMapper _mapper;
@@ -22,16 +24,18 @@ namespace UniversityManagementSystemPortal.Application.Handler.Postion
             _identityServices = identityServices;
             _positionRepository = positionRepository;
         }
-        public async Task<List<PositionDto>> Handle(GetAllPositionsQuery request, CancellationToken cancellationToken)
+        public async Task<PaginatedList<PositionDto>> Handle(GetAllPositionsQuery request, CancellationToken cancellationToken)
         {
             var activeUserId = _identityServices.GetUserId();
             var instituteId = await _repository.GetInstituteIdByActiveUserId(activeUserId.Value);
-
+            var paginatedViewModel = request.paginatedViewModel;
             var positions = await _positionRepository.GetAllAsync(instituteId.Value);
-
-            var positionDtos = _mapper.Map<IEnumerable<PositionDto>>(positions);
-
-            return positionDtos.ToList();
+            var propertyNames = new[] { paginatedViewModel.columnName };
+            var filteredPositions = Filtering.Filter(positions, paginatedViewModel.search, propertyNames);
+            var sortedCategories = Sorting<Position>.Sort(paginatedViewModel.SortBy, paginatedViewModel.columnName, filteredPositions);
+            var paginatedCategories = PaginationHelper.Create(sortedCategories, paginatedViewModel);
+            var categoryDto = _mapper.Map<PaginatedList<PositionDto>>(paginatedCategories);
+            return await Task.FromResult(categoryDto);
         }
 
     }

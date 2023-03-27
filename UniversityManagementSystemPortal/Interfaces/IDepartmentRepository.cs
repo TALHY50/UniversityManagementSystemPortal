@@ -3,7 +3,7 @@ namespace UniversityManagementSystemPortal.Interfaces
 {
     public interface IDepartmentRepository
     {
-        Task<IEnumerable<Department>> GetAllDepartmentsAsync();
+        IQueryable<Department> GetAllDepartmentsAsync();
         Task<Department> GetDepartmentByIdAsync(Guid departmentId);
         Task<IEnumerable<Department>> GetDepartmentsByInstituteIdAsync(Guid instituteId);
         Task<Department> CreateDepartmentAsync(Department department);

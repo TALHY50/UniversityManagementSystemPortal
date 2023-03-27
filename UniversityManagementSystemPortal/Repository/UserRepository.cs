@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.EntityFrameworkCore;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
@@ -32,9 +33,13 @@ namespace UniversityManagementSystemPortal.Repository
             return user;
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public  Task<IQueryable<User>> GetAllAsync()
         {
-            return await _context.Users.ToListAsync();
+            var user =  _context.Users.AsQueryable()
+                .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+                .AsNoTracking();
+            return Task.FromResult(user);
         }
 
         public async Task<User> GetByIdAsync(Guid id)

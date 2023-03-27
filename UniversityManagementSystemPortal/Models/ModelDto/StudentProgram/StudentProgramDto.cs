@@ -12,6 +12,13 @@
 
         public string? Student_Name { get; set; }
         public string? Program_Name { get; set; }
+        public DateTime? CreatedAt { get; set; }
+
+        public Guid? CreatedBy { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+
+        public Guid? UpdatedBy { get; set; }
 
     }
 }

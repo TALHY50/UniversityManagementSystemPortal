@@ -11,7 +11,14 @@ namespace UniversityManagementSystemPortal
         public bool IsActive { get; set; }
         public bool IsStaff { get; set; }
         public bool IsFaculty { get; set; }
+        public DateTime? CreatedAt { get; set; }
+
+        public Guid? CreatedBy { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+
+        public Guid? UpdatedBy { get; set; }
         public InstituteDto? Institute { get; set; }
-        //public ICollection<PositionDto> Positions { get; set; }
+
     }
 }

@@ -37,14 +37,14 @@ namespace UniversityManagementSystemPortal.Repository
             return positions;
         }
 
-        public async Task<IEnumerable<Position>> GetAllAsync(Guid? instituteId = null)
+        public async Task<IQueryable<Position>> GetAllAsync(Guid? instituteId = null)
         {
-            IQueryable<Position> query = _dbContext.Positions;
+            IQueryable<Position> query = _dbContext.Positions.AsQueryable();
             if (instituteId.HasValue)
             {
                 query = query.Where(p => p.Category.InstituteId == instituteId);
             }
-            return await query.ToListAsync();
+            return  query.AsNoTracking();
         }
 
         public async Task<IEnumerable<Position>> GetByCategoryIdAsync(Guid categoryId)

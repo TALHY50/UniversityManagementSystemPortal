@@ -13,7 +13,7 @@ namespace UniversityManagementSystemPortal.Interfaces
     {
         Task<User> Authenticate(Login model);
         Task<User> GetByIdAsync(Guid id);
-        Task<IEnumerable<User>> GetAllAsync();
+        Task<IQueryable<User>> GetAllAsync();
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);
         Task<User> RegisterAsUser(User model);

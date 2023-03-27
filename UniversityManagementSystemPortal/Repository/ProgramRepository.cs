@@ -31,18 +31,15 @@ namespace UniversityManagementSystemPortal.Repository
             return program;
         }
 
-        public async Task<IEnumerable<PorgramNamespace>> GetAllAsync()
+        public async Task<IQueryable<PorgramNamespace>> GetAllAsync()
         {
-           var program = await _context.Programs
-                .Include(p => p.Department)
-                .Include(p => p.StudentPrograms)
-                    .ThenInclude(sp => sp.Student)
-                .ToListAsync();
-            if(program == null)
-            {
-                throw new AppException($"Program not found.");
-            }
-            return program;
+            var program =  _context.Programs.AsQueryable()
+                 .Include(p => p.Department)
+                 .Include(p => p.StudentPrograms)
+                     .ThenInclude(sp => sp.Student)
+                 .AsTracking();
+           
+            return  program;
         }
 
         public async Task AddAsync(PorgramNamespace program)

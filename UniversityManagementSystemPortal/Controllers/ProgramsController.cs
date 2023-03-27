@@ -11,6 +11,7 @@ using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.Models.ModelDto.StudentProgram;
 using UniversityManagementSystemPortal.ModelDto.StudentProgram;
 using UniversityManagementSystemPortal.ModelDto.Program;
+using UniversityManagementSystemPortal.Helpers.Paging;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
@@ -32,9 +33,9 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProgramReadDto>>> GetAll()
+        public async Task<ActionResult<PaginatedList<ProgramReadDto>>> GetAll(PaginatedViewModel paginatedViewModel)
         {
-            var programs = await _mediator.Send(new GetAllProgramsQuery());
+            var programs = await _mediator.Send(new GetAllProgramsQuery { paginatedViewModel = paginatedViewModel });
             return Ok(programs);
         }
         [AllowAnonymous]

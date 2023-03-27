@@ -5,7 +5,7 @@ namespace UniversityManagementSystemPortal.Interfaces
     public interface IPositionRepository
     {
         Task<IEnumerable<Position>> GetByIdAsync(Guid id, Guid? instituteId = null);
-        Task<IEnumerable<Position>> GetAllAsync(Guid? instituteId = null);
+        Task<IQueryable<Position>> GetAllAsync(Guid? instituteId = null);
         Task<IEnumerable<Position>> GetByCategoryIdAsync(Guid categoryId);
         Task CreateAsync(Position position);
         Task UpdateAsync(Position position, Guid? instituteId = null);

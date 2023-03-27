@@ -16,11 +16,11 @@ namespace UniversityManagementSystemPortal.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Department>> GetAllDepartmentsAsync()
+        public IQueryable<Department> GetAllDepartmentsAsync()
         {
-            var departments = await _context.Departments
+            var departments = _context.Departments
                 .Include(d => d.Institute)
-                .ToListAsync();
+               .AsTracking();
 
             if (departments == null)
             {

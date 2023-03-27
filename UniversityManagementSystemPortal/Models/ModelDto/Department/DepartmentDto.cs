@@ -9,5 +9,12 @@
         public bool IsActive { get; set; }
         public bool IsAcademics { get; set; }
         public bool IsAdministrative { get; set; }
+        public DateTime? CreatedAt { get; set; }
+
+        public Guid? CreatedBy { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+
+        public Guid? UpdatedBy { get; set; }
     }
 }

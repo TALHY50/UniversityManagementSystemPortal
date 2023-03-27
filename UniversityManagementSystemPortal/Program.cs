@@ -67,8 +67,21 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "University Portal API", Version = "1.0" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "University Portal API",
+        Version = "1.0",
+        Description = "A simple API for managing universities and Institute",
+        Contact = new OpenApiContact
+        {
+            Name = "Talha Asif",
+            Email = "talhaasif.ibs@gmail.com",
+            Url = new Uri("https://github.com/")
 
+        }
+    });
+
+    // Add a security definition for JWT tokens
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -77,26 +90,28 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT"
     });
 
+    // Add a security requirement for JWT tokens
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
         {
-            new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
+                new OpenApiSecurityScheme
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                    Scheme = "oauth2",
+                    Name = "Bearer",
+                    In = ParameterLocation.Header
                 },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header
-            },
-            new List<string>()
-        }
-    });
+                new List<string>()
+            }
+        });
 
-    // Enable file upload in Swagger
+    // Add an operation filter for handling file uploads
     c.OperationFilter<FileUploadOperationFilter>();
+
 });
 builder.Services.Configure<FormOptions>(options =>
 {
