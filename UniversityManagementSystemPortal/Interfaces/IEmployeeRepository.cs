@@ -1,4 +1,6 @@
 ﻿
+using UniversityManagementSystemPortal.ModelDto.Employee;
+
 namespace UniversityManagementSystemPortal.Interfaces
 {
     public interface IEmployeeRepository
@@ -12,5 +14,6 @@ namespace UniversityManagementSystemPortal.Interfaces
         Task DeleteAsync(Guid id);
         Task<bool> EmployeeNoExistsAsync(string employeeNo);
         Task<bool> SaveChangesAsync();
+        Task<List<string>> Upload(List<EmployeeReadModel> employeessData);
     }
 }

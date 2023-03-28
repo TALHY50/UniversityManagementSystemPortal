@@ -18,7 +18,9 @@ namespace UniversityManagementSystemPortal.ModelDto.Employee
         public Gender Gender { get; set; }
         public string Email { get; set; }
         public string UserName { get; set; }
+        public string password { get; set; }
         public string EmployeeNo { get; set; }
+        public bool EmailConfirmed { get; set; }
         public string Address { get; set; }
         public EmployeeType EmployeeType { get; set; }
         public string? EmployeAddress { get; set; }
@@ -27,7 +29,7 @@ namespace UniversityManagementSystemPortal.ModelDto.Employee
         public string? InstituteType { get; set; }
         public string? DepartmentName { get; set; }
         public string? DepartmentCode { get; set; }
-        public string PositionName { get; set; } = null!;
+        public string PositionName { get; set; }
         public bool IsActive { get; set; }
         public DateTime? CreatedAt { get; set; }
         public Guid? CreatedBy { get; set; }

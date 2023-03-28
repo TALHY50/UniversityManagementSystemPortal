@@ -134,7 +134,11 @@ namespace UniversityManagementSystemPortal.Controllers
                 var employeeData = csvContext.Read<EmployeeReadModel>(streamReader, csvFileDescription).ToList();
 
                 var command = new ImportEmployeeCommand(employeeData);
-                await _mediator.Send(command);
+                var skippedEntries =   await _mediator.Send(command);
+                if (skippedEntries.Any())
+                {
+                    return BadRequest(new { message = "File Imported with some skipped entries", skippedEntries });
+                }
             }
 
             _logger.LogInformation("Processing file {FileName} for user {UserId}.", file.FileName);

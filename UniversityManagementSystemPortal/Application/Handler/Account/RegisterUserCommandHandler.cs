@@ -33,18 +33,32 @@ namespace UniversityManagementSystemPortal.Application.Handler.Account
                     throw new AppException(nameof(request), "User data is required.");
                 }
 
-                var existingUser = await _userRepository.GetByEmailAsync(request.RegisterUserDto.Email);
+                var existingUser = await _userRepository.GetByEmailAsync(request.Email);
                 if (existingUser != null)
                 {
-                    throw new AppException($"A user with the email {request.RegisterUserDto.Email} already exists.");
+                    throw new Exception($"A user with the email {request.Email} already exists.");
                 }
 
                 var user = _mapper.Map<User>(request);
                 if (string.IsNullOrEmpty(user.Username))
                 {
                     var username = user.Email.Split('@')[0];
-                    var uniqueNumber = await _userRepository.GetUniqueUsernameNumberAsync(username);
-                    user.Username = $"{username}{uniqueNumber}";
+                    if (!username.Any(char.IsDigit))
+                    {
+                        var random = new Random();
+                        var uniqueNumber = random.Next(100, 999);
+                        while (await _userRepository.GetByUsernameAsync($"{username}{uniqueNumber}") != null)
+                        {
+                            uniqueNumber = random.Next(100, 999);
+                        }
+                        username = $"{username}{uniqueNumber}";
+                    }
+                    var existingUsernameUser = await _userRepository.GetByUsernameAsync(username);
+                    if (existingUsernameUser != null)
+                    {
+                        throw new AppException($"A user with the username {username} already exists.");
+                    }
+                    user.Username = username;
                 }
                 else
                 {
@@ -73,6 +87,7 @@ namespace UniversityManagementSystemPortal.Application.Handler.Account
                 _logger.LogError(ex, "Error occurred while registering user");
                 throw new AppException("Error occurred while registering user");
             }
+
         }
     }
 

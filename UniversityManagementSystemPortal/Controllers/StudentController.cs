@@ -70,7 +70,12 @@ namespace UniversityManagementSystemPortal.Controllers
                 var studentsData = csvContext.Read<StudentReadModel>(streamReader, csvFileDescription).ToList();
 
                 var command = new ImportStudentsCommand(studentsData);
-                await _mediator.Send(command);
+               var skippedEntries =  await _mediator.Send(command);
+                if (skippedEntries.Any())
+                {
+                    // Return the list of skipped entries as a response
+                    return BadRequest(new { message = "File Imported with some skipped entries", skippedEntries });
+                }
             }
 
             _logger.LogInformation("Processing file {FileName} for user {UserId}.", file.FileName);

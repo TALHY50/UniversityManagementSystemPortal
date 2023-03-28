@@ -99,18 +99,6 @@ namespace UniversityManagementSystemPortal.Repository
         {
             return await _context.Set<User>().SingleOrDefaultAsync(u => u.Email == email);
         }
-
-        public async Task<int> GetUniqueUsernameNumberAsync(string username)
-        {
-            int uniqueNumber = 1;
-
-            while (await _context.Users.AnyAsync(u => u.Username == username + uniqueNumber))
-            {
-                uniqueNumber++;
-            }
-
-            return uniqueNumber;
-        }
         public async Task<User> GetByUsernameAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);

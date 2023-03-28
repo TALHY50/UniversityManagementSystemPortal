@@ -8,11 +8,10 @@ namespace UniversityManagementSystemPortal.Interfaces
         IQueryable<Student> Get();
         Task<Student> GetById(Guid id);
         Task<Student> Add(Student student);
-        Student AddBulk(Student student, User user, StudentReadModel dto);
-        Task<StudentReadModel> AddToImport(StudentReadModel student);
+        //Student AddBulk(Student student, User user, StudentReadModel dto)
         Task<Student> Update(Student student);
         Task Delete(Guid id);
         Task<Student> GetByAdmissionNo(string admissionNo);
-        //List<string> Upload(List<StudentReadModel> studentDataList);
+        Task<List<string>> Upload(List<StudentReadModel> studentDataList);
     }
 }

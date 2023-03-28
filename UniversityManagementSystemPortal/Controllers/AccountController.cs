@@ -5,6 +5,7 @@ using UniversityManagementSystemPortal.Application.Command.Account;
 using UniversityManagementSystemPortal.Application.Qurey.Account;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
 using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
@@ -30,11 +31,11 @@ namespace UniversityManagementSystemPortal.Controllers
 
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserViewModel>>> Get()
+        public async Task<ActionResult<List<UserViewModel>>> Get([FromQuery]PaginatedViewModel paginatedView)
         {
             try
             {
-                var userViewModels = await _mediator.Send(new GetAllUsersQuery());
+                var userViewModels = await _mediator.Send(new GetAllUsersQuery { paginatedViewModel = paginatedView});
                 return Ok(new { message = "Successfully retrieved all users.", data = userViewModels });
             }
             catch (Exception ex)
@@ -66,11 +67,11 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [AllowAnonymous]
         [HttpPost("post")]
-        public async Task<IActionResult> Register(RegistorUserDto registerUserDto)
+        public async Task<IActionResult> Register([FromForm] RegisterUserCommand registerUserDto)
         {
             try
             {
-                var command = new RegisterUserCommand { RegisterUserDto = registerUserDto };
+                var command = registerUserDto;
                 var result = await _mediator.Send(command);
                 return Ok(result);
             }
@@ -82,7 +83,7 @@ namespace UniversityManagementSystemPortal.Controllers
 
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserViewModel>> UpdateUser(Guid id, UpdateUserDto updateUserDto)
+        public async Task<ActionResult<UserViewModel>> UpdateUser(Guid id, [FromForm] UpdateUserDto updateUserDto)
         {
             var command = new UpdateUserCommand { Id = id, UpdateUserDto = updateUserDto };
             var user = await _mediator.Send(command);
@@ -113,7 +114,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Authenticate")]
-        public async Task<ActionResult<LoginView>> Login(LoginCommand loginCommand)
+        public async Task<ActionResult<LoginView>> Login([FromForm] LoginCommand loginCommand)
         {
             try
             {

@@ -70,7 +70,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "University Portal API",
-        Version = "1.0",
+        Version = "ProLevel",
         Description = "A simple API for managing universities and Institute",
         Contact = new OpenApiContact
         {

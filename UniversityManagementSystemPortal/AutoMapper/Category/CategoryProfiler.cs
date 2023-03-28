@@ -8,7 +8,7 @@ namespace UniversityManagementSystemPortal
         public CategoryProfiler()
         {
             CreateMap<Category, CategoryDto>()
-               .ForMember(dest => dest.Institute, opt => opt.MapFrom(src => src.Institute));
+               .ForMember(dest => dest.InstituteName, opt => opt.MapFrom(src => src.Name));
             //.ForMember(dest => dest.Positions, opt => opt.MapFrom(src => src.Positions));
 
             CreateMap<CategoryCreateDto, Category>();
