@@ -87,7 +87,8 @@ namespace UniversityManagementSystemPortal.Repository
                 throw new AppException(nameof(model), "Login object is null.");
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
+            var user = await _context.Users
+         .SingleOrDefaultAsync(u => (u.Email == model.Email || u.Username == model.Username) && u.Password == model.Password);
 
             if (user == null)
             {

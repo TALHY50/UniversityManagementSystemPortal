@@ -4,10 +4,13 @@ namespace UniversityManagementSystemPortal.ModelDto.NewFolder
 {
     public class Login
     {
-        [Required]
+
+        public string? Email { get; set; }
+        [Required(ErrorMessage = "Username is required")]
         public string? Username { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         public string? Password { get; set; }
     }
+
 }

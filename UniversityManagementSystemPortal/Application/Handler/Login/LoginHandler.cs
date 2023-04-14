@@ -2,8 +2,6 @@
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
-using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
-using UniversityManagementSystemPortal.Repository;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Login
 {
@@ -20,26 +18,56 @@ namespace UniversityManagementSystemPortal.Application.Handler.Login
             _logger = logger;
         }
 
-        public async Task<LoginView> Handle(LoginCommand request, CancellationToken cancellationToken)
+     public async Task<LoginView> Handle(LoginCommand request, CancellationToken cancellationToken)
+{
+    try
+    {
+        User user = null;
+
+        if (!string.IsNullOrWhiteSpace(request.model.Email))
         {
-            try
-            {
-                var user = await _userRepository.Authenticate(request.model);
-
-                if (user == null)
-                {
-                    throw new Exception("Invalid username or password.");
-                }
-
-                var jwtToken = _jwtTokenService.GenerateJwtToken(user);
-                var loginView = new LoginView(user, jwtToken);
-                return loginView;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while logging in.");
-                throw new Exception("An error occurred while logging in. Please try again later.", ex);
-            }
+            user = await _userRepository.GetByEmailAsync(request.model.Email);
         }
+        else if (!string.IsNullOrWhiteSpace(request.model.Username))
+        {
+            user = await _userRepository.GetByUsernameAsync(request.model.Username);
+        }
+        else
+        {
+            _logger.LogWarning("Email and username are both empty.");
+            throw new ArgumentException("Please provide either an email or a username.");
+        }
+
+        if (user == null)
+        {
+            _logger.LogWarning("User not found.");
+            throw new ArgumentException("User not found.");
+        }
+
+        var authenticatedUser = await _userRepository.Authenticate(request.model);
+
+        if (authenticatedUser == null)
+        {
+            _logger.LogWarning("Invalid password.");
+            throw new ArgumentException("Invalid password.");
+        }
+
+        var jwtToken = _jwtTokenService.GenerateJwtToken(authenticatedUser);
+        var loginView = new LoginView(authenticatedUser, jwtToken);
+        return loginView;
+    }
+    catch (ArgumentException ex)
+    {
+        _logger.LogError(ex, ex.Message);
+        throw;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while logging in.");
+        throw new Exception("An error occurred while logging in. Please try again later.", ex);
+    }
+}
+
+
     }
 }

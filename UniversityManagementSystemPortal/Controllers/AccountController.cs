@@ -31,11 +31,11 @@ namespace UniversityManagementSystemPortal.Controllers
 
         [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpGet]
-        public async Task<ActionResult<List<UserViewModel>>> Get([FromQuery]PaginatedViewModel paginatedView)
+        public async Task<ActionResult<List<UserViewModel>>> Get([FromQuery] PaginatedViewModel paginatedView)
         {
             try
             {
-                var userViewModels = await _mediator.Send(new GetAllUsersQuery { paginatedViewModel = paginatedView});
+                var userViewModels = await _mediator.Send(new GetAllUsersQuery { paginatedViewModel = paginatedView });
                 return Ok(new { message = "Successfully retrieved all users.", data = userViewModels });
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace UniversityManagementSystemPortal.Controllers
 
             return Ok(user);
         }
-        [JwtAuthorize("SuperAdmin")]
+        [JwtAuthorize("Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -114,12 +114,12 @@ namespace UniversityManagementSystemPortal.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Authenticate")]
-        public async Task<ActionResult<LoginView>> Login([FromForm] LoginCommand loginCommand)
+        public async Task<ActionResult<LoginView>> Login(Login model)
         {
             try
             {
-                var loginView = await _mediator.Send(loginCommand);
-                return Ok(new { message = "Successfully logged in.", data = loginView });
+                var loginView = await _mediator.Send(new LoginCommand(model));
+                return Ok(new { message = "Successfully logged in.", loginView });
             }
             catch (Exception ex)
             {

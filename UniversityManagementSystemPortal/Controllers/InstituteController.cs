@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
 using UniversityManagementSystemPortal.Application.Command.Institute;
 using UniversityManagementSystemPortal.Application.Qurey.Institute;
 using UniversityManagementSystemPortal.Authorization;
@@ -14,7 +15,7 @@ using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.Controllers
 {
-    [JwtAuthorize("Admin")]
+  
     [Route("api/[controller]")]
     [ApiController]
     public class InstitutesController : ControllerBase
@@ -57,7 +58,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromForm] InstituteCreateDto instituteCreateDto)
+        public async Task<ActionResult> Create( InstituteCreateDto instituteCreateDto)
         {
             if (instituteCreateDto == null)
             {
@@ -74,19 +75,16 @@ namespace UniversityManagementSystemPortal.Controllers
             return CreatedAtAction(nameof(GetById), new { id = institute.Id }, new { message = "Institute created successfully" });
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] InstituteUpdateDto instituteUpdateDto)
+        public async Task<IActionResult> Update(Guid id,InstituteUpdateDto instituteUpdateDto)
         {
-            if (instituteUpdateDto == null || id != instituteUpdateDto.Id)
-            {
-                return BadRequest();
-            }
+          
 
             var command = _mapper.Map<InstituteUpdateCommand>(instituteUpdateDto);
             command.Id = id;
 
             var result = await _mediator.Send(command);
 
-            return Ok(new { message = "Institute updated successfully" });
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
@@ -109,6 +107,7 @@ namespace UniversityManagementSystemPortal.Controllers
                 return StatusCode(500, "An error occurred while deleting institute");
             }
         }
+
 
     }
 

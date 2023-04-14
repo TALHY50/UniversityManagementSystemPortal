@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using UniversityManagementSystemPortal;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.EmailServices;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto;
@@ -34,6 +35,10 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog(SerilogConfig.CreateLogger()); 
     builder.Services.AddLogging();
     builder.Services.AddCors();
+    var emailConfig = builder.Configuration
+        .GetSection("EmailConfiguration")
+        .Get<EmailConfiguration>();
+    builder.Services.AddSingleton(emailConfig);
     builder.Services.AddControllers().AddJsonOptions(x =>
     {
         // serialize enums as strings in api responses (e.g. Role)
@@ -60,7 +65,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     builder.Services.AddMediatR(typeof(Program).GetTypeInfo().Assembly);
     services.AddAutoMapper(typeof(Program));
-    //builder.Services.AddScoped(typeof(CreateLogger());
+    builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 }
 builder.Services.AddEndpointsApiExplorer();

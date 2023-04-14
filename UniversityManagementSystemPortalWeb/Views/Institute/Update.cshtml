@@ -1,0 +1,71 @@
+﻿@using UniversityManagementSystemPortal.Enum;
+@using UniversityManagementSystemPortal.Models.ModelDto.Institute;
+@model InstituteUpdateDto
+
+@{
+    ViewBag.Title = "Update Institute";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}<h2>Update Institute</h2>
+
+<form asp-action="Update" method="post" asp-controller="Institute" asp-action="Update" class="form-inline">
+    <div class="form-group mr-3">
+        <label asp-for="Name" class="mr-2">Name <span class="text-danger">*</span></label>
+        <input asp-for="Name" class="form-control mr-2" placeholder="Institute Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mr-3">
+        <label asp-for="Type" class="mr-2">Type <span class="text-danger">*</span></label>
+        <select asp-for="Type" class="form-control mr-2">
+            <option value="">Select a type</option>
+            @foreach (var type in Enum.GetValues(typeof(InstituteType)))
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+
+    <div class="form-group icon-input-container mr-3">
+        <label asp-for="Phone" class="mr-2">Phone <span class="text-danger">*</span></label>
+        <input asp-for="Phone" class="form-control icon-input mr-2" placeholder="1234567890" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+        <i class="fas fa-phone input-icon"></i>
+    </div>
+
+
+    <div class="form-group icon-input-container mr-3">
+        <label asp-for="Email" class="mr-2">Email <span class="text-danger">*</span></label>
+        <input asp-for="Email" class="form-control icon-input mr-2" placeholder="example@example.com" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+        <i class="fas fa-envelope input-icon"></i>
+    </div>
+
+    <div class="form-group icon-input-container mr-3">
+        <label asp-for="Website" class="mr-2">Website</label>
+        <input asp-for="Website" class="form-control icon-input mr-2" placeholder="https://example.com" />
+        <span asp-validation-for="Website" class="text-danger"></span>
+        <i class="fas fa-globe input-icon"></i>
+    </div>
+
+    <div class="form-group mr-3">
+        <label asp-for="Address" class="mr-2">Address</label>
+        <input asp-for="Address" class="form-control mr-2" placeholder="123 Main St, City, Country" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-group form-check mr-3">
+        <input type="checkbox" asp-for="IsAutoIncrementAdmissionNo" class="form-check-input" />
+        <label asp-for="IsAutoIncrementAdmissionNo" class="form-check-label mr-2">Auto Increment Admission No</label>
+    </div>
+
+    <div class="form-group form-check mr-3">
+        <input type="checkbox" asp-for="IsAutoIncrementEmployeeNo" class="form-check-input" />
+        <label asp-for="IsAutoIncrementEmployeeNo" class="form-check-label mr-2">Auto Increment Employee No</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/font-awesome.min.css"></script>
+}

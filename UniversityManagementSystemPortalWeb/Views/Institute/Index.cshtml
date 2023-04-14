@@ -1,0 +1,55 @@
+﻿@using UniversityManagementSystemPortal.ModelDto.InstituteDto;
+@model List<InstituteDto>
+
+@{
+    ViewBag.Title = "Institute Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Institute List</h2>
+<a href="@Url.Action("Create", "Institute")" class="btn btn-success mb-3">Create a New Institute</a>
+<table id="instituteTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Website</th>
+            <th>Address</th>
+            <th>Auto Increment Admission No</th>
+            <th>Auto Increment Employee No</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Type</td>
+                <td>@item.Phone</td>
+                <td>@item.Email</td>
+                <td>@item.Website</td>
+                <td>@item.Address</td>
+                <td>@(item.IsAutoIncrementAdmissionNo ? "Yes" : "No")</td>
+                <td>@(item.IsAutoIncrementEmployeeNo ? "Yes" : "No")</td>
+                <td>
+                    <a href="@Url.Action("Update", "Institute", new { id = item.Id })" class="btn btn-warning">Update</a>
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this institute?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#instituteTable').DataTable();
+        });
+    </script>
+}

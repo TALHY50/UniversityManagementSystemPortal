@@ -4,9 +4,8 @@ using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
 
 namespace UniversityManagementSystemPortal
 {
-    public class LoginCommand : IRequest<LoginView>
-    {
-        public Login model { get; set; }
-    }
+    public record LoginCommand(Login model) : IRequest<LoginView>;
+   
+    
 
 }

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
+using MimeKit;
 using UniversityManagementSystemPortal.Application.Command.Account;
 using UniversityManagementSystemPortal.Authorization;
+using UniversityManagementSystemPortal.EmailServices;
 using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
@@ -11,17 +13,19 @@ namespace UniversityManagementSystemPortal.Application.Handler.Account
 {
     public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, RegistorUserDto>
     {
+        public readonly IEmailSender _emailSend ;
         private readonly IUserInterface _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<RegisterUserCommandHandler> _logger;
         private readonly IIdentityServices _identityServices;
 
-        public RegisterUserCommandHandler(IUserInterface userRepository, IMapper mapper, ILogger<RegisterUserCommandHandler> logger, IIdentityServices identityServices)
+        public RegisterUserCommandHandler(IEmailSender emailSend ,IUserInterface userRepository, IMapper mapper, ILogger<RegisterUserCommandHandler> logger, IIdentityServices identityServices)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _logger = logger;
             _identityServices = identityServices;
+            _emailSend = emailSend;
         }
 
         public async Task<RegistorUserDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -80,6 +84,13 @@ namespace UniversityManagementSystemPortal.Application.Handler.Account
                 }
 
                 var mappedUserViewModel = _mapper.Map<RegistorUserDto>(registeredUser);
+                var message = new Message(new List<string> { user.Email },
+                           "Registration successful",
+                           $"Dear {user.FirstName},<br /><br />Thank you for registering on our website.<br /><br />Best regards,<br />The University Management System Portal Team");
+
+                _emailSend.SendEmail(message);
+                _logger.LogDebug($"Sending email to {message.To}");
+
                 return mappedUserViewModel;
             }
             catch (AppException ex)
