@@ -49,7 +49,7 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<InstituteDto>>> GetAll()
+        public async Task<ActionResult<List<InstituteDto>>> GetAll()
         {
             var query = new GetAllInstitutesQuery();
             var result = await _mediator.Send(query);

@@ -27,6 +27,6 @@ app.UseAuthorization();
 app.UseSession();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Institute}/{action=Index}/{id?}");
+    pattern: "{controller=Institute}/{action=GetInstitutes}/{id?}");
 
 app.Run();

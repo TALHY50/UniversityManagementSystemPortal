@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using UniversityManagementSystemPortal.ModelDto.Institute;
-using System.Net.Http.Formatting;
 using UniversityManagementSystemPortal.ModelDto.InstituteDto;
 using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
@@ -19,6 +19,13 @@ namespace UniversityManagementSystemPortalWeb.Controllers
         }
 
         public async Task<IActionResult> Index()
+        {
+            // Just return the view since we will load the data asynchronously with AJAX
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetInstitutes()
         {
             List<InstituteDto> institutes = new List<InstituteDto>();
 
@@ -40,16 +47,15 @@ namespace UniversityManagementSystemPortalWeb.Controllers
                 }
             }
 
-            return View(institutes);
+            return PartialView(institutes);
         }
 
-       
         [HttpPost]
         public async Task<IActionResult> Create(InstituteCreateDto instituteCreateDto)
         {
             if (instituteCreateDto == null)
             {
-                return BadRequest();
+                return Json(new { success = false, error = "Invalid data." });
             }
 
             string apiUrl = "https://localhost:7092/api/Institutes";
@@ -59,42 +65,36 @@ namespace UniversityManagementSystemPortalWeb.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction("Index");
+                return Json(new { success = true });
             }
             else
             {
                 ModelState.AddModelError(string.Empty, "An error occurred while creating the institute.");
-                return View(instituteCreateDto);
+                return Json(new { success = false, error = "An error occurred while creating the institute." });
             }
         }
         [HttpGet]
-        public async Task<IActionResult> Update(Guid id)
+        public async Task<IActionResult> GetInstituteById(Guid id)
         {
             var response = await _httpClient.GetAsync($"https://localhost:7092/api/Institutes/{id}");
 
             if (response.IsSuccessStatusCode)
             {
-                var instituteUpdateDto = await response.Content.ReadAsAsync<InstituteUpdateDto>();
-                return View(instituteUpdateDto);
+                var institute = await response.Content.ReadAsAsync<InstituteUpdateDto>();
+                return Json(new { success = true, data = institute });
             }
             else
             {
-                // Handle error, e.g., display an error message or redirect to an error page
-                return RedirectToAction("Error");
+                return Json(new { success = false, error = "Failed to fetch the institute." });
             }
         }
 
-        public IActionResult Update()
-        {
-            return View();
-        }
-
-        [HttpPost]
+        [HttpPut]
         public async Task<IActionResult> Update(InstituteUpdateDto instituteUpdateDto)
         {
             if (!ModelState.IsValid)
             {
-                return View(instituteUpdateDto);
+                return Json(new { success = false, error = "Invalid model state." });
             }
 
             try
@@ -103,21 +103,21 @@ namespace UniversityManagementSystemPortalWeb.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("Index");
+                    return Json(new { success = true });
                 }
                 else
                 {
                     ModelState.AddModelError("", "Failed to update the institute.");
                     var errorContent = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Error updating institute: {errorContent}");
-                    return View(instituteUpdateDto);
+                    return Json(new { success = false, error = "Failed to update the institute." });
                 }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "An error occurred while updating the institute.");
                 Console.WriteLine($"Exception: {ex.Message}");
-                return View(instituteUpdateDto);
+                return Json(new { success = false, error = "An error occurred while updating the institute." });
             }
         }
         [HttpPost]
@@ -127,12 +127,11 @@ namespace UniversityManagementSystemPortalWeb.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction("Index");
+                return Json(new { success = true });
             }
             else
             {
-                TempData["ErrorMessage"] = "Failed to delete the institute.";
-                return RedirectToAction("Index");
+                return Json(new { success = false, error = "Failed to delete the institute." });
             }
         }
 

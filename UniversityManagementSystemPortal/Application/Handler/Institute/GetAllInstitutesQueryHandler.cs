@@ -7,7 +7,7 @@ using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.Application.Handler.Institute
 {
-    public class GetAllInstitutesQueryHandler : IRequestHandler<GetAllInstitutesQuery, IEnumerable<InstituteDto>>
+    public class GetAllInstitutesQueryHandler : IRequestHandler<GetAllInstitutesQuery, List<InstituteDto>>
     {
         private readonly IInstituteRepository _repository;
         private readonly IMapper _mapper;
@@ -18,14 +18,15 @@ namespace UniversityManagementSystemPortal.Application.Handler.Institute
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<InstituteDto>> Handle(GetAllInstitutesQuery request, CancellationToken cancellationToken)
+        public async Task<List<InstituteDto>> Handle(GetAllInstitutesQuery request, CancellationToken cancellationToken)
         {
-            var institutes = await _repository.GetAllAsync();
+            var institutes =  _repository.GetAllAsync();
 
-            var institutesDto = _mapper.Map<IEnumerable<InstituteDto>>(institutes);
+            var institutesDto = _mapper.Map<List<InstituteDto>>(institutes);
 
             return institutesDto;
         }
+
     }
 
 }

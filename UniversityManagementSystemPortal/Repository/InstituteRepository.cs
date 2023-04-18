@@ -16,33 +16,24 @@ namespace UniversityManagementSystemPortal.Repository
         public async Task<Institute> GetByIdAsync(Guid id)
         {
             var institute = await _context.Institutes
-                .Include(i => i.Categories)
-                .Include(i => i.Departments)
-                .Include(i => i.Employees).ThenInclude(e => e.Position)
-                .Include(i => i.InstituteAdmins)
-                .Include(i => i.Students)
+             
                 .SingleOrDefaultAsync(i => i.Id == id);
 
             if (institute == null)
             {
-                throw new ArgumentException($"No institute found with ID {id}");
+                
             }
 
             return institute;
         }
 
-        public async Task<IEnumerable<Institute>> GetAllAsync()
+        public IQueryable<Institute> GetAllAsync()
         {
-            var institutes = await _context.Institutes
-                .Include(i => i.Categories)
-                .Include(i => i.Departments)
-                .Include(i => i.Employees).ThenInclude(e => e.Position)
-                .Include(i => i.InstituteAdmins)
-                .Include(i => i.Students)
-                .ToListAsync();
+            var institutes = _context.Institutes.AsNoTracking();
 
             return institutes;
         }
+
 
         public async Task AddAsync(Institute institute)
         {

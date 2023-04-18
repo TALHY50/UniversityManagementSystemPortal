@@ -4,7 +4,7 @@ using UniversityManagementSystemPortal.Models.ModelDto.Institute;
 
 namespace UniversityManagementSystemPortal.Application.Qurey.Institute
 {
-    public class GetAllInstitutesQuery : IRequest<IEnumerable<InstituteDto>>
+    public class GetAllInstitutesQuery : IRequest<List<InstituteDto>>
     {
     }
 }
