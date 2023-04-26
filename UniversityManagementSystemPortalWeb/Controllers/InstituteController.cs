@@ -20,36 +20,14 @@ namespace UniversityManagementSystemPortalWeb.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Just return the view since we will load the data asynchronously with AJAX
             return View();
         }
-
         [HttpGet]
-        public async Task<IActionResult> GetInstitutes()
+        public IActionResult LoadInstitutes()
         {
-            List<InstituteDto> institutes = new List<InstituteDto>();
-
-            using (var client = new HttpClient())
-            {
-                // Replace this URL with the actual URL of your API
-                string apiURL = "https://localhost:7092/api/Institutes";
-                client.BaseAddress = new Uri(apiURL);
-
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                HttpResponseMessage response = await client.GetAsync(apiURL);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = response.Content.ReadAsStringAsync().Result;
-                    institutes = JsonConvert.DeserializeObject<List<InstituteDto>>(result);
-                }
-            }
-
-            return PartialView(institutes);
+            return ViewComponent("Institute");
         }
-
+      
         [HttpPost]
         public async Task<IActionResult> Create(InstituteCreateDto instituteCreateDto)
         {
@@ -123,8 +101,7 @@ namespace UniversityManagementSystemPortalWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var response = await _httpClient.DeleteAsync($"https://localhost:7092/api/Institutes/{id}");
-
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"https://localhost:7092/api/Institutes/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return Json(new { success = true });
