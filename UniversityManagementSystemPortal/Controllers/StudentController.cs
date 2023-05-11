@@ -84,13 +84,12 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
 
-        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPost]
-        public async Task<ActionResult<AddStudentDto>> AddStudent([FromForm] AddStudentCommand command)
+        public async Task<ActionResult<AddStudentDto>> AddStudent([FromForm] AddStudentDto command)
         {
             try
             {
-                var result = await _mediator.Send(command);
+                var result = await _mediator.Send(new AddStudentCommand(command));
                 return Ok(result);
             }
             catch (Exception ex)

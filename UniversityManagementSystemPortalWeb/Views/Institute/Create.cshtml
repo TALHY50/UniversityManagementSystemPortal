@@ -12,6 +12,8 @@
                 <form id="createInstituteForm" method="post" onsubmit="return validateForm();" asp-action="Create" asp-controller="Institute" data-ajax="true" data-ajax-method="POST" data-ajax-success="onSuccess" data-ajax-failure="onFailure">
 
                     <input type="hidden" name="Id" id="Id" />
+                    <input type="hidden" name="Operation" id="Operation" value="Create" />
+
                     <div class="form-group mr-3">
                         <label for="Name" class="mr-2">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control mr-2" name="Name" id="Name" placeholder="Institute Name" required />
@@ -21,9 +23,9 @@
                         <label for="Type" class="mr-2">Type <span class="text-danger">*</span></label>
                         <select name="Type" id="Type" class="form-control mr-2">
                             <option value="">Select a type</option>
-                            @foreach (var type in Enum.GetValues(typeof(InstituteType)))
+                            @foreach (InstituteType type in Enum.GetValues(typeof(InstituteType)))
                             {
-                                <option value="@type">@type</option>
+                                <option value="@((int)type)">@type</option>
                             }
                         </select>
                     </div>
@@ -78,19 +80,38 @@
 
         // Initialize the DataTable after the table is loaded in the DOM
         initInstituteDataTable();
+
+        // Add event listeners for the delete and update buttons
+        $(document).on('click', '.delete-institute', function () {
+            const instituteId = $(this).data('institute-id');
+            const deleteUrl = '@Url.Action("Delete", "Institute")';
+            deleteInstitute(instituteId, deleteUrl);
+        });
+
+        $(document).on('click', '.update-institute', function () {
+            const instituteId = $(this).data('institute-id');
+            const updateUrl = '@Url.Action("GetInstituteById", "Institute")';
+            updateInstitute(instituteId, updateUrl);
+        });
     });
 
     function submitFormAndRefreshGrid() {
         var form = $('#createInstituteForm');
+        var operation = $('#Operation').val();
+
+        var action = operation === 'Create' ? 'Create' : 'Update';
+        var url = operation === 'Create' ? '@Url.Action("Create", "Institute")' : '@Url.Action("Update", "Institute")';
 
         $.ajax({
-            url: form.attr('action'),
+            url: url,
             type: form.attr('method'),
             data: form.serialize(),
             success: function (result) {
                 if (result.success) {
                     // Success, refresh the table
                     refreshInstituteGrid();
+                    clearFormFields();
+                    $('#createInstituteModal').modal('hide');
                 } else {
                     // Show error message
                     alert(result.error);
@@ -98,7 +119,7 @@
             },
             error: function () {
                 // Show error message
-                alert('An error occurred while creating the institute.');
+                alert('An error occurred while processing the institute.');
             }
         });
     }
@@ -126,8 +147,73 @@
             });
         }
     }
+    function setModalTitleAndSubmitButtonText(operation) {
+        if (operation === 'Create') {
+            $('#createInstituteModalLabel').text('Create a New Institute');
+            $('#submitInstitute').text('Save changes');
+        } else if (operation === 'Update') {
+            $('#createInstituteModalLabel').text('Update Institute');
+            $('#submitInstitute').text('Update changes');
+        }
+    }
+    function updateInstitute(instituteId, getUrl) {
+        $.ajax({
+            url: getUrl,
+            type: 'GET',
+            data: { id: instituteId },
+            success: function (result) {
+                if (result.success) {
+                    var instituteUpdateDto = result.data;
+                    $('#createInstituteForm input[name="Id"]').val(instituteUpdateDto.id);
+                    $('#createInstituteForm input[name="Name"]').val(instituteUpdateDto.name);
+                    $('#createInstituteForm select[name="Type"]').val(instituteUpdateDto.type.toString());
+                    $('#createInstituteForm input[name="Phone"]').val(instituteUpdateDto.phone);
+                    $('#createInstituteForm input[name="Email"]').val(instituteUpdateDto.email);
+                    $('#createInstituteForm input[name="Website"]').val(instituteUpdateDto.website);
+                    $('#createInstituteForm input[name="Address"]').val(instituteUpdateDto.address);
+                    $('#createInstituteForm input[name="IsAutoIncrementAdmissionNo"]').prop('checked', instituteUpdateDto.isAutoIncrementAdmissionNo);
+                    $('#createInstituteForm input[name="IsAutoIncrementEmployeeNo"]').prop('checked', instituteUpdateDto.isAutoIncrementEmployeeNo);
+
+                    $('#Operation').val('Update'); // Set operation to 'Update'
+                    setModalTitleAndSubmitButtonText('Update'); // Update title and button text
+
+                    $('#createInstituteModal').modal('show');
+                } else {
+                    alert('An error occurred while loading the institute for update.');
+                }
+            },
+            error: function () {
+                alert('An error occurred while loading the institute for update.');
+            }
+        });
+    }
+
+    function deleteInstitute(instituteId, deleteUrl) {
+        if (confirm('Are you sure you want to delete this institute?')) {
+            $.ajax({
+                url: deleteUrl,
+                type: 'POST',
+                data: { id: instituteId },
+                success: function (result) {
+                    if (result.success) {
+                        // Refresh the grid after a successful delete
+                        refreshInstituteGrid();
+                    } else {
+                        alert('An error occurred while deleting the institute.');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred while deleting the institute.');
+                }
+            });
+        }
+    }
+    $('#createInstituteModal').on('hidden.bs.modal', function () {
+        clearFormFields();
+        $('#Operation').val('Create');
+        setModalTitleAndSubmitButtonText('Create');
+    });
+    function clearFormFields() {
+        $('#createInstituteForm')[0].reset();
+    }
 </script>
-
-
-
-

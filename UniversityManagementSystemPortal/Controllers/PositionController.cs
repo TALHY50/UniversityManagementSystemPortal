@@ -3,6 +3,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementSystemPortal.Application.Command.Position;
+using UniversityManagementSystemPortal.Application.Handler.Postion;
 using UniversityManagementSystemPortal.Application.Qurey.Position;
 using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.Authorization.UniversityManagementSystemPortal.Authorization;
@@ -35,7 +36,7 @@ namespace UniversityManagementSystemPortal.Controllers
             [HttpGet]
             public async Task<ActionResult<PaginatedList<PositionDto>>> GetAll(PaginatedViewModel paginatedViewModel)
             {
-                var positions = await _mediator.Send(new GetAllPositionsQuery {paginatedViewModel = paginatedViewModel });
+                var positions = await _mediator.Send(new GetAllPositionsQuery { paginatedViewModel = paginatedViewModel });
 
                 return Ok(positions);
             }
@@ -43,7 +44,7 @@ namespace UniversityManagementSystemPortal.Controllers
             [HttpGet("{id}")]
             public async Task<ActionResult<PositionDto>> GetById(Guid id)
             {
-                var query = new GetPositionByIdQuery { Id = id};
+                var query = new GetPositionByIdQuery { Id = id };
                 var positions = await _mediator.Send(query);
 
                 if (positions == null || positions.Count() == 0)
@@ -53,7 +54,18 @@ namespace UniversityManagementSystemPortal.Controllers
 
                 return Ok(positions.First());
             }
+            [HttpGet("Lookup")]
+            public async Task<IActionResult> GetPositions()
+            {
+                var positions = await _mediator.Send(new GetLookupPositionList(null));
 
+                if (positions == null || positions.Count == 0)
+                {
+                    return NotFound();
+                }
+
+                return Ok(positions);
+            }
             [HttpPost]
             public async Task<ActionResult<PositionDto>> Create(PositionAddorUpdateDto positionAddDto)
             {

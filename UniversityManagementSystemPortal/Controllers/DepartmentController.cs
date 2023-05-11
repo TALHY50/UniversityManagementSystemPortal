@@ -40,7 +40,18 @@ namespace UniversityManagementSystemPortal.Controllers
             }
             return Ok(departmentDto);
         }
+        [HttpGet("lookup")]
+        public async Task<IActionResult> GetDepartments()
+        {
+            var departments = await _mediator.Send(new GetLookupList(null));
 
+            if (departments == null || departments.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(departments);
+        }
         [HttpGet("institute/{id}")]
         public async Task<ActionResult<IEnumerable<DepartmentDto>>> GetByInstituteId(Guid id)
         {
@@ -49,11 +60,11 @@ namespace UniversityManagementSystemPortal.Controllers
             return Ok(departmentDtos);
         }
         [HttpPost]
-        public async Task<ActionResult<DepartmentCreateDto>> Create([FromForm]CreateDepartmentCommand command)
+        public async Task<ActionResult<DepartmentCreateDto>> Create([FromForm]DepartmentCreateDto command)
         {
             try
             {
-                var result = await _mediator.Send(command);
+                var result = await _mediator.Send(new CreateDepartmentCommand (command));
                 return Ok(result);
             }
             catch (AppException ex)

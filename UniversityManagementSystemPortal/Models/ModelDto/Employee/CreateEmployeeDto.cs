@@ -12,5 +12,9 @@ namespace UniversityManagementSystemPortal.ModelDto.Employee
         public Guid? DepartmentId { get; set; }
         public Guid? PositionId { get; set; }
         public Guid? UserId { get; set; }
+        public IFormFile? Picture { get; set; }
+
     }
+
+
 }

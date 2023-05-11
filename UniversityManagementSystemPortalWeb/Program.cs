@@ -1,5 +1,7 @@
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Newtonsoft.Json.Serialization;
 using System.Net.Http.Headers;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSession();
@@ -9,6 +11,11 @@ builder.Services.AddHttpClient("apiClient", client =>
     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 });
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllers()
+        .AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+        });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +34,6 @@ app.UseAuthorization();
 app.UseSession();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Institute}/{action=Index}/{id?}");
+    pattern: "{controller=User}/{action=Login}/{id?}");
 
 app.Run();

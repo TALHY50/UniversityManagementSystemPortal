@@ -1,16 +1,12 @@
-﻿
-
-using System.Text.Json.Serialization;
-
-namespace UniversityManagementSystemPortal.ModelDto.NewFolder
+﻿namespace UniversityManagementSystemPortal.ModelDto.NewFolder
 {
     public class LoginView
     {
-
-        
         public string Username { get; set; }
         public string Email { get; set; }
         public string Token { get; set; }
+
+        public LoginView() { } // Add a parameterless constructor
 
         public LoginView(User user, string token)
         {
@@ -19,5 +15,5 @@ namespace UniversityManagementSystemPortal.ModelDto.NewFolder
             Email = user.Email;
         }
     }
-
 }
+

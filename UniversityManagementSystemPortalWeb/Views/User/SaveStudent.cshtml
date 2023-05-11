@@ -1,0 +1,195 @@
+﻿@using UniversityManagementSystemPortal.Enum;
+@using UniversityManagementSystemPortalWeb.ViewModels;
+@model StudentUserViewModel
+
+@{
+    ViewBag.Title = "Student Registration";
+}
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        h3 {
+            color: #444;
+        }
+
+        form {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #f7f7f7;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #saveDraftBtn {
+            background-color: #ffc107;
+            color: #fff;
+            margin-right: 10px;
+        }
+
+        #submitBtn {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<h1>Student Registration</h1>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
+<form id="createStudentForm" asp-controller="Student" asp-action="CreateStudent" method="post" enctype="multipart/form-data">
+    @* Personal Details *@
+    <h3>Personal Details</h3>
+    <div>
+        <label asp-for="userDto.FirstName">First Name</label>
+        <input asp-for="userDto.FirstName" />
+    </div>
+    <div>
+        <label asp-for="userDto.MiddleName">Middle Name</label>
+        <input asp-for="userDto.MiddleName" />
+    </div>
+    <div>
+        <label asp-for="userDto.LastName">Last Name</label>
+        <input asp-for="userDto.LastName" />
+    </div>
+    <div>
+        <label asp-for="userDto.MobileNo">Mobile No</label>
+        <input asp-for="userDto.MobileNo" />
+    </div>
+    <div>
+        <label asp-for="userDto.DateOfBirth">Date of Birth</label>
+        <input type="date" asp-for="userDto.DateOfBirth" />
+    </div>
+    <div>
+        <label asp-for="userDto.BloodGroup">Blood Group</label>
+        <select asp-for="userDto.BloodGroup" asp-items="Html.GetEnumSelectList<BloodGroup>()"></select>
+    </div>
+    <div>
+        <label asp-for="userDto.Gender">Gender</label>
+        <select asp-for="userDto.Gender" asp-items="Html.GetEnumSelectList<Gender>()"></select>
+    </div>
+    <div>
+        <label asp-for="userDto.Email">Email</label>
+        <input type="email" asp-for="userDto.Email" />
+    </div>
+    <div>
+        <label asp-for="userDto.Username">Username</label>
+        <input asp-for="userDto.Username" />
+    </div>
+    <div>
+        <label asp-for="userDto.Password">Password</label>
+        <input type="password" asp-for="userDto.Password" />
+    </div>
+    <button type="button" id="saveDraftBtn">Save Personal Details as Draft</button>
+
+    @* Student Details *@
+    <h3>Student Details</h3>
+    <div>
+        <label asp-for="studentDto.AdmissionNo">Admission Number</label>
+        <input asp-for="studentDto.AdmissionNo" />
+    </div>
+    <div>
+        <label asp-for="studentDto.Category">Category</label>
+        <select asp-for="studentDto.Category" asp-items="Html.GetEnumSelectList<StudentCategory>()"></select>
+    </div>
+    <div>
+        <label asp-for="studentDto.Address">Address</label>
+        <textarea asp-for="studentDto.Address"></textarea>
+    </div>
+    <div>
+        <label asp-for="studentDto.Picture">Picture</label>
+        <input type="file" asp-for="studentDto.Picture" />
+    </div>
+    <button type="submit" id="submitBtn">Save Student Details</button>
+
+</form>
+
+
+@section Scripts {
+    <script>
+        const accessToken = "your_access_token_here";
+
+        document.getElementById("saveDraftBtn").addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(document.getElementById("createStudentForm"));
+            // Only append personal detail fields here
+            // Example: formData.append("FirstName", document.querySelector("input[name='userDto.FirstName']").value);
+
+            const response = await fetch("/api/Account/", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+
+            if (response.ok) {
+                const { userId } = await response.json();
+                document.getElementsByName("studentDto.UserId")[0].value = userId;
+                alert("Personal details saved as draft.");
+            } else {
+                alert("Error saving personal details.");
+            }
+        });
+
+        document.getElementById("submitBtn").addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(document.getElementById("createStudentForm"));
+            // Only append student detail fields here
+            // Example: formData.append("AdmissionNo", document.querySelector("input[name='studentDto.AdmissionNo']").value);
+
+            const response = await fetch("/api/Student/", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+
+            if (response.ok) {
+                const { instituteId } = await response.json();
+                document.getElementsByName("studentDto.InstituteId")[0].value = instituteId;
+                alert("Student details saved successfully.");
+                location.href = "/"; // Redirect to the desired page
+            } else {
+                alert("Error saving student details.");
+            }
+        });
+    </script>
+}

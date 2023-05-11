@@ -65,14 +65,14 @@ namespace UniversityManagementSystemPortal.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = $"Error occurred while getting user with ID {id}" });
             }
         }
-        [AllowAnonymous]
+        [JwtAuthorize("Admin", "SuperAdmin")]
         [HttpPost("post")]
-        public async Task<IActionResult> Register([FromForm] RegisterUserCommand registerUserDto)
+        public async Task<IActionResult> Register([FromBody] RegistorUserDto registerUserDto)
         {
             try
             {
                 var command = registerUserDto;
-                var result = await _mediator.Send(command);
+                var result = await _mediator.Send(new RegisterUserCommand(registerUserDto));
                 return Ok(result);
             }
             catch (AppException ex)

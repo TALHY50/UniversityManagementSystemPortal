@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UniversityManagementSystemPortal.Application.Command.Category;
 using UniversityManagementSystemPortal.Application.Qurey.Category;
+using UniversityManagementSystemPortal.Application.Qurey.Department;
 using UniversityManagementSystemPortal.Helpers.Paging;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Category;
@@ -42,7 +43,18 @@ namespace UniversityManagementSystemPortal.Controllers
             var categoryDtos = await _mediator.Send(new GetCategoriesByInstituteIdQuery { InstituteId = instituteId });
             return Ok(categoryDtos);
         }
+        [HttpGet("lookup")]
+        public async Task<IActionResult> GetCategory()
+        {
+            var catgory = await _mediator.Send(new GetLookUpQurey(null));
 
+            if (catgory == null || catgory.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(catgory);
+        }
         [HttpPost]
         public async Task<ActionResult<CategoryDto>> Create(CategoryCreateDto createCategoryDto)
         {

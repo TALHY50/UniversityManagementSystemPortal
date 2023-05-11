@@ -58,6 +58,7 @@ namespace UniversityManagementSystemPortal.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = userRoleDto.Id }, userRoleDto);
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromQuery] Guid id, CreateUserRoleDto createUserRoleDto)
         {

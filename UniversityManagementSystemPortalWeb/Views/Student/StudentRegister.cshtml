@@ -1,0 +1,181 @@
+﻿@using UniversityManagementSystemPortal.Enum;
+@using UniversityManagementSystemPortalWeb.ViewModels;
+@model StudentUserViewModel
+
+@{
+    ViewBag.Title = "Student Registration";
+}
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        h3 {
+            color: #444;
+        }
+
+        form {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #f7f7f7;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #submitBtn {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Student Registration</h1>
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+    }
+    <h1>Student Registration</h1>
+    <form id="registrationForm" asp-controller="Student" asp-action="StudentRegister" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <h3>Personal Details</h3>
+        <div>
+            <label asp-for="userDto.FirstName">First Name</label>
+            <input asp-for="userDto.FirstName" name="userDto.FirstName" />
+        </div>
+        <div>
+            <label asp-for="userDto.MiddleName">Middle Name</label>
+            <input asp-for="userDto.MiddleName" name="userDto.MiddleName" />
+        </div>
+        <div>
+            <label asp-for="userDto.LastName">Last Name</label>
+            <input asp-for="userDto.LastName" name="userDto.LastName" />
+        </div>
+        <div>
+            <label asp-for="userDto.MobileNo">Mobile No</label>
+            <input asp-for="userDto.MobileNo" name="userDto.MobileNo" />
+        </div>
+        <div>
+            <label asp-for="userDto.DateOfBirth">Date of Birth</label>
+            <input type="datetime" asp-for="userDto.DateOfBirth" name="userDto.DateOfBirth" />
+        </div>
+        <div>
+            <label asp-for="userDto.BloodGroup">Blood Group</label>
+            <select asp-for="userDto.BloodGroup" asp-items="Html.GetEnumSelectList<BloodGroup>()" name="userDto.BloodGroup"></select>
+        </div>
+        <div>
+            <label asp-for="userDto.Gender">Gender</label>
+            <select asp-for="userDto.Gender" asp-items="Html.GetEnumSelectList<Gender>()" name="userDto.Gender"></select>
+        </div>
+        <div>
+            <label asp-for="userDto.Email">Email</label>
+            <input type="email" asp-for="userDto.Email" name="userDto.Email" />
+        </div>
+        <div>
+            <label asp-for="userDto.Username">Username</label>
+            <input asp-for="userDto.Username" name="userDto.Username" />
+        </div>
+        <div>
+            <label asp-for="userDto.Password">Password</label>
+            <input type="password" asp-for="userDto.Password" name="userDto.Password" />
+        </div>
+        <input type="hidden" asp-for="studentDto.UserId" name="studentDto.UserId" />
+        <h3>Student Details</h3>
+        <div>
+            <label asp-for="studentDto.AdmissionNo">Admission Number</label>
+            <input asp-for="studentDto.AdmissionNo" />
+        </div>
+        <div>
+            <label asp-for="studentDto.Category">Category</label>
+            <select asp-for="studentDto.Category" asp-items="Html.GetEnumSelectList<StudentCategory>()"></select>
+        </div>
+        <div>
+            <label asp-for="studentDto.Address">Address</label>
+            <textarea asp-for="studentDto.Address"></textarea>
+        </div>
+        <div>
+            <label asp-for="studentDto.Picture">Picture</label>
+            <input type="file" asp-for="studentDto.Picture" />
+        </div>
+
+        <button type="submit" id="submitBtn">Save Student Details</button>
+    </form>
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+        <script>
+            $(document).ready(function () {
+                $("#registrationForm").on("submit", function (event) {
+                    event.preventDefault();
+
+                    const formElement = document.getElementById("registrationForm");
+                    let ajaxData = new FormData(formElement);
+
+                    $.ajax({
+                        url: "@Url.Action("StudentRegister", "Student")",
+                        type: "POST",
+                        data: ajaxData,
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            RequestVerificationToken: getCsrfToken()
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                                alert("Successfully submitted the form.");
+                            } else {
+                                let errorMessage = "Error submitting the form: " + data.error;
+                                if (data.errors) {
+                                    errorMessage += "\n\nErrors:\n" + data.errors.join("\n");
+                                }
+                                alert(errorMessage);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            if (xhr.status === 400) {
+                                alert("Error: Bad Request. Please check your input data and try again.");
+                            } else {
+                                alert("Error: " + xhr.responseText);
+                            }
+                        }
+                    });
+                });
+
+                function getCsrfToken() {
+                    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                    return tokenInput ? tokenInput.value : '';
+                }
+            });
+        </script>
+    }
+
+</body>

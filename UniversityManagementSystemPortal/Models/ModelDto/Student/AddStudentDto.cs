@@ -8,9 +8,7 @@ namespace UniversityManagementSystemPortal.Models.ModelDto.Student
         public string AdmissionNo { get; set; }
         public StudentCategory? Category { get; set; }
         public string Address { get; set; }
-        public Guid InstituteId { get; set; }
-
-
+        public IFormFile? Picture { get; set; }
 
     }
 }

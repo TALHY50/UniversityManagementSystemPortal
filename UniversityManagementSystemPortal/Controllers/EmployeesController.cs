@@ -50,11 +50,11 @@ namespace UniversityManagementSystemPortal.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] CreateEmployeeCommand createEmployeeCommand)
+        public async Task<IActionResult> Add([FromForm] CreateEmployeeDto createEmployeeDto)
         {
             try
             {
-                var createdEmployee = await _mediator.Send(createEmployeeCommand);
+                var createdEmployee = await _mediator.Send(new CreateEmployeeCommand(createEmployeeDto));
                 return Ok(new { message = "Employee created successfully.", employee = createdEmployee });
             }
             catch (AppException ex)

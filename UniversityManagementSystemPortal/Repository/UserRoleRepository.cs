@@ -71,6 +71,13 @@ namespace UniversityManagementSystemPortal.Repository
             _context.UserRoles.Remove(userRole);
             await SaveChangesAsync();
         }
+        public async Task<UserRole> GetByRoleNameAsync(string roleName)
+        {
+            return await _context.UserRoles
+                .Include(ur => ur.Role)
+                .SingleOrDefaultAsync(ur => ur.Role.Name == roleName);
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;

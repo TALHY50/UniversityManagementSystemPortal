@@ -1,0 +1,55 @@
+﻿@using UniversityManagementSystemPortal.Enum;
+@model UniversityManagementSystemPortal.ModelDto.UserDto.RegistorUserDto
+@{
+    ViewData["Title"] = "Registration Form";
+}
+
+<form asp-action="Index" asp-controller="Student" method="post" enctype="multipart/form-data">
+    <section>
+        <h2>Personal Details</h2>
+        <label asp-for="FirstName">First Name:</label>
+        <input type="text" asp-for="FirstName" required>
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+
+        <label asp-for="MiddleName">Middle Name:</label>
+        <input type="text" asp-for="MiddleName">
+        <span asp-validation-for="MiddleName" class="text-danger"></span>
+
+        <label asp-for="LastName">Last Name:</label>
+        <input type="text" asp-for="LastName">
+        <span asp-validation-for="LastName" class="text-danger"></span>
+
+        <label asp-for="MobileNo">Mobile No:</label>
+        <input type="text" asp-for="MobileNo">
+        <span asp-validation-for="MobileNo" class="text-danger"></span>
+
+        <label asp-for="DateOfBirth">Date of Birth:</label>
+        <input type="date" asp-for="DateOfBirth">
+        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+
+        <label asp-for="BloodGroup">Blood Group:</label>
+        <select asp-for="BloodGroup" asp-items="Html.GetEnumSelectList<BloodGroup>()">
+            <option value="">Select Blood Group</option>
+        </select>
+        <span asp-validation-for="BloodGroup" class="text-danger"></span>
+
+        <label asp-for="Gender">Gender:</label>
+        <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()">
+            <option value="">Select Gender</option>
+        </select>
+        <span asp-validation-for="Gender" class="text-danger"></span>
+
+        <label asp-for="Email">Email:</label>
+        <input type="email" asp-for="Email" required>
+        <span asp-validation-for="Email" class="text-danger"></span>
+
+        <label asp-for="Username">Username:</label>
+        <input type="text" asp-for="Username" required>
+        <span asp-validation-for="Username" class="text-danger"></span>
+
+        <label asp-for="Password">Password:</label>
+        <input type="password" asp-for="Password" required>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </section>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

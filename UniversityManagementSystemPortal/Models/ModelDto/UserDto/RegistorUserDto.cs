@@ -5,8 +5,9 @@ namespace UniversityManagementSystemPortal.ModelDto.UserDto
 {
     public class RegistorUserDto
     {
-       
-        public string FirstName { get; set; } = null!;
+        public Guid Id { get; set; } // Add this line
+
+        public string FirstName { get; set; } 
 
         
         public string? MiddleName { get; set; }
@@ -27,11 +28,10 @@ namespace UniversityManagementSystemPortal.ModelDto.UserDto
         [EnumDataType(typeof(Gender))]
         public Gender Gender { get; set; }
 
-        public string Email { get; set; } = null!;
+        public string Email { get; set; }
+        public string Username { get; set; } 
 
-        public string Username { get; set; } = null!;
-
-        public string Password { get; set; } = null!;
+        public string Password { get; set; } 
 
     }
 

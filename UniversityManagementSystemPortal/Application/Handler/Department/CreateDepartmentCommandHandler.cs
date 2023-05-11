@@ -27,7 +27,7 @@ namespace UniversityManagementSystemPortal
         {
             try
             {
-                var existingDepartment = await _departmentRepository.GetDepartmentByNameAsync(request.Name);
+                var existingDepartment = await _departmentRepository.GetDepartmentByNameAsync(request.departmentCreateDto.Name);
                 if (existingDepartment != null)
                 {
                     throw new AppException("Department with the same name already exists.");

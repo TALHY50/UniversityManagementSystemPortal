@@ -37,7 +37,9 @@ namespace UniversityManagementSystemPortal
             CreateMap<AddStudentCommand, Student>()
               .ForMember(dest => dest.Id, opt => opt.Ignore())
               .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
-
+            CreateMap<AddStudentDto, Student>()
+             .ForMember(dest => dest.Id, opt => opt.Ignore())
+             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
             //CreateMap<Student, AddStudentDto>();
 
             CreateMap<UpdateStudentDto, Student>();

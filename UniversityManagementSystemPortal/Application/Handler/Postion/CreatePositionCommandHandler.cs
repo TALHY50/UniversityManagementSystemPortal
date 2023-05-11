@@ -6,7 +6,7 @@ using UniversityManagementSystemPortal.IdentityServices;
 using UniversityManagementSystemPortal.Interfaces;
 using UniversityManagementSystemPortal.ModelDto.Position;
 
-namespace UniversityManagementSystemPortal.Application.Handler.Postion
+namespace UniversityManagementSystemPortal
 {
     public class CreatePositionCommandHandler : IRequestHandler<CreatePositionCommand, PositionDto>
     {

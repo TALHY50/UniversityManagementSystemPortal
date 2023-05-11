@@ -61,22 +61,24 @@ namespace UniversityManagementSystemPortal.Repository
                 .Include(i => i.User)
                 .Where(i => i.InstituteId == instituteId)
                 .ToListAsync();
-        }      
+        }
         public async Task<Guid?> GetInstituteIdByActiveUserId(Guid activeUserId)
         {
             var instituteAdmin = await _context.InstituteAdmins
                 .FirstOrDefaultAsync(i => i.UserId == activeUserId);
-            return instituteAdmin?.InstituteId;
+
+            if (instituteAdmin == null)
+            {
+                return null;
+            }
+
+            return instituteAdmin.InstituteId;
         }
+
         public async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }
 
     }
-
-
-
-
-
 }

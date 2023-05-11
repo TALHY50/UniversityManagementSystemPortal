@@ -54,7 +54,7 @@ namespace UniversityManagementSystemPortal.Repository
 
             student.Id = Guid.NewGuid();
             _dbContext.Students.Add(student);
-            await SaveChangesAsync();
+          await  _dbContext.SaveChangesAsync();
             return student;
         }
         public async Task<Student> Update(Student student)

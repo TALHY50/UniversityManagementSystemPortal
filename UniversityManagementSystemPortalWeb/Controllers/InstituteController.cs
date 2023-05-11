@@ -67,7 +67,7 @@ namespace UniversityManagementSystemPortalWeb.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPost]
         public async Task<IActionResult> Update(InstituteUpdateDto instituteUpdateDto)
         {
             if (!ModelState.IsValid)

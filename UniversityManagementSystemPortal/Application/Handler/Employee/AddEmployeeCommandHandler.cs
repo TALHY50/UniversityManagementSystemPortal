@@ -35,11 +35,11 @@ namespace UniversityManagementSystemPortal
         {
             try
             {
-                var employeeNoExists = await _employeeRepository.EmployeeNoExistsAsync(request.EmployeeNo);
+                var employeeNoExists = await _employeeRepository.EmployeeNoExistsAsync(request.createEmployeeDto.EmployeeNo);
 
                 if (employeeNoExists)
                 {
-                    throw new AppException($"Employee with employee number {request.EmployeeNo} already exists.");
+                    throw new AppException($"Employee with employee number {request.createEmployeeDto.EmployeeNo} already exists.");
                 }
 
                 var userId = _identityServices.GetUserId();
@@ -49,12 +49,12 @@ namespace UniversityManagementSystemPortal
                     throw new UnauthorizedAccessException("You must be logged in to perform this action.");
                 }
 
-                var employee = _mapper.Map<Employee>(request);
+                var employee = _mapper.Map<Employee>(request.createEmployeeDto);
                 employee.CreatedBy = userId.Value;
 
-                if (request.Picture != null)
+                if (request.createEmployeeDto.Picture != null)
                 {
-                    var fileName = await _pictureManager.Upload(request.Picture);
+                    var fileName = await _pictureManager.Upload(request.createEmployeeDto.Picture);
                     employee.ProfilePath = fileName;
                 }
 
@@ -70,6 +70,7 @@ namespace UniversityManagementSystemPortal
                 throw;
             }
         }
+
 
 
     }
