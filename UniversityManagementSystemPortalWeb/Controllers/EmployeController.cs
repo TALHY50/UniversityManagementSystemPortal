@@ -5,15 +5,14 @@ using System.Net.Http.Headers;
 using System.Text;
 using UniversityManagementSystemPortalWeb.ViewModels;
 using UniversityManagementSystemPortal.ModelDto.Employee;
-using UniversityManagementSystemPortal.ModelDto.Position;
 using UniversityManagementSystemPortal.Models.ModelDto.Department;
 using UniversityManagementSystemPortal.Models.ModelDto.Position;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using UniversityManagementSystemPortal.Application.Handler.Category;
-using UniversityManagementSystemPortal.Models.ModelDto.Category;
+using UniversityManagementSystemPortalWeb.Authorization;
 
 namespace UniversityManagementSystemPortalWeb.Controllers
 {
+    [CustomAuth("Admin")]
     public class EmployeController : Controller
     {
         private readonly IHttpClientFactory _clientFactory;
@@ -39,6 +38,7 @@ namespace UniversityManagementSystemPortalWeb.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+ 
         public async Task<IActionResult> EmployeeRegister([FromForm] EmployeeUserViewModel model)
         {
             if (ModelState.IsValid)
@@ -162,6 +162,7 @@ namespace UniversityManagementSystemPortalWeb.Controllers
                 return (false, Guid.Empty, new List<string> { ex.Message });
             }
         }
+       
         private async Task<(bool success, List<string> errors)> SaveEmployeeAsync(CreateEmployeeDto createEmployeeDto)
         {
             try

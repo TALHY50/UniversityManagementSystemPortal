@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
+using UniversityManagementSystemPortal;
+using UniversityManagementSystemPortal.Authorization;
 using UniversityManagementSystemPortal.ModelDto.NewFolder;
 using UniversityManagementSystemPortal.ModelDto.UserDto;
 using UniversityManagementSystemPortal.Models.ModelDto.UserDto;
@@ -27,46 +32,46 @@ namespace UniversityManagementSystemPortalWeb.Controllers
         {
             return View();
         }
-
         [HttpPost]
-
-        public ActionResult Login(Login login)
+        public async Task<ActionResult> Login(Login login)
         {
             if (ModelState.IsValid)
             {
                 using (var handler = new HttpClientHandler())
                 {
                     handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
-
                     using (var client = new HttpClient(handler))
                     {
                         client.BaseAddress = new Uri(url);
-                        client.DefaultRequestHeaders.Clear();
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                         var jsonPayload = JsonConvert.SerializeObject(login);
-
                         var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                        // Send the HTTP POST request to the authentication API
-                        HttpResponseMessage responseMessage = client.PostAsync(url, content).Result;
+                        HttpResponseMessage responseMessage = await client.PostAsync(url, content);
 
                         if (responseMessage.IsSuccessStatusCode)
                         {
-                            // Parse the response to get the JWT token
-                            var responseContent = responseMessage.Content.ReadAsStringAsync().Result;
-                            Console.WriteLine(responseContent); // Log the response content
+                            var responseContent = await responseMessage.Content.ReadAsStringAsync();
+                            Console.WriteLine(responseContent);
 
                             var apiResponse = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
                             var token = apiResponse?.LoginView;
 
-
-
-                            // Check if the user object is null
                             if (token != null && token.Token != null)
                             {
-                                // Store the token in a session variable
-                                HttpContext.Session.SetString("Token", token.Token);
+                                var identity = new ClaimsIdentity(new[]
+                                 {
+                                new Claim(ClaimTypes.Name, login.Username),
+                                new Claim("Token", token.Token),
+                                new Claim("UserId", token.UserId.ToString()),
+                                new Claim(ClaimTypes.Role, token.Roles.ToString())
+
+                                }, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                                var principal = new ClaimsPrincipal(identity);
+                                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                                 return RedirectToAction("EmployeeRegister", "Employe");
                             }
@@ -79,7 +84,7 @@ namespace UniversityManagementSystemPortalWeb.Controllers
                         else
                         {
                             var statusCode = responseMessage.StatusCode;
-                            var responseContent = responseMessage.Content.ReadAsStringAsync().Result;
+                            var responseContent = await responseMessage.Content.ReadAsStringAsync();
 
                             ViewBag.Message = $"Invalid Username or Password. Status Code: {statusCode}, Response: {responseContent}";
                             return View();
@@ -92,6 +97,7 @@ namespace UniversityManagementSystemPortalWeb.Controllers
                 return View();
             }
         }
+
         public IActionResult Registor()
         {
             return View();
@@ -139,10 +145,10 @@ namespace UniversityManagementSystemPortalWeb.Controllers
 
 
         public IActionResult Logout()
-            {
-                HttpContext.Session.Clear();
-                return RedirectToAction("Index", "Home");
-            }
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
+        }
 
     }
 }
